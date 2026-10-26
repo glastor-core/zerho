@@ -117,3 +117,81 @@ editLink: {
 
 Esto generará automáticamente un enlace directo con icono al archivo `.md` específico en GitHub al
 principio de cada documento.
+
+---
+
+## Auto-Documentación de Código (`apiDocs`)
+
+Zerho incorpora un motor nativo de introspección que analiza tus archivos TypeScript fuente mediante
+`deno doc --json` y genera automáticamente una página completa de referencia en Markdown:
+
+```ts [zerho.config.ts]
+apiDocs: {
+  entrypoints: [
+    "./src/core/builder.ts",
+    "./src/core/markdown.ts",
+    "./src/core/search.ts"
+  ],
+  route: "/reference",
+  title: "Referencia de API (Deno Doc)",
+}
+```
+
+- **Firmas Tipadas**: Extrae automáticamente tipos de retorno, modificadores de visibilidad,
+  propiedades opcionales y valores por defecto.
+- **JSDoc Parsing**: Convierte etiquetas `@param` y `@returns` en tablas GFM legibles y
+  estandarizadas.
+- **Cero Build Steps Externos**: Se ejecuta directamente con el comando `deno task build`.
+
+---
+
+## Internacionalización Multilingüe (`locales`)
+
+Configura soporte i18n declarando prefijos de ruta con sus respectivas traducciones de navegación,
+barra lateral y metadatos:
+
+```ts [zerho.config.ts]
+locales: {
+  root: {
+    label: "Español",
+    lang: "es",
+  },
+  en: {
+    label: "English",
+    lang: "en",
+    link: "/en/",
+    title: "Zerho",
+    tagline: "Pro-grade documentation engine built natively for Deno 2",
+    nav: [
+      { text: "Guide", link: "/en/guide/getting-started" },
+      { text: "Reference", link: "/reference" }
+    ],
+    sidebar: {
+      "/en/guide/": [
+        {
+          text: "Getting Started",
+          items: [
+            { text: "Introduction", link: "/en/guide/getting-started" },
+            { text: "Features", link: "/en/guide/markdown-features" }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+El selector de idioma en la barra de navegación permite a los usuarios alternar fluidamente entre
+versiones preservando el estado de la aplicación.
+
+---
+
+## Soporte para Agentes de IA (`llms.txt`)
+
+Durante la compilación, Zerho genera automáticamente dos archivos estándar en la raíz de tu sitio:
+
+1. **`/llms.txt`**: Manifiesto estructurado según la especificación de
+   [llmstxt.org](https://llmstxt.org) que lista todas las páginas indexadas con títulos y
+   descripciones concisas.
+2. **`/llms-full.txt`**: Documentación técnica consolidada en un único archivo Markdown limpio (sin
+   HTML boilerplate), ideal para ingestión en agentes y LLMs con ventanas de contexto extendidas.

@@ -10,7 +10,7 @@ layout: doc
 
 ---
 
-## Índice de Simbolos
+## Índice de Símbolos
 
 - [**BuildOptions**](#buildoptions) (`interface`)
 - [**LlmsPageEntry**](#llmspageentry) (`interface`)
@@ -32,113 +32,121 @@ layout: doc
 ---
 
 ## BuildOptions
-**Tipo:** `interface` | **Ubicación:** `builder.ts:8`
+**Tipo:** `interface` | **Ubicación:** `builder.ts:9`
 
-Sin descripción JSDoc proporcionada.
+Options configuring the Zerho static site generator compilation process.
 
 ### Propiedades
 
-| Nombre | Tipo | Descripción |
-| :--- | :--- | :--- |
-| `devMode` | `boolean` | — |
-| `outDir` | `string` | — |
-| `docsDir` | `string` | — |
-| `skipDocgen` | `boolean` | — |
+| Propiedad | Tipo | Opcional | Descripción |
+| :--- | :--- | :--- | :--- |
+| `devMode` | `boolean` | Sí | Run builder in development mode enabling livereload and development banners |
+| `outDir` | `string` | Sí | Output directory path for compiled static assets (defaults to 'dist') |
+| `docsDir` | `string` | Sí | Source documentation directory containing Markdown files (defaults to 'docs') |
+| `skipDocgen` | `boolean` | Sí | Skip automatic generation of API reference documentation via deno doc |
 
 ---
 
 ## LlmsPageEntry
-**Tipo:** `interface` | **Ubicación:** `builder.ts:15`
+**Tipo:** `interface` | **Ubicación:** `builder.ts:21`
 
-Sin descripción JSDoc proporcionada.
+Represents an indexed page entry prepared for LLM and agent ingestion.
 
 ### Propiedades
 
-| Nombre | Tipo | Descripción |
-| :--- | :--- | :--- |
-| `title` | `string` | — |
-| `description` | `string` | — |
-| `route` | `string` | — |
-| `rawContent` | `string` | — |
+| Propiedad | Tipo | Opcional | Descripción |
+| :--- | :--- | :--- | :--- |
+| `title` | `string` | No | Title of the document |
+| `description` | `string` | No | Summary description extracted from frontmatter or generated |
+| `route` | `string` | No | Canonical route URL path |
+| `rawContent` | `string` | No | Clean Markdown content ready for LLM consumption |
 
 ---
 
 ## generateSitemapXml
-**Tipo:** `function` | **Ubicación:** `builder.ts:25`
+**Tipo:** `function` | **Ubicación:** `builder.ts:38`
 
-Generates standards-compliant sitemap.xml for SEO crawlers.
+Generates standards-compliant sitemap.xml for search engines and SEO crawlers.
 
 ```typescript
-function generateSitemapXml(routes: any, arg: any): string;
+function generateSitemapXml(routes: string[], baseUrl = "https://zerho.xyz"): string;
 ```
+
+**Retorna:** `string` — Formatted XML sitemap string
 
 ### Parámetros
 
-| Parámetro | Tipo | Opcional |
-| :--- | :--- | :--- |
-| `routes` | `any` | No |
-| `arg` | `any` | No |
+| Parámetro | Tipo | Opcional | Defecto | Descripción |
+| :--- | :--- | :--- | :--- | :--- |
+| `routes` | `string[]` | No | — | List of canonical URL paths to include in the sitemap |
+| `baseUrl` | `string` | Sí | `"https://zerho.xyz"` | Canonical production domain origin |
 
 ---
 
 ## generateRobotsTxt
-**Tipo:** `function` | **Ubicación:** `builder.ts:42`
+**Tipo:** `function` | **Ubicación:** `builder.ts:57`
 
 Generates robots.txt pointing to the production sitemap.
 
 ```typescript
-function generateRobotsTxt(arg: any): string;
+function generateRobotsTxt(baseUrl = "https://zerho.xyz"): string;
 ```
+
+**Retorna:** `string` — Formatted robots.txt string
 
 ### Parámetros
 
-| Parámetro | Tipo | Opcional |
-| :--- | :--- | :--- |
-| `arg` | `any` | No |
+| Parámetro | Tipo | Opcional | Defecto | Descripción |
+| :--- | :--- | :--- | :--- | :--- |
+| `baseUrl` | `string` | Sí | `"https://zerho.xyz"` | Canonical production domain origin |
 
 ---
 
 ## generateLlmsTxt
-**Tipo:** `function` | **Ubicación:** `builder.ts:49`
+**Tipo:** `function` | **Ubicación:** `builder.ts:69`
 
 Generates /llms.txt according to the llmstxt.org specification for LLM agents.
 
 ```typescript
-function generateLlmsTxt(pages: any, arg: any, arg: any, arg: any): string;
+function generateLlmsTxt(pages: LlmsPageEntry[], baseUrl = "https://zerho.xyz", siteTitle = "Zerho", siteDescription = "El motor de documentación de nivel pro diseñado nativamente para Deno & Deno Deploy"): string;
 ```
+
+**Retorna:** `string` — Formatted Markdown llms.txt string
 
 ### Parámetros
 
-| Parámetro | Tipo | Opcional |
-| :--- | :--- | :--- |
-| `pages` | `any` | No |
-| `arg` | `any` | No |
-| `arg` | `any` | No |
-| `arg` | `any` | No |
+| Parámetro | Tipo | Opcional | Defecto | Descripción |
+| :--- | :--- | :--- | :--- | :--- |
+| `pages` | `LlmsPageEntry[]` | No | — | Indexed documentation pages |
+| `baseUrl` | `string` | Sí | `"https://zerho.xyz"` | Canonical production domain origin |
+| `siteTitle` | `string` | Sí | `"Zerho"` | Site brand title |
+| `siteDescription` | `string` | Sí | `"El motor de documentación de nivel pro diseñado nativamente para Deno & Deno Deploy"` | Concise tagline or description |
 
 ---
 
 ## generateLlmsFullTxt
-**Tipo:** `function` | **Ubicación:** `builder.ts:85`
+**Tipo:** `function` | **Ubicación:** `builder.ts:109`
 
 Generates /llms-full.txt containing the entire concatenated documentation for direct LLM ingestion.
 
 ```typescript
-function generateLlmsFullTxt(pages: any, arg: any, arg: any): string;
+function generateLlmsFullTxt(pages: LlmsPageEntry[], baseUrl = "https://zerho.xyz", siteTitle = "Zerho"): string;
 ```
+
+**Retorna:** `string` — Consolidated Markdown documentation string
 
 ### Parámetros
 
-| Parámetro | Tipo | Opcional |
-| :--- | :--- | :--- |
-| `pages` | `any` | No |
-| `arg` | `any` | No |
-| `arg` | `any` | No |
+| Parámetro | Tipo | Opcional | Defecto | Descripción |
+| :--- | :--- | :--- | :--- | :--- |
+| `pages` | `LlmsPageEntry[]` | No | — | Indexed documentation pages |
+| `baseUrl` | `string` | Sí | `"https://zerho.xyz"` | Canonical production domain origin |
+| `siteTitle` | `string` | Sí | `"Zerho"` | Site brand title |
 
 ---
 
 ## resolveConfigForPath
-**Tipo:** `function` | **Ubicación:** `builder.ts:111`
+**Tipo:** `function` | **Ubicación:** `builder.ts:138`
 
 Resolves effective configuration applying locale overrides if currentPath belongs to a registered locale.
 
@@ -146,171 +154,202 @@ Resolves effective configuration applying locale overrides if currentPath belong
 function resolveConfigForPath(baseConfig: ZerhoConfig, path: string): ZerhoConfig;
 ```
 
+**Retorna:** `ZerhoConfig` — Localized configuration object
+
 ### Parámetros
 
-| Parámetro | Tipo | Opcional |
-| :--- | :--- | :--- |
-| `baseConfig` | `ZerhoConfig` | No |
-| `path` | `string` | No |
+| Parámetro | Tipo | Opcional | Defecto | Descripción |
+| :--- | :--- | :--- | :--- | :--- |
+| `baseConfig` | `ZerhoConfig` | No | — | Global root Zerho configuration |
+| `path` | `string` | No | — | Current route path being rendered |
 
 ---
 
 ## buildSite
-**Tipo:** `function` | **Ubicación:** `builder.ts:136`
+**Tipo:** `function` | **Ubicación:** `builder.ts:168`
 
-Sin descripción JSDoc proporcionada.
+Compiles Markdown documentation into static HTML, CSS, search index, and LLM endpoints.
 
 ```typescript
-function buildSite(arg: any): Promise;
+function buildSite(options = {}): Promise<void>;
 ```
+
+**Retorna:** `Promise<void>` — Promise resolving when site compilation is complete
 
 ### Parámetros
 
-| Parámetro | Tipo | Opcional |
-| :--- | :--- | :--- |
-| `arg` | `any` | No |
+| Parámetro | Tipo | Opcional | Defecto | Descripción |
+| :--- | :--- | :--- | :--- | :--- |
+| `options` | `BuildOptions` | Sí | `{}` | Build configuration options |
 
 ---
 
 ## TocItem
-**Tipo:** `interface` | **Ubicación:** `markdown.ts:14`
+**Tipo:** `interface` | **Ubicación:** `markdown.ts:15`
 
-Sin descripción JSDoc proporcionada.
+Represents an entry in the document's Table of Contents (TOC) hierarchy.
 
 ### Propiedades
 
-| Nombre | Tipo | Descripción |
-| :--- | :--- | :--- |
-| `id` | `string` | — |
-| `text` | `string` | — |
-| `level` | `number` | — |
+| Propiedad | Tipo | Opcional | Descripción |
+| :--- | :--- | :--- | :--- |
+| `id` | `string` | No | Unique anchor fragment identifier |
+| `text` | `string` | No | Visible heading title text |
+| `level` | `number` | No | Heading depth level (e.g. 2 for h2, 3 for h3) |
 
 ---
 
 ## Frontmatter
-**Tipo:** `interface` | **Ubicación:** `markdown.ts:20`
+**Tipo:** `interface` | **Ubicación:** `markdown.ts:25`
 
-Sin descripción JSDoc proporcionada.
+Schema for document YAML frontmatter metadata and layout settings.
 
 ### Propiedades
 
-| Nombre | Tipo | Descripción |
-| :--- | :--- | :--- |
-| `title` | `string` | — |
-| `description` | `string` | — |
-| `layout` | `unknown` | — |
-| `hero` | `unknown` | — |
-| `features` | `Array` | — |
-| `editLink` | `boolean` | — |
-| `prev` | `unknown` | — |
-| `next` | `unknown` | — |
+| Propiedad | Tipo | Opcional | Descripción |
+| :--- | :--- | :--- | :--- |
+| `title` | `string` | Sí | Document page title |
+| `description` | `string` | Sí | Meta description for search engines and SEO |
+| `layout` | `doc \| home \| page` | Sí | Layout mode: 'doc' for documentation with sidebar, 'home' for hero landing, 'page' for generic |
+| `hero` | `any` | Sí | Hero banner configuration for landing pages |
+| `features` | `Array<any>` | Sí | Feature cards displayed on landing pages |
+| `editLink` | `boolean` | Sí | Whether to render an edit link pointing to the repository source |
+| `prev` | `any` | Sí | Previous page navigation link |
+| `next` | `any` | Sí | Next page navigation link |
 
 ---
 
 ## ParsedMarkdown
-**Tipo:** `interface` | **Ubicación:** `markdown.ts:45`
+**Tipo:** `interface` | **Ubicación:** `markdown.ts:59`
 
-Sin descripción JSDoc proporcionada.
+Result of compiling a Markdown document with frontmatter, HTML, and analytics.
 
 ### Propiedades
 
-| Nombre | Tipo | Descripción |
-| :--- | :--- | :--- |
-| `frontmatter` | `Frontmatter` | — |
-| `html` | `string` | — |
-| `toc` | `unknown` | — |
-| `readingTimeMin` | `number` | — |
-| `wordCount` | `number` | — |
-| `plainText` | `string` | — |
+| Propiedad | Tipo | Opcional | Descripción |
+| :--- | :--- | :--- | :--- |
+| `frontmatter` | `Frontmatter` | No | Extracted YAML frontmatter metadata |
+| `html` | `string` | No | Rendered HTML output with syntax highlighting and callouts |
+| `toc` | `TocItem[]` | No | Extracted Table of Contents hierarchy for the right sidebar |
+| `readingTimeMin` | `number` | No | Estimated reading time in minutes |
+| `wordCount` | `number` | No | Total word count of the body |
+| `plainText` | `string` | No | Plain text representation used for full-text search indexing |
 
 ---
 
 ## processCodeGroups
-**Tipo:** `function` | **Ubicación:** `markdown.ts:173`
+**Tipo:** `function` | **Ubicación:** `markdown.ts:195`
 
-Transforms VitePress-style ::: code-group containers into tabbed code blocks
+Transforms VitePress-style `::: code-group` blocks into tabbed interactive HTML code panels.
 
 ```typescript
 function processCodeGroups(markdown: string): string;
 ```
 
+**Retorna:** `string` — Transformed Markdown with HTML tab structures
+
 ### Parámetros
 
-| Parámetro | Tipo | Opcional |
-| :--- | :--- | :--- |
-| `markdown` | `string` | No |
+| Parámetro | Tipo | Opcional | Defecto | Descripción |
+| :--- | :--- | :--- | :--- | :--- |
+| `markdown` | `string` | No | — | Raw Markdown content containing code-group directives |
 
 ---
 
 ## parseMarkdown
-**Tipo:** `function` | **Ubicación:** `markdown.ts:248`
+**Tipo:** `function` | **Ubicación:** `markdown.ts:275`
 
-Sin descripción JSDoc proporcionada.
+Parses raw Markdown text into structured HTML, extracting frontmatter, TOC, and reading time.
 
 ```typescript
-function parseMarkdown(rawContent: string): Promise;
+function parseMarkdown(rawContent: string): Promise<ParsedMarkdown>;
 ```
+
+**Retorna:** `Promise<ParsedMarkdown>` — Promise resolving to the parsed document metadata and HTML
 
 ### Parámetros
 
-| Parámetro | Tipo | Opcional |
-| :--- | :--- | :--- |
-| `rawContent` | `string` | No |
+| Parámetro | Tipo | Opcional | Defecto | Descripción |
+| :--- | :--- | :--- | :--- | :--- |
+| `rawContent` | `string` | No | — | Raw Markdown file content including frontmatter |
 
 ---
 
 ## SearchDocument
-**Tipo:** `interface` | **Ubicación:** `search.ts:0`
+**Tipo:** `interface` | **Ubicación:** `search.ts:1`
 
-Sin descripción JSDoc proporcionada.
+Represents an indexed document item in the Zerho client-side search engine.
 
 ### Propiedades
 
-| Nombre | Tipo | Descripción |
-| :--- | :--- | :--- |
-| `id` | `string` | — |
-| `url` | `string` | — |
-| `title` | `string` | — |
-| `section` | `string` | — |
-| `content` | `string` | — |
+| Propiedad | Tipo | Opcional | Descripción |
+| :--- | :--- | :--- | :--- |
+| `id` | `string` | No | Unique document identifier hash or slug |
+| `url` | `string` | No | Canonical link URL |
+| `title` | `string` | No | Primary document or section title |
+| `section` | `string` | Sí | Sub-section heading title if applicable |
+| `content` | `string` | No | Plain text content indexed for term matching |
 
 ---
 
 ## SearchResult
-**Tipo:** `interface` | **Ubicación:** `search.ts:8`
+**Tipo:** `interface` | **Ubicación:** `search.ts:15`
 
-Sin descripción JSDoc proporcionada.
+Represents a weighted search query hit returned by the search engine.
 
 ### Propiedades
 
-| Nombre | Tipo | Descripción |
-| :--- | :--- | :--- |
-| `item` | `SearchDocument` | — |
-| `score` | `number` | — |
+| Propiedad | Tipo | Opcional | Descripción |
+| :--- | :--- | :--- | :--- |
+| `item` | `SearchDocument` | No | The matching search document |
+| `score` | `number` | No | Relevance score calculated by exact and partial term matches |
 
 ---
 
 ## SearchIndexer
-**Tipo:** `class` | **Ubicación:** `search.ts:13`
+**Tipo:** `class` | **Ubicación:** `search.ts:23`
 
-Sin descripción JSDoc proporcionada.
+In-memory client-side and server-side search indexer and query ranking engine.
 
 ### Propiedades
 
-| Nombre | Visibilidad | Tipo |
-| :--- | :--- | :--- |
-| `docs` | `private` | `unknown` |
+| Propiedad | Visibilidad | Tipo | Descripción |
+| :--- | :--- | :--- | :--- |
+| `docs` | `private` | `SearchDocument[]` | — |
 
 ### Métodos
 
 #### `addDocument(doc: SearchDocument): void`
 
-#### `getDocuments(): void`
+Adds a document to the search index collection.
+
+| Parámetro | Tipo | Opcional | Defecto | Descripción |
+| :--- | :--- | :--- | :--- | :--- |
+| `doc` | `SearchDocument` | No | — | Search document to index |
+
+#### `getDocuments(): SearchDocument[]`
+
+Returns a copy of all currently indexed documents.
 
 #### `toJSON(): string`
 
+Serializes the search index into formatted JSON for client download.
+
 #### `static fromJSON(jsonStr: string): SearchIndexer`
 
-#### `search(query: string, arg: any): void`
+Reconstructs a SearchIndexer instance from serialized JSON.
+
+| Parámetro | Tipo | Opcional | Defecto | Descripción |
+| :--- | :--- | :--- | :--- | :--- |
+| `jsonStr` | `string` | No | — | Serialized JSON documents array |
+
+#### `search(query: string, limit = 10): SearchResult[]`
+
+Executes a weighted multi-term search query across titles, sections, and bodies.
+
+| Parámetro | Tipo | Opcional | Defecto | Descripción |
+| :--- | :--- | :--- | :--- | :--- |
+| `query` | `string` | No | — | Search keywords or phrase |
+| `limit` | `number` | Sí | `10` | Maximum number of ranked results to return |
 
 ---

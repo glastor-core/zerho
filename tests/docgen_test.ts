@@ -19,5 +19,6 @@ Deno.test("Docgen: Format extracted symbols to structured Markdown", async () =>
   assertStringIncludes(markdown, "SearchIndexer");
   assertStringIncludes(markdown, "SearchDocument");
   assertStringIncludes(markdown, "addDocument");
-  assertStringIncludes(markdown, "| Nombre |");
+  assertStringIncludes(markdown, "| Propiedad |");
+  assertStringIncludes(markdown, "| Parámetro |");
 });

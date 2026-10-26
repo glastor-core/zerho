@@ -41,7 +41,8 @@ Este proyecto se adhiere a:
 
 ### ✨ Added
 
-- **ai-i18n:** implement llms.txt standard, deno doc auto-reference, kv search insights, and declarative i18n (b2da55c)
+- **ai-i18n:** implement llms.txt standard, deno doc auto-reference, kv search insights, and
+  declarative i18n (b2da55c)
 
 ---
 ## [1.5.0] - 2026-10-26
@@ -49,13 +50,15 @@ Este proyecto se adhiere a:
 ### ✨ Added
 
 - **dx:** implement polyglot code-groups, dynamic sitemaps, and security hardening (53920ad)
-
 ---
+
 ## [1.4.0] - 2026-10-26
 
 ### ✨ Added
 
-- **quality:** implement native git hooks and conventional commit verification without npm dependencies (2972b1e)
+- **quality:** implement native git hooks and conventional commit verification without npm
+  dependencies (2972b1e)
+
 ---
 
 ## [1.3.0] - 2026-10-26

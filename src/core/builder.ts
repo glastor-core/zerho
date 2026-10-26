@@ -6,22 +6,35 @@ import { SearchIndexer } from "./search.ts";
 import { renderPage } from "../templates/layout.ts";
 import { generateApiDocs } from "./docgen.ts";
 
+/** Options configuring the Zerho static site generator compilation process. */
 export interface BuildOptions {
+  /** Run builder in development mode enabling livereload and development banners */
   devMode?: boolean;
+  /** Output directory path for compiled static assets (defaults to 'dist') */
   outDir?: string;
+  /** Source documentation directory containing Markdown files (defaults to 'docs') */
   docsDir?: string;
+  /** Skip automatic generation of API reference documentation via deno doc */
   skipDocgen?: boolean;
 }
 
+/** Represents an indexed page entry prepared for LLM and agent ingestion. */
 export interface LlmsPageEntry {
+  /** Title of the document */
   title: string;
+  /** Summary description extracted from frontmatter or generated */
   description: string;
+  /** Canonical route URL path */
   route: string;
+  /** Clean Markdown content ready for LLM consumption */
   rawContent: string;
 }
 
 /**
- * Generates standards-compliant sitemap.xml for SEO crawlers.
+ * Generates standards-compliant sitemap.xml for search engines and SEO crawlers.
+ * @param routes List of canonical URL paths to include in the sitemap
+ * @param baseUrl Canonical production domain origin
+ * @returns Formatted XML sitemap string
  */
 export function generateSitemapXml(routes: string[], baseUrl = "https://zerho.xyz"): string {
   const today = new Date().toISOString().split("T")[0];
@@ -39,6 +52,8 @@ export function generateSitemapXml(routes: string[], baseUrl = "https://zerho.xy
 
 /**
  * Generates robots.txt pointing to the production sitemap.
+ * @param baseUrl Canonical production domain origin
+ * @returns Formatted robots.txt string
  */
 export function generateRobotsTxt(baseUrl = "https://zerho.xyz"): string {
   return `User-agent: *\nAllow: /\n\nSitemap: ${baseUrl}/sitemap.xml\n`;
@@ -46,6 +61,11 @@ export function generateRobotsTxt(baseUrl = "https://zerho.xyz"): string {
 
 /**
  * Generates /llms.txt according to the llmstxt.org specification for LLM agents.
+ * @param pages Indexed documentation pages
+ * @param baseUrl Canonical production domain origin
+ * @param siteTitle Site brand title
+ * @param siteDescription Concise tagline or description
+ * @returns Formatted Markdown llms.txt string
  */
 export function generateLlmsTxt(
   pages: LlmsPageEntry[],
@@ -82,6 +102,10 @@ ${docLinks}
 
 /**
  * Generates /llms-full.txt containing the entire concatenated documentation for direct LLM ingestion.
+ * @param pages Indexed documentation pages
+ * @param baseUrl Canonical production domain origin
+ * @param siteTitle Site brand title
+ * @returns Consolidated Markdown documentation string
  */
 export function generateLlmsFullTxt(
   pages: LlmsPageEntry[],
@@ -108,6 +132,9 @@ ${sections.join("\n\n---\n\n")}
 
 /**
  * Resolves effective configuration applying locale overrides if currentPath belongs to a registered locale.
+ * @param baseConfig Global root Zerho configuration
+ * @param path Current route path being rendered
+ * @returns Localized configuration object
  */
 export function resolveConfigForPath(baseConfig: ZerhoConfig, path: string): ZerhoConfig {
   if (!baseConfig.locales) return baseConfig;
@@ -134,7 +161,12 @@ export function resolveConfigForPath(baseConfig: ZerhoConfig, path: string): Zer
   return baseConfig;
 }
 
-export async function buildSite(options: BuildOptions = {}) {
+/**
+ * Compiles Markdown documentation into static HTML, CSS, search index, and LLM endpoints.
+ * @param options Build configuration options
+ * @returns Promise resolving when site compilation is complete
+ */
+export async function buildSite(options: BuildOptions = {}): Promise<void> {
   const startTime = performance.now();
   const docsDir = options.docsDir || join(Deno.cwd(), "docs");
   const outDir = options.outDir || join(Deno.cwd(), "dist");

@@ -1,31 +1,58 @@
+/** Represents an indexed document item in the Zerho client-side search engine. */
 export interface SearchDocument {
+  /** Unique document identifier hash or slug */
   id: string;
+  /** Canonical link URL */
   url: string;
+  /** Primary document or section title */
   title: string;
+  /** Sub-section heading title if applicable */
   section?: string;
+  /** Plain text content indexed for term matching */
   content: string;
 }
 
+/** Represents a weighted search query hit returned by the search engine. */
 export interface SearchResult {
+  /** The matching search document */
   item: SearchDocument;
+  /** Relevance score calculated by exact and partial term matches */
   score: number;
 }
 
+/** In-memory client-side and server-side search indexer and query ranking engine. */
 export class SearchIndexer {
   private docs: SearchDocument[] = [];
 
+  /**
+   * Adds a document to the search index collection.
+   * @param doc Search document to index
+   */
   addDocument(doc: SearchDocument) {
     this.docs.push(doc);
   }
 
+  /**
+   * Returns a copy of all currently indexed documents.
+   * @returns Array of indexed search documents
+   */
   getDocuments(): SearchDocument[] {
     return [...this.docs];
   }
 
+  /**
+   * Serializes the search index into formatted JSON for client download.
+   * @returns Formatted JSON string of indexed documents
+   */
   toJSON(): string {
     return JSON.stringify(this.docs, null, 2);
   }
 
+  /**
+   * Reconstructs a SearchIndexer instance from serialized JSON.
+   * @param jsonStr Serialized JSON documents array
+   * @returns Populated SearchIndexer instance
+   */
   static fromJSON(jsonStr: string): SearchIndexer {
     const indexer = new SearchIndexer();
     try {
@@ -43,6 +70,12 @@ export class SearchIndexer {
     return indexer;
   }
 
+  /**
+   * Executes a weighted multi-term search query across titles, sections, and bodies.
+   * @param query Search keywords or phrase
+   * @param limit Maximum number of ranked results to return
+   * @returns Ranked array of matching search results
+   */
   search(query: string, limit = 10): SearchResult[] {
     const trimmed = query.trim().toLowerCase();
     if (!trimmed) return [];

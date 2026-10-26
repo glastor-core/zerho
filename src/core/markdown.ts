@@ -12,16 +12,25 @@ await import("prismjs/components/prism-json");
 await import("prismjs/components/prism-yaml");
 await import("prismjs/components/prism-css");
 
+/** Represents an entry in the document's Table of Contents (TOC) hierarchy. */
 export interface TocItem {
+  /** Unique anchor fragment identifier */
   id: string;
+  /** Visible heading title text */
   text: string;
+  /** Heading depth level (e.g. 2 for h2, 3 for h3) */
   level: number;
 }
 
+/** Schema for document YAML frontmatter metadata and layout settings. */
 export interface Frontmatter {
+  /** Document page title */
   title?: string;
+  /** Meta description for search engines and SEO */
   description?: string;
+  /** Layout mode: 'doc' for documentation with sidebar, 'home' for hero landing, 'page' for generic */
   layout?: "doc" | "home" | "page";
+  /** Hero banner configuration for landing pages */
   hero?: {
     name?: string;
     text?: string;
@@ -32,23 +41,34 @@ export interface Frontmatter {
       link: string;
     }>;
   };
+  /** Feature cards displayed on landing pages */
   features?: Array<{
     icon?: string;
     title: string;
     details: string;
   }>;
+  /** Whether to render an edit link pointing to the repository source */
   editLink?: boolean;
+  /** Previous page navigation link */
   prev?: { text: string; link: string };
+  /** Next page navigation link */
   next?: { text: string; link: string };
   [key: string]: unknown;
 }
 
+/** Result of compiling a Markdown document with frontmatter, HTML, and analytics. */
 export interface ParsedMarkdown {
+  /** Extracted YAML frontmatter metadata */
   frontmatter: Frontmatter;
+  /** Rendered HTML output with syntax highlighting and callouts */
   html: string;
+  /** Extracted Table of Contents hierarchy for the right sidebar */
   toc: TocItem[];
+  /** Estimated reading time in minutes */
   readingTimeMin: number;
+  /** Total word count of the body */
   wordCount: number;
+  /** Plain text representation used for full-text search indexing */
   plainText: string;
 }
 
@@ -169,7 +189,9 @@ function processGitHubAlerts(markdown: string): string {
 }
 
 /**
- * Transforms VitePress-style ::: code-group containers into tabbed code blocks
+ * Transforms VitePress-style `::: code-group` blocks into tabbed interactive HTML code panels.
+ * @param markdown Raw Markdown content containing code-group directives
+ * @returns Transformed Markdown with HTML tab structures
  */
 export function processCodeGroups(markdown: string): string {
   const codeGroupRegex = /^:::\s*code-group[ \t]*\r?\n([\s\S]*?)\r?\n:::/gm;
@@ -246,6 +268,11 @@ export function processCodeGroups(markdown: string): string {
   });
 }
 
+/**
+ * Parses raw Markdown text into structured HTML, extracting frontmatter, TOC, and reading time.
+ * @param rawContent Raw Markdown file content including frontmatter
+ * @returns Promise resolving to the parsed document metadata and HTML
+ */
 export async function parseMarkdown(rawContent: string): Promise<ParsedMarkdown> {
   let frontmatter: Frontmatter = {};
   let markdownBody = rawContent;
