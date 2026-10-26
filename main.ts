@@ -15,6 +15,17 @@ try {
   console.warn("Deno KV no disponible en este entorno local:", e);
 }
 
+const SECURITY_HEADERS: Record<string, string> = {
+  "x-frame-options": "DENY",
+  "x-content-type-options": "nosniff",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+  "permissions-policy": "camera=(), microphone=(), geolocation=()",
+  "content-security-policy":
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' ws: wss: https:; frame-ancestors 'none';",
+  "x-powered-by": "Zerho / Deno 2",
+};
+
 function getContentType(path: string): string {
   const ext = extname(path).toLowerCase();
   const types: Record<string, string> = {
@@ -26,6 +37,8 @@ function getContentType(path: string): string {
     ".png": "image/png",
     ".jpg": "image/jpeg",
     ".ico": "image/x-icon",
+    ".xml": "application/xml; charset=utf-8",
+    ".txt": "text/plain; charset=utf-8",
   };
   return types[ext] || "application/octet-stream";
 }
@@ -156,9 +169,9 @@ export async function handleRequest(req: Request): Promise<Response> {
 
     return new Response(file, {
       headers: {
+        ...SECURITY_HEADERS,
         "content-type": getContentType(diskPath),
         "cache-control": cacheControl,
-        "x-powered-by": "Zerho / Deno 2",
       },
     });
   } catch {
@@ -168,15 +181,18 @@ export async function handleRequest(req: Request): Promise<Response> {
       const file = await Deno.readFile(dirIndex);
       return new Response(file, {
         headers: {
+          ...SECURITY_HEADERS,
           "content-type": "text/html; charset=utf-8",
           "cache-control": "public, max-age=3600",
-          "x-powered-by": "Zerho / Deno 2",
         },
       });
     } catch {
       return new Response("404: Página no encontrada en Zerho", {
         status: 404,
-        headers: { "content-type": "text/plain; charset=utf-8" },
+        headers: {
+          ...SECURITY_HEADERS,
+          "content-type": "text/plain; charset=utf-8",
+        },
       });
     }
   }

@@ -9,6 +9,26 @@
     "./builder": "./src/core/builder.ts",
     "./openapi": "./src/core/openapi.ts"
   },
+  "publish": {
+    "include": [
+      "main.ts",
+      "zerho.config.ts",
+      "src/**/*.ts",
+      "src/client/*",
+      "deno.json",
+      "README.md",
+      "LICENSE"
+    ],
+    "exclude": [
+      "dist/",
+      "tests/",
+      ".github/",
+      ".githooks/",
+      ".vscode/",
+      ".zed/",
+      "scripts/"
+    ]
+  },
   "tasks": {
     "dev": "deno run --allow-net --allow-read --allow-write --allow-env --unstable-kv --watch src/core/dev.ts",
     "build": "deno run --allow-net --allow-read --allow-write --allow-env src/core/builder.ts",

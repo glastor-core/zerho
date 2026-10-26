@@ -65,6 +65,14 @@ Contenido del primer capítulo con información relevante.`,
 
     const openapiJs = await Deno.readTextFile(join(outDir, "assets", "openapi-client.js"));
     assertStringIncludes(openapiJs, "renderOpenApiExplorer");
+
+    // Check sitemap.xml & robots.txt
+    const sitemap = await Deno.readTextFile(join(outDir, "sitemap.xml"));
+    assertStringIncludes(sitemap, "https://zerho.xyz/");
+    assertStringIncludes(sitemap, "<urlset");
+
+    const robots = await Deno.readTextFile(join(outDir, "robots.txt"));
+    assertStringIncludes(robots, "Sitemap: https://zerho.xyz/sitemap.xml");
   } finally {
     // Clean up temp dir
     await Deno.remove(tmpBase, { recursive: true });

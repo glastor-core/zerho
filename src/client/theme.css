@@ -758,6 +758,84 @@ body {
 }
 
 /* ==========================================================================
+   Code Group (Polyglot Synchronized Tabbed Snippets)
+   ========================================================================== */
+.code-group {
+  margin: 1.5rem 0;
+  background: #080a10;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-subtle);
+}
+
+[data-theme="light"] .code-group {
+  background: #0d1117;
+}
+
+.code-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--border-subtle);
+  gap: 0.5rem;
+}
+
+.code-group-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.code-group-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.code-group-tab {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.code-group-tab:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.code-group-tab.active {
+  color: var(--cyan-accent);
+  background: rgba(6, 182, 212, 0.12);
+  border-color: rgba(6, 182, 212, 0.3);
+  font-weight: 600;
+}
+
+.code-group-copy-btn {
+  flex-shrink: 0;
+}
+
+.code-group-panels .code-group-panel {
+  display: none;
+}
+
+.code-group-panels .code-group-panel.active {
+  display: block;
+}
+
+/* ==========================================================================
    Prism Syntax Highlighting Colors (Electric Pro Palette)
    ========================================================================== */
 .token.comment,

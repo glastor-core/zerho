@@ -102,13 +102,45 @@ sequenceDiagram
 
 ---
 
+## Grupos de Código Polyglot Sincronizados (`::: code-group`)
+
+Cuando documentas bibliotecas o herramientas multiplataforma, puedes agrupar comandos o ejemplos en
+pestañas con sincronización global client-side:
+
+::: code-group
+
+```bash [Deno]
+deno add jsr:@zerho/zerho
+```
+
+```bash [npm]
+npx jsr add @zerho/zerho
+```
+
+```bash [pnpm]
+pnpm dlx jsr add @zerho/zerho
+```
+
+```bash [bun]
+bunx jsr add @zerho/zerho
+```
+
+:::
+
+::: tip SINCRONIZACIÓN AUTOMÁTICA Si el usuario selecciona la pestaña **pnpm** o **Deno**, Zerho
+memoriza su preferencia en `localStorage` y actualiza automáticamente todos los grupos de código del
+sitio web para mostrar su gestor de paquetes favorito. :::
+
+---
+
 ## Tablas de Comparación
 
-| Característica           |       VitePress Estándar       |             Zerho Pro             |
-| :----------------------- | :----------------------------: | :-------------------------------: |
-| **Runtime Base**         |         Node.js / npm          |         **Deno 2 Nativo**         |
-| **Playground en Vivo**   |      ❌ Requiere plugins       |      **✅ Nativo de Serie**       |
-| **Despliegue Edge**      |      Configuración manual      |     **✅ 1 Clic Deno Deploy**     |
-| **Búsqueda Instantánea** | Algolia externo / local básico | **✅ Minisearch Cmd+K integrado** |
-| **Diagramas Mermaid**    |  Requiere dependencias extra   |     **✅ Incluido de serie**      |
-| **Tiempos de Arranque**  |             ~2.5s              |            **~180ms**             |
+| Característica                |       VitePress Estándar       |             Zerho Pro             |
+| :---------------------------- | :----------------------------: | :-------------------------------: |
+| **Runtime Base**              |         Node.js / npm          |         **Deno 2 Nativo**         |
+| **Playground en Vivo**        |      ❌ Requiere plugins       |      **✅ Nativo de Serie**       |
+| **Despliegue Edge**           |      Configuración manual      |     **✅ 1 Clic Deno Deploy**     |
+| **Búsqueda Instantánea**      | Algolia externo / local básico | **✅ Minisearch Cmd+K integrado** |
+| **Diagramas Mermaid**         |  Requiere dependencias extra   |     **✅ Incluido de serie**      |
+| **Code Groups Sincronizados** |     Requiere bundler Node      |  **✅ Nativo con LocalStorage**   |
+| **Tiempos de Arranque**       |             ~2.5s              |            **~180ms**             |

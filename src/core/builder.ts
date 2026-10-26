@@ -11,6 +11,30 @@ export interface BuildOptions {
   docsDir?: string;
 }
 
+/**
+ * Generates standards-compliant sitemap.xml for SEO crawlers.
+ */
+export function generateSitemapXml(routes: string[], baseUrl = "https://zerho.xyz"): string {
+  const today = new Date().toISOString().split("T")[0];
+  const urlEntries = routes
+    .map((route) => {
+      const priority = route === "/" ? "1.0" : "0.8";
+      const changefreq = route === "/" ? "daily" : "weekly";
+      const loc = route === "/" ? `${baseUrl}/` : `${baseUrl}${route}`;
+      return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
+    })
+    .join("\n");
+
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urlEntries}\n</urlset>\n`;
+}
+
+/**
+ * Generates robots.txt pointing to the production sitemap.
+ */
+export function generateRobotsTxt(baseUrl = "https://zerho.xyz"): string {
+  return `User-agent: *\nAllow: /\n\nSitemap: ${baseUrl}/sitemap.xml\n`;
+}
+
 export async function buildSite(options: BuildOptions = {}) {
   const startTime = performance.now();
   const docsDir = options.docsDir || join(Deno.cwd(), "docs");
@@ -24,6 +48,7 @@ export async function buildSite(options: BuildOptions = {}) {
   await Deno.mkdir(join(outDir, "assets"), { recursive: true });
 
   const indexer = new SearchIndexer();
+  const routes: string[] = [];
   let pageCount = 0;
 
   // Process all markdown files
@@ -38,6 +63,7 @@ export async function buildSite(options: BuildOptions = {}) {
     if (routePath.endsWith("/index")) {
       routePath = routePath.slice(0, -6) || "/";
     }
+    routes.push(routePath);
 
     const parsed = await parseMarkdown(content);
 
@@ -50,7 +76,7 @@ export async function buildSite(options: BuildOptions = {}) {
       content: parsed.plainText.slice(0, 1500),
     });
 
-    // Also index individual h2/h3 sections for direct anchor jumping!
+    // Also index individual h2/h3 sections for direct anchor jumping
     for (const heading of parsed.toc) {
       indexer.addDocument({
         id: `${routePath}#${heading.id}`,
@@ -100,12 +126,16 @@ export async function buildSite(options: BuildOptions = {}) {
     // Ignore if not present in test environments
   }
 
+  // Generate sitemap.xml and robots.txt
+  await Deno.writeTextFile(join(outDir, "sitemap.xml"), generateSitemapXml(routes));
+  await Deno.writeTextFile(join(outDir, "robots.txt"), generateRobotsTxt());
+
   // Save search index
   await Deno.writeTextFile(join(outDir, "search-index.json"), indexer.toJSON());
 
   const duration = (performance.now() - startTime).toFixed(1);
   console.log(
-    `✨ \x1b[32m[Zerho Exitoso]\x1b[0m ${pageCount} páginas compiladas e indexadas en ${duration}ms\n`,
+    `✨ \x1b[32m[Zerho Exitoso]\x1b[0m ${pageCount} páginas compiladas, sitemap generado e indexadas en ${duration}ms\n`,
   );
 }
 

@@ -4,7 +4,105 @@ document.addEventListener("DOMContentLoaded", () => {
   initSidebarMobile();
   initTocScrollSpy();
   initSearchModal();
+  initCodeGroups();
 });
+
+// Polyglot Synchronized Code Groups
+function initCodeGroups() {
+  const PREF_KEY = "zerho-code-pref";
+  const savedPref = localStorage.getItem(PREF_KEY);
+
+  function activateTab(tabElement, sync = true) {
+    const group = tabElement.closest(".code-group");
+    if (!group) return;
+
+    const targetTab = tabElement.getAttribute("data-tab");
+    if (!targetTab) return;
+
+    // Update active tab in this group
+    const tabs = group.querySelectorAll(".code-group-tab");
+    tabs.forEach((tab) => {
+      const isMatch = tab === tabElement;
+      tab.classList.toggle("active", isMatch);
+      tab.setAttribute("aria-selected", isMatch ? "true" : "false");
+    });
+
+    // Update active panel in this group
+    const panels = group.querySelectorAll(".code-group-panel");
+    panels.forEach((panel) => {
+      const isMatch = panel.getAttribute("data-tab-panel") === targetTab;
+      panel.classList.toggle("active", isMatch);
+      panel.style.display = isMatch ? "block" : "none";
+    });
+
+    if (sync) {
+      localStorage.setItem(PREF_KEY, targetTab);
+      // Synchronize all other code groups on the page that have a matching tab label
+      document.querySelectorAll(".code-group").forEach((otherGroup) => {
+        if (otherGroup === group) return;
+        const matchingTab = Array.from(otherGroup.querySelectorAll(".code-group-tab")).find(
+          (t) =>
+            t.getAttribute("data-tab")?.trim().toLowerCase() === targetTab.trim().toLowerCase(),
+        );
+        if (matchingTab && !matchingTab.classList.contains("active")) {
+          activateTab(matchingTab, false);
+        }
+      });
+    }
+  }
+
+  // Restore preferred tab globally if remembered
+  if (savedPref) {
+    document.querySelectorAll(".code-group").forEach((group) => {
+      const matchingTab = Array.from(group.querySelectorAll(".code-group-tab")).find(
+        (t) => t.getAttribute("data-tab")?.trim().toLowerCase() === savedPref.trim().toLowerCase(),
+      );
+      if (matchingTab) {
+        activateTab(matchingTab, false);
+      }
+    });
+  }
+
+  // Event delegation for tab clicks & copy button
+  document.addEventListener("click", (e) => {
+    const tab = e.target.closest(".code-group-tab");
+    if (tab) {
+      e.preventDefault();
+      activateTab(tab, true);
+      return;
+    }
+
+    const copyBtn = e.target.closest(".code-group-copy-btn");
+    if (copyBtn) {
+      e.preventDefault();
+      const group = copyBtn.closest(".code-group");
+      if (!group) return;
+      const activePanel = group.querySelector(".code-group-panel.active") ||
+        group.querySelector(".code-group-panel");
+      if (!activePanel) return;
+      const rawTextarea = activePanel.querySelector(".raw-code");
+      const codeText = rawTextarea
+        ? rawTextarea.value
+        : (activePanel.querySelector("code")?.innerText || "");
+
+      const icon = copyBtn.querySelector(".copy-icon");
+      const feedback = copyBtn.querySelector(".copy-feedback");
+
+      if (codeText) {
+        navigator.clipboard.writeText(codeText).then(() => {
+          if (icon && feedback) {
+            icon.style.display = "none";
+            feedback.style.display = "inline";
+            setTimeout(() => {
+              icon.style.display = "inline";
+              feedback.style.display = "none";
+            }, 2000);
+          }
+        });
+      }
+    }
+  });
+}
 
 // Theme Management
 function initTheme() {

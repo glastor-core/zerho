@@ -1,7 +1,10 @@
 /*
-  X-Frame-Options: SAMEORIGIN
+  X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' ws: wss: https:; frame-ancestors 'none';
   X-Powered-By: Zerho / Deno 2 / Cloudflare
 
 /assets/*
@@ -12,3 +15,9 @@
 
 /search-index.json
   Cache-Control: no-cache, must-revalidate
+
+/sitemap.xml
+  Cache-Control: public, max-age=86400
+
+/robots.txt
+  Cache-Control: public, max-age=86400

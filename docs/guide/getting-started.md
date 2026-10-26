@@ -32,7 +32,9 @@ Inspirado en la ergonomía de VitePress, Zerho eleva la experiencia al **Nivel P
 Para iniciar un proyecto con Zerho en tu equipo, solo necesitas tener [Deno](https://deno.com)
 instalado:
 
-```bash [Terminal]
+::: code-group
+
+```bash [Deno]
 # 1. Iniciar el servidor de desarrollo con Live-Reload
 deno task dev
 
@@ -42,6 +44,23 @@ deno task build
 # 3. Previsualizar la versión de producción
 deno task serve
 ```
+
+```bash [npm]
+# Instalar e inicializar mediante JSR
+npx jsr add @zerho/zerho
+```
+
+```bash [pnpm]
+# Instalar mediante pnpm y JSR
+pnpm dlx jsr add @zerho/zerho
+```
+
+```bash [bun]
+# Instalar mediante Bun y JSR
+bunx jsr add @zerho/zerho
+```
+
+:::
 
 ::: tip RECARGA EN VIVO (HMR) El comando `deno task dev` incluye un servidor WebSocket integrado que
 detecta automáticamente cualquier cambio en los archivos Markdown o configuraciones y recarga el

@@ -90,3 +90,31 @@ Este es un **texto formateado** con <span style="color:red">HTML</span>.`;
   const result = await parseMarkdown(md);
   assertStringIncludes(result.plainText, "Este es un texto formateado con HTML");
 });
+
+Deno.test("Markdown: Parse polyglot ::: code-group tabs", async () => {
+  const md = `::: code-group
+\`\`\`bash [Deno]
+deno add jsr:@zerho/zerho
+\`\`\`
+
+\`\`\`bash [npm]
+npx jsr add @zerho/zerho
+\`\`\`
+
+\`\`\`bash [pnpm]
+pnpm dlx jsr add @zerho/zerho
+\`\`\`
+:::`;
+
+  const result = await parseMarkdown(md);
+  assertStringIncludes(result.html, 'class="code-group"');
+  assertStringIncludes(result.html, 'class="code-group-tabs"');
+  assertStringIncludes(result.html, 'data-tab="Deno"');
+  assertStringIncludes(result.html, 'data-tab="npm"');
+  assertStringIncludes(result.html, 'data-tab="pnpm"');
+  assertStringIncludes(result.html, 'class="code-group-tab active"');
+  assertStringIncludes(result.html, 'data-tab-panel="Deno"');
+  assertStringIncludes(result.html, 'class="code-group-panel active"');
+  assertStringIncludes(result.html, 'style="display: none;"');
+  assertStringIncludes(result.html, 'class="copy-code-btn code-group-copy-btn"');
+});

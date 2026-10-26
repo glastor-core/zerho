@@ -168,6 +168,84 @@ function processGitHubAlerts(markdown: string): string {
   });
 }
 
+/**
+ * Transforms VitePress-style ::: code-group containers into tabbed code blocks
+ */
+export function processCodeGroups(markdown: string): string {
+  const codeGroupRegex = /^:::\s*code-group[ \t]*\r?\n([\s\S]*?)\r?\n:::/gm;
+
+  return markdown.replace(codeGroupRegex, (_match, groupBody) => {
+    const blockRegex = /```([^\r\n]*)\r?\n([\s\S]*?)\r?\n```/g;
+    const blocks: Array<{ lang: string; label: string; code: string }> = [];
+
+    let blockMatch;
+    while ((blockMatch = blockRegex.exec(groupBody)) !== null) {
+      const langLine = blockMatch[1].trim();
+      const code = blockMatch[2];
+
+      let language = "text";
+      let label = "";
+
+      const titleMatch = langLine.match(/^([a-zA-Z0-9_-]+)(?:\s*\[(.*?)\]|:\s*(.*?))?$/);
+      if (titleMatch) {
+        language = titleMatch[1] || "text";
+        label = titleMatch[2] || titleMatch[3] || "";
+      } else {
+        language = langLine.split(/\s+/)[0] || "text";
+      }
+
+      if (!label) {
+        label = language.toUpperCase();
+      }
+
+      blocks.push({ lang: language, label, code });
+    }
+
+    if (blocks.length === 0) {
+      return groupBody;
+    }
+
+    const tabsHtml = blocks
+      .map((block, index) => {
+        const activeClass = index === 0 ? " active" : "";
+        const ariaSelected = index === 0 ? "true" : "false";
+        const safeLabel = escapeHtml(block.label);
+        return `<button class="code-group-tab${activeClass}" role="tab" type="button" aria-selected="${ariaSelected}" data-tab="${safeLabel}">${safeLabel}</button>`;
+      })
+      .join("");
+
+    const panelsHtml = blocks
+      .map((block, index) => {
+        const activeClass = index === 0 ? " active" : "";
+        const displayStyle = index === 0 ? "" : ' style="display: none;"';
+        const highlighted = highlightCode(block.code, block.lang);
+        const safeLabel = escapeHtml(block.label);
+
+        return `
+<div class="code-group-panel${activeClass}" role="tabpanel" data-tab-panel="${safeLabel}"${displayStyle}>
+  <pre class="code-pre"><code class="language-${block.lang}">${highlighted}</code></pre>
+  <textarea class="raw-code" style="display:none;">${escapeHtml(block.code)}</textarea>
+</div>`;
+      })
+      .join("");
+
+    return `\n\n<div class="code-group" data-code-group>
+  <div class="code-group-header">
+    <div class="code-group-tabs" role="tablist">
+      ${tabsHtml}
+    </div>
+    <button class="copy-code-btn code-group-copy-btn" type="button" aria-label="Copiar código" title="Copiar código">
+      <svg class="copy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      <span class="copy-feedback">Copiado!</span>
+    </button>
+  </div>
+  <div class="code-group-panels">
+    ${panelsHtml}
+  </div>
+</div>\n\n`;
+  });
+}
+
 export async function parseMarkdown(rawContent: string): Promise<ParsedMarkdown> {
   let frontmatter: Frontmatter = {};
   let markdownBody = rawContent;
@@ -184,9 +262,10 @@ export async function parseMarkdown(rawContent: string): Promise<ParsedMarkdown>
     }
   }
 
-  // Pre-process GitHub alerts and custom containers
+  // Pre-process GitHub alerts, custom containers, and code groups
   let processedMarkdown = processGitHubAlerts(markdownBody);
   processedMarkdown = processCallouts(processedMarkdown);
+  processedMarkdown = processCodeGroups(processedMarkdown);
 
   const toc: TocItem[] = [];
   const renderer = new marked.Renderer();

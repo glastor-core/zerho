@@ -48,7 +48,8 @@ Este proyecto se adhiere a:
 
 ### ✨ Added
 
-- **security:** incorporate glastor-core/nemesis DevSecOps audit pipeline, .nemesis.yml config, and local audit task (17b705d)
+- **security:** incorporate glastor-core/nemesis DevSecOps audit pipeline, .nemesis.yml config, and
+  local audit task (17b705d)
 
 ---
 ## [1.2.1] - 2026-10-26
@@ -56,8 +57,8 @@ Este proyecto se adhiere a:
 ### 🔄 Changed
 
 - rename all occurrences of ZerhoPress to Zerho across codebase (b5a9903)
-
 ---
+
 ## [1.2.0] - 2026-10-26
 
 ### ✨ Added
@@ -71,6 +72,7 @@ Este proyecto se adhiere a:
 - complete Pro suite with Monaco editor, Ask AI RAG, OpenAPI explorer, Deno KV analytics, and
   universal CLI ( 5055a61)
 - initial commit of Zerho pro documentation engine for Deno ( 7acb69b)
+
 ---
 
 ## [1.1.0] - 2026-10-26
