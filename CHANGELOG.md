@@ -37,6 +37,13 @@ Este proyecto se adhiere a:
 
 ---
 
+## [1.6.1] - 2026-10-26
+
+### 🐛 Fixed
+
+- **playground:** add unsafe-eval and worker-src to CSP and improve Monaco fallback (285b984)
+
+---
 ## [1.6.0] - 2026-10-26
 
 ### ✨ Added
