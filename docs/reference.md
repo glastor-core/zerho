@@ -31,7 +31,7 @@ layout: doc
 
 ---
 
-## BuildOptions {#buildoptions}
+## BuildOptions
 **Tipo:** `interface` | **Ubicación:** `builder.ts:8`
 
 Sin descripción JSDoc proporcionada.
@@ -47,7 +47,7 @@ Sin descripción JSDoc proporcionada.
 
 ---
 
-## LlmsPageEntry {#llmspageentry}
+## LlmsPageEntry
 **Tipo:** `interface` | **Ubicación:** `builder.ts:15`
 
 Sin descripción JSDoc proporcionada.
@@ -63,7 +63,7 @@ Sin descripción JSDoc proporcionada.
 
 ---
 
-## generateSitemapXml {#generatesitemapxml}
+## generateSitemapXml
 **Tipo:** `function` | **Ubicación:** `builder.ts:25`
 
 Generates standards-compliant sitemap.xml for SEO crawlers.
@@ -81,7 +81,7 @@ function generateSitemapXml(routes: any, arg: any): string;
 
 ---
 
-## generateRobotsTxt {#generaterobotstxt}
+## generateRobotsTxt
 **Tipo:** `function` | **Ubicación:** `builder.ts:42`
 
 Generates robots.txt pointing to the production sitemap.
@@ -98,7 +98,7 @@ function generateRobotsTxt(arg: any): string;
 
 ---
 
-## generateLlmsTxt {#generatellmstxt}
+## generateLlmsTxt
 **Tipo:** `function` | **Ubicación:** `builder.ts:49`
 
 Generates /llms.txt according to the llmstxt.org specification for LLM agents.
@@ -118,7 +118,7 @@ function generateLlmsTxt(pages: any, arg: any, arg: any, arg: any): string;
 
 ---
 
-## generateLlmsFullTxt {#generatellmsfulltxt}
+## generateLlmsFullTxt
 **Tipo:** `function` | **Ubicación:** `builder.ts:85`
 
 Generates /llms-full.txt containing the entire concatenated documentation for direct LLM ingestion.
@@ -137,7 +137,7 @@ function generateLlmsFullTxt(pages: any, arg: any, arg: any): string;
 
 ---
 
-## resolveConfigForPath {#resolveconfigforpath}
+## resolveConfigForPath
 **Tipo:** `function` | **Ubicación:** `builder.ts:111`
 
 Resolves effective configuration applying locale overrides if currentPath belongs to a registered locale.
@@ -155,7 +155,7 @@ function resolveConfigForPath(baseConfig: ZerhoConfig, path: string): ZerhoConfi
 
 ---
 
-## buildSite {#buildsite}
+## buildSite
 **Tipo:** `function` | **Ubicación:** `builder.ts:136`
 
 Sin descripción JSDoc proporcionada.
@@ -172,7 +172,7 @@ function buildSite(arg: any): Promise;
 
 ---
 
-## TocItem {#tocitem}
+## TocItem
 **Tipo:** `interface` | **Ubicación:** `markdown.ts:14`
 
 Sin descripción JSDoc proporcionada.
@@ -187,7 +187,7 @@ Sin descripción JSDoc proporcionada.
 
 ---
 
-## Frontmatter {#frontmatter}
+## Frontmatter
 **Tipo:** `interface` | **Ubicación:** `markdown.ts:20`
 
 Sin descripción JSDoc proporcionada.
@@ -207,7 +207,7 @@ Sin descripción JSDoc proporcionada.
 
 ---
 
-## ParsedMarkdown {#parsedmarkdown}
+## ParsedMarkdown
 **Tipo:** `interface` | **Ubicación:** `markdown.ts:45`
 
 Sin descripción JSDoc proporcionada.
@@ -225,7 +225,7 @@ Sin descripción JSDoc proporcionada.
 
 ---
 
-## processCodeGroups {#processcodegroups}
+## processCodeGroups
 **Tipo:** `function` | **Ubicación:** `markdown.ts:173`
 
 Transforms VitePress-style ::: code-group containers into tabbed code blocks
@@ -242,7 +242,7 @@ function processCodeGroups(markdown: string): string;
 
 ---
 
-## parseMarkdown {#parsemarkdown}
+## parseMarkdown
 **Tipo:** `function` | **Ubicación:** `markdown.ts:248`
 
 Sin descripción JSDoc proporcionada.
@@ -259,7 +259,7 @@ function parseMarkdown(rawContent: string): Promise;
 
 ---
 
-## SearchDocument {#searchdocument}
+## SearchDocument
 **Tipo:** `interface` | **Ubicación:** `search.ts:0`
 
 Sin descripción JSDoc proporcionada.
@@ -276,7 +276,7 @@ Sin descripción JSDoc proporcionada.
 
 ---
 
-## SearchResult {#searchresult}
+## SearchResult
 **Tipo:** `interface` | **Ubicación:** `search.ts:8`
 
 Sin descripción JSDoc proporcionada.
@@ -290,7 +290,7 @@ Sin descripción JSDoc proporcionada.
 
 ---
 
-## SearchIndexer {#searchindexer}
+## SearchIndexer
 **Tipo:** `class` | **Ubicación:** `search.ts:13`
 
 Sin descripción JSDoc proporcionada.

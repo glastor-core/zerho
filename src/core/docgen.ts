@@ -129,9 +129,8 @@ layout: doc
 
     const kind = decl.kind;
     const docText = decl.jsDoc?.doc || "Sin descripción JSDoc proporcionada.";
-    const slug = sym.name.toLowerCase();
 
-    sections.push(`## ${sym.name} {#${slug}}`);
+    sections.push(`## ${sym.name}`);
     sections.push(
       `**Tipo:** \`${kind}\` | **Ubicación:** \`${
         decl.location.filename.split("/").pop()

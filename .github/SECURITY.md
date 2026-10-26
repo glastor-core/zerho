@@ -12,8 +12,8 @@ Mantenemos actualizaciones de seguridad activas para las versiones estables de Z
 
 | Versión | Estado de Soporte  | Tipo de Soporte                       |
 | :------ | :----------------- | :------------------------------------ |
-| `1.1.x` | :white_check_mark: | Soporte activo y parches de seguridad |
-| `1.0.x` | :white_check_mark: | Parches de seguridad críticos         |
+| `1.5.x` | :white_check_mark: | Soporte activo y parches inmediatos   |
+| `1.x`   | :white_check_mark: | Soporte activo y parches de seguridad |
 | `< 1.0` | :x: No soportada   | Fin de ciclo de vida (EOL)            |
 
 ---
