@@ -1,0 +1,5 @@
+#!/bin/sh
+# Zerho Native Commit-Msg Hook
+# Valida que el mensaje cumpla con la especificación de Conventional Commits.
+
+deno run --allow-read scripts/verify-commit.ts "$1"

@@ -1,0 +1,12 @@
+#!/bin/sh
+# Zerho Native Pre-Push Hook
+# Ejecuta la suite de pruebas unitarias antes de enviar cambios al repositorio remoto.
+
+echo "🧪 [Zerho Hook] Ejecutando suite de pruebas automatizadas antes del push..."
+deno task test || {
+  echo "❌ [Zerho Hook] Fallaron una o más pruebas unitarias. Resuelve los errores antes de hacer push."
+  exit 1
+}
+
+echo "✅ [Zerho Hook] Suite de pruebas aprobada al 100%. Procediendo con el push."
+exit 0

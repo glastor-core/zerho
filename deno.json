@@ -23,6 +23,7 @@
     "check": "deno check main.ts src/cli.ts src/core/*.ts scripts/*.ts tests/*.ts",
     "ci": "deno task check && deno task lint && deno task fmt:check && deno task test",
     "audit": "deno run -A scripts/audit.ts",
+    "hooks:install": "git config core.hooksPath .githooks",
     "version": "deno run -A scripts/bump-version.ts",
     "version:check": "deno run -A scripts/bump-version.ts --dry-run",
     "version:patch": "deno run -A scripts/bump-version.ts patch",

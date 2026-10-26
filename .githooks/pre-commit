@@ -1,0 +1,34 @@
+#!/bin/sh
+# Zerho Native Pre-Commit Hook
+# Previene la inclusión de secretos, archivos tóxicos, errores de tipos, formato o linter.
+
+echo "🛡️  [Zerho Hook] Ejecutando validaciones de calidad previas al commit..."
+
+# 1. Auditoría de Seguridad e Higiene
+echo "🔒 [Zerho Hook] Auditando secretos e higiene de archivos..."
+deno task audit || {
+  echo "❌ [Zerho Hook] Auditoría fallida. Revisa secretos expuestos o archivos no permitidos."
+  exit 1
+}
+
+# 2. Formato y Linter
+echo "🔍 [Zerho Hook] Verificando formato y linter..."
+deno fmt --check || {
+  echo "❌ [Zerho Hook] Error de formato. Ejecuta 'deno task fmt' antes de hacer commit."
+  exit 1
+}
+
+deno lint || {
+  echo "❌ [Zerho Hook] Fallo de linter. Corrige los problemas reportados."
+  exit 1
+}
+
+# 3. Comprobación de Tipos TypeScript
+echo "⚡ [Zerho Hook] Verificando tipos TypeScript..."
+deno task check || {
+  echo "❌ [Zerho Hook] Fallo de compilación o tipos TypeScript. Corrige los errores antes de continuar."
+  exit 1
+}
+
+echo "✅ [Zerho Hook] Todas las comprobaciones previas al commit fueron aprobadas."
+exit 0
