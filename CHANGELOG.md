@@ -37,6 +37,23 @@ Este proyecto se adhiere a:
 
 ---
 
+## [1.2.0] - 2026-10-26
+
+### ✨ Added
+
+- **release:** implement automated semantic versioning, changelog generation, and CI bump workflows (6e4b818)
+- adapt governance, citation, changelog, workflows, and Cloudflare Pages setup for glastor-core/zerho on main (
+2ea6e0b)
+- configure full compatibility for VS Code, Cursor, Zed, JetBrains, and Neovim (
+a56bb9b)
+- establish comprehensive test suite, lint rules, format verification, and CI pipeline (
+f6ac133)
+- complete Pro suite with Monaco editor, Ask AI RAG, OpenAPI explorer, Deno KV analytics, and universal CLI (
+5055a61)
+- initial commit of ZerhoPress pro documentation engine for Deno (
+7acb69b)
+
+---
 ## [1.1.0] - 2026-10-26
 
 **Nombre del Release:** "Pro Developer Experience, Interactive Playground & Edge AI Suite"\

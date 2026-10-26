@@ -1,7 +1,7 @@
 {
   "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
   "name": "@zerhopress/core",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Next-generation documentation engine for Deno & Deno Deploy with live interactive playground, Monaco editor, OpenAPI explorer and Edge AI search",
   "exports": {
     ".": "./main.ts",
@@ -44,23 +44,41 @@
     "prismjs/components/prism-css": "npm:prismjs@^1.30.0/components/prism-css.js"
   },
   "lint": {
-    "exclude": ["dist/"],
+    "exclude": [
+      "dist/"
+    ],
     "rules": {
-      "tags": ["recommended"],
-      "exclude": ["no-window", "no-window-prefix", "no-explicit-any"]
+      "tags": [
+        "recommended"
+      ],
+      "exclude": [
+        "no-window",
+        "no-window-prefix",
+        "no-explicit-any"
+      ]
     }
   },
   "fmt": {
-    "exclude": ["dist/"],
+    "exclude": [
+      "dist/"
+    ],
     "indentWidth": 2,
     "lineWidth": 100,
     "singleQuote": false
   },
   "test": {
-    "exclude": ["dist/"],
-    "include": ["tests/"]
+    "exclude": [
+      "dist/"
+    ],
+    "include": [
+      "tests/"
+    ]
   },
   "compilerOptions": {
-    "lib": ["deno.window", "deno.unstable", "dom"]
+    "lib": [
+      "deno.window",
+      "deno.unstable",
+      "dom"
+    ]
   }
 }
