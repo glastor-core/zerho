@@ -37,6 +37,13 @@ Este proyecto se adhiere a:
 
 ---
 
+## [1.4.0] - 2026-10-26
+
+### ✨ Added
+
+- **quality:** implement native git hooks and conventional commit verification without npm dependencies (2972b1e)
+
+---
 ## [1.3.0] - 2026-10-26
 
 ### ✨ Added
