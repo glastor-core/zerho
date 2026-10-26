@@ -1,12 +1,19 @@
 {
-  "name": "zerhopress",
-  "version": "1.0.0",
-  "description": "Next-generation documentation engine for Deno & Deno Deploy with live interactive playground",
-  "exports": "./main.ts",
+  "name": "@zerhopress/core",
+  "version": "1.1.0",
+  "description": "Next-generation documentation engine for Deno & Deno Deploy with live interactive playground, Monaco editor, OpenAPI explorer and Edge AI search",
+  "exports": {
+    ".": "./main.ts",
+    "./cli": "./src/cli.ts",
+    "./builder": "./src/core/builder.ts",
+    "./openapi": "./src/core/openapi.ts"
+  },
   "tasks": {
-    "dev": "deno run --allow-net --allow-read --allow-write --allow-env --watch src/core/dev.ts",
+    "dev": "deno run --allow-net --allow-read --allow-write --allow-env --unstable-kv --watch src/core/dev.ts",
     "build": "deno run --allow-net --allow-read --allow-write --allow-env src/core/builder.ts",
-    "serve": "deno run --allow-net --allow-read --allow-env main.ts"
+    "serve": "deno run --allow-net --allow-read --allow-write --allow-env --unstable-kv main.ts",
+    "cli": "deno run -A --unstable-kv src/cli.ts",
+    "stats": "deno run -A --unstable-kv src/cli.ts stats"
   },
   "imports": {
     "@std/fs": "jsr:@std/fs@^1.0.14",

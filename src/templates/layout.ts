@@ -127,7 +127,7 @@ export function renderPage({ config, parsed, currentPath, devMode = false }: Ren
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="/assets/theme.css">
+  <link rel="stylesheet" href="/assets/theme.css?v=1.1.0">
   ${devMode ? `<script>
     // Live Reload WebSocket
     const ws = new WebSocket("ws://" + location.host + "/_hmr");
@@ -336,6 +336,25 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
           ${html}
         </div>
 
+        <!-- Feedback Widget (Edge Deno KV) -->
+        <div class="feedback-widget" id="feedbackWidget">
+          <div class="feedback-text">¿Te ha resultado útil esta página?</div>
+          <div class="feedback-buttons">
+            <button class="feedback-btn" onclick="submitFeedback(true)" id="fbYes">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+              <span>Sí</span>
+            </button>
+            <button class="feedback-btn" onclick="submitFeedback(false)" id="fbNo">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
+              <span>No</span>
+            </button>
+          </div>
+          <div class="feedback-msg" id="feedbackMsg" style="display:none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>¡Gracias! Retroalimentación guardada en Deno KV.</span>
+          </div>
+        </div>
+
         <!-- Doc Footer: Prev/Next -->
         <footer class="doc-footer">
           <div class="doc-nav-cards">
@@ -369,28 +388,62 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
     </div>
   </footer>
 
-  <!-- Search Modal Overlay (Cmd+K) -->
+  <!-- Search Modal Overlay (Cmd+K) with Ask AI RAG -->
   <div class="search-modal-backdrop" id="searchModalBackdrop" style="display: none;">
     <div class="search-modal" role="dialog" aria-modal="true">
+      <div class="search-tabs-bar">
+        <button class="search-tab-btn active" id="searchTabQuick" onclick="switchSearchTab('quick')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Búsqueda Rápida</span>
+        </button>
+        <button class="search-tab-btn" id="searchTabAi" onclick="switchSearchTab('ai')">
+          <span class="ai-tab-glow">✨</span>
+          <span>Preguntar a la IA</span>
+          <span class="ai-tab-badge">RAG</span>
+        </button>
+      </div>
+
       <div class="search-input-wrap">
         <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="searchInput" class="search-input" placeholder="Buscar temas, funciones o APIs..." autocomplete="off">
         <button class="search-close-btn" id="searchCloseBtn">ESC</button>
       </div>
+
+      <!-- Quick Search Results List -->
       <div class="search-results-list" id="searchResultsList">
         <div class="search-empty">Comienza a escribir para buscar en toda la documentación...</div>
       </div>
+
+      <!-- Ask AI Chat Response Box -->
+      <div class="ai-chat-view" id="aiChatView" style="display: none;">
+        <div class="ai-response-card" id="aiResponseCard">
+          <div class="ai-card-header">
+            <span class="ai-avatar">⚡</span>
+            <span class="ai-bot-name">ZerhoPress Edge AI</span>
+            <span class="ai-status-pill" id="aiStatusPill">Listo</span>
+          </div>
+          <div class="ai-content-body" id="aiContentBody">
+            Escribe tu consulta en lenguaje natural arriba y presiona <kbd>Enter</kbd> para que la IA sintetice una respuesta basada en la documentación oficial.
+          </div>
+          <div class="ai-sources-wrap" id="aiSourcesWrap" style="display:none;">
+            <div class="ai-sources-title">Fuentes y Citas:</div>
+            <div class="ai-sources-list" id="aiSourcesList"></div>
+          </div>
+        </div>
+      </div>
+
       <div class="search-footer-hint">
         <span><kbd>↑</kbd> <kbd>↓</kbd> Navegar</span>
-        <span><kbd>↵</kbd> Seleccionar</span>
+        <span><kbd>↵</kbd> Consultar</span>
         <span><kbd>ESC</kbd> Cerrar</span>
       </div>
     </div>
   </div>
 
   <!-- Scripts -->
-  <script src="/assets/app.js"></script>
-  <script src="/assets/playground.js"></script>
+  <script src="/assets/app.js?v=1.1.0"></script>
+  <script src="/assets/playground.js?v=1.1.0"></script>
+  <script type="module" src="/assets/openapi-client.js?v=1.1.0"></script>
   <!-- Mermaid.js for diagrams -->
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';

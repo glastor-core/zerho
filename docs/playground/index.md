@@ -38,10 +38,11 @@ Este playground te permite experimentar con código **TypeScript** y simular API
 <div class="playground-split">
 <div class="playground-editor-pane">
 <div class="playground-pane-title">
-<span>Editor TypeScript (main.ts)</span>
-<span style="font-size:0.7rem; color:var(--text-muted);">Editable</span>
+<span>Editor VS Code / Monaco (TypeScript)</span>
+<span style="font-size:0.7rem; color:var(--brand-primary); font-weight:700;">IntelliSense Activo</span>
 </div>
-<textarea id="pgCodeInput" class="playground-textarea" spellcheck="false" placeholder="Escribe tu código TypeScript aquí..."></textarea>
+<div id="pgMonacoEditor" class="playground-monaco-container"></div>
+<textarea id="pgCodeInput" class="playground-textarea" style="display:none;" spellcheck="false" placeholder="Escribe tu código TypeScript aquí..."></textarea>
 </div>
 <div class="playground-output-pane">
 <div class="playground-pane-title">

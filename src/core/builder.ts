@@ -87,6 +87,7 @@ export async function buildSite(options: BuildOptions = {}) {
   await Deno.copyFile(join(clientDir, "theme.css"), join(outDir, "assets", "theme.css"));
   await Deno.copyFile(join(clientDir, "app.js"), join(outDir, "assets", "app.js"));
   await Deno.copyFile(join(clientDir, "playground.js"), join(outDir, "assets", "playground.js"));
+  await Deno.copyFile(join(clientDir, "openapi-client.js"), join(outDir, "assets", "openapi-client.js"));
 
   // Save search index
   await Deno.writeTextFile(join(outDir, "search-index.json"), indexer.toJSON());

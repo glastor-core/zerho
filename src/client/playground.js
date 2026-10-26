@@ -224,8 +224,74 @@ try {
 }`
     };
 
+    const monacoContainer = document.getElementById("pgMonacoEditor");
+    let initialCode = PRESETS.server;
+
+    // Load Monaco Editor dynamically
+    if (monacoContainer) {
+      if (window.monaco) {
+        setupMonaco();
+      } else {
+        const script = document.createElement("script");
+        script.src = "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js";
+        script.onload = () => {
+          // @ts-ignore
+          if (window.require) {
+            // @ts-ignore
+            window.require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs" } });
+            // @ts-ignore
+            window.require(["vs/editor/editor.main"], () => {
+              setupMonaco();
+            });
+          }
+        };
+        script.onerror = () => {
+          if (textarea) textarea.style.display = "block";
+          if (monacoContainer) monacoContainer.style.display = "none";
+        };
+        document.head.appendChild(script);
+      }
+    }
+
+    function setupMonaco() {
+      if (!monacoContainer) return;
+      monacoContainer.innerHTML = "";
+      const isDark = document.documentElement.getAttribute("data-theme") !== "light";
+      // @ts-ignore
+      window.monacoEditor = monaco.editor.create(monacoContainer, {
+        value: initialCode,
+        language: "typescript",
+        theme: isDark ? "vs-dark" : "vs",
+        automaticLayout: true,
+        fontSize: 13.5,
+        fontFamily: "'JetBrains Mono', Consolas, monospace",
+        minimap: { enabled: false },
+        scrollBeyondLastLine: false,
+        lineNumbers: "on",
+        renderLineHighlight: "all",
+        padding: { top: 12, bottom: 12 }
+      });
+
+      // @ts-ignore
+      window.monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+        execute();
+      });
+
+      // Observe theme changes to adjust Monaco theme
+      const observer = new MutationObserver(() => {
+        const dark = document.documentElement.getAttribute("data-theme") !== "light";
+        // @ts-ignore
+        if (window.monaco) monaco.editor.setTheme(dark ? "vs-dark" : "vs");
+      });
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+      // Run initial execution after Monaco is ready
+      setTimeout(() => execute(), 250);
+    }
+
     async function execute() {
-      const code = textarea.value;
+      // @ts-ignore
+      const code = window.monacoEditor ? window.monacoEditor.getValue() : textarea.value;
       statusEl.textContent = "Ejecutando...";
       statusEl.style.color = "var(--brand-primary)";
       outputEl.textContent = "Procesando...";
@@ -240,7 +306,7 @@ try {
 
     runBtn.addEventListener("click", execute);
 
-    // Ctrl+Enter or Cmd+Enter to execute
+    // Ctrl+Enter or Cmd+Enter to execute on fallback textarea
     textarea.addEventListener("keydown", (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
         e.preventDefault();
@@ -252,18 +318,24 @@ try {
       presetSelect.addEventListener("change", (e) => {
         const val = e.target.value;
         if (PRESETS[val]) {
-          textarea.value = PRESETS[val];
+          // @ts-ignore
+          if (window.monacoEditor) {
+            // @ts-ignore
+            window.monacoEditor.setValue(PRESETS[val]);
+          } else {
+            textarea.value = PRESETS[val];
+          }
           execute();
         }
       });
-      // Initial run
+      // Initial value
       textarea.value = PRESETS.server;
       execute();
     }
   };
 
   document.addEventListener("DOMContentLoaded", () => {
-    if (document.getElementById("pgCodeInput")) {
+    if (document.getElementById("pgCodeInput") || document.getElementById("pgMonacoEditor")) {
       window.initPlaygroundPage();
     }
   });

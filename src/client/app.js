@@ -69,6 +69,33 @@ window.copyCodeBlock = function(id) {
   }
 };
 
+// Feedback Widget (Edge Deno KV)
+window.submitFeedback = async function(helpful) {
+  const yesBtn = document.getElementById("fbYes");
+  const noBtn = document.getElementById("fbNo");
+  const msgEl = document.getElementById("feedbackMsg");
+
+  if (yesBtn) yesBtn.disabled = true;
+  if (noBtn) noBtn.disabled = true;
+
+  try {
+    await fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        path: window.location.pathname,
+        helpful
+      })
+    });
+  } catch (e) {
+    console.warn("Feedback offline fallback:", e);
+  }
+
+  if (msgEl) {
+    msgEl.style.display = "inline-flex";
+  }
+};
+
 // Table of Contents ScrollSpy
 function initTocScrollSpy() {
   const headings = Array.from(document.querySelectorAll(".markdown-body h2, .markdown-body h3"));
@@ -100,13 +127,70 @@ function initTocScrollSpy() {
   onScroll();
 }
 
-// Cmd+K Search Modal
+// Search Tab Switcher (Quick Search vs Ask AI)
+window.__currentSearchTab = "quick";
+window.switchSearchTab = function(tab) {
+  window.__currentSearchTab = tab;
+  const tabQuick = document.getElementById("searchTabQuick");
+  const tabAi = document.getElementById("searchTabAi");
+  const resultsContainer = document.getElementById("searchResultsList");
+  const aiChatView = document.getElementById("aiChatView");
+  const input = document.getElementById("searchInput");
+
+  if (!tabQuick || !tabAi) return;
+
+  if (tab === "quick") {
+    tabQuick.classList.add("active");
+    tabAi.classList.remove("active");
+    if (resultsContainer) resultsContainer.style.display = "block";
+    if (aiChatView) aiChatView.style.display = "none";
+    if (input) {
+      input.placeholder = "Buscar temas, funciones o APIs...";
+      input.focus();
+    }
+  } else {
+    tabAi.classList.add("active");
+    tabQuick.classList.remove("active");
+    if (resultsContainer) resultsContainer.style.display = "none";
+    if (aiChatView) aiChatView.style.display = "block";
+    if (input) {
+      input.placeholder = "Pregunta a la IA sobre ZerhoPress o Deno...";
+      input.focus();
+    }
+  }
+};
+
+window.openSearchModal = function() {
+  const backdrop = document.getElementById("searchModalBackdrop");
+  const input = document.getElementById("searchInput");
+  if (!backdrop) return;
+  backdrop.style.display = "flex";
+  if (input) {
+    input.value = "";
+    input.focus();
+  }
+  if (typeof window.loadSearchIndex === "function") {
+    window.loadSearchIndex();
+  }
+};
+
+window.closeSearchModal = function() {
+  const backdrop = document.getElementById("searchModalBackdrop");
+  if (backdrop) backdrop.style.display = "none";
+};
+
+// Cmd+K Search Modal with Ask AI
 function initSearchModal() {
   const triggerBtn = document.getElementById("searchTriggerBtn");
   const backdrop = document.getElementById("searchModalBackdrop");
   const closeBtn = document.getElementById("searchCloseBtn");
   const input = document.getElementById("searchInput");
   const resultsContainer = document.getElementById("searchResultsList");
+  const aiChatView = document.getElementById("aiChatView");
+  const aiStatusPill = document.getElementById("aiStatusPill");
+  const aiContentBody = document.getElementById("aiContentBody");
+  const aiSourcesWrap = document.getElementById("aiSourcesWrap");
+  const aiSourcesList = document.getElementById("aiSourcesList");
 
   if (!backdrop || !input) return;
 
@@ -114,7 +198,7 @@ function initSearchModal() {
   let isIndexLoaded = false;
   let selectedIndex = -1;
 
-  async function loadIndex() {
+  window.loadSearchIndex = async function() {
     if (isIndexLoaded) return;
     try {
       const res = await fetch("/search-index.json");
@@ -125,27 +209,19 @@ function initSearchModal() {
     } catch (e) {
       console.warn("Could not load search index", e);
     }
-  }
+  };
 
   function openModal() {
-    backdrop.style.display = "flex";
-    input.value = "";
-    input.focus();
+    window.openSearchModal();
     renderResults([]);
-    loadIndex();
   }
 
   function closeModal() {
-    backdrop.style.display = "none";
+    window.closeSearchModal();
   }
 
-  if (triggerBtn) {
-    triggerBtn.addEventListener("click", openModal);
-  }
-
-  if (closeBtn) {
-    closeBtn.addEventListener("click", closeModal);
-  }
+  if (triggerBtn) triggerBtn.addEventListener("click", openModal);
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
 
   backdrop.addEventListener("click", (e) => {
     if (e.target === backdrop) closeModal();
@@ -165,8 +241,10 @@ function initSearchModal() {
     }
   });
 
-  // Search input handler
+  // Input listener for Quick Search
   input.addEventListener("input", () => {
+    if (window.__currentSearchTab !== "quick") return;
+
     const query = input.value.trim().toLowerCase();
     if (!query) {
       resultsContainer.innerHTML = `<div class="search-empty">Comienza a escribir para buscar en toda la documentación...</div>`;
@@ -184,23 +262,63 @@ function initSearchModal() {
     renderResults(matches, query);
   });
 
-  // Keyboard navigation inside modal
-  input.addEventListener("keydown", (e) => {
-    const items = resultsContainer.querySelectorAll(".search-item");
-    if (items.length === 0) return;
+  // Enter handler for Ask AI or selecting search item
+  input.addEventListener("keydown", async (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
 
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      selectedIndex = (selectedIndex + 1) % items.length;
-      updateSelected(items);
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      selectedIndex = (selectedIndex - 1 + items.length) % items.length;
-      updateSelected(items);
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      if (selectedIndex >= 0 && selectedIndex < items.length) {
-        items[selectedIndex].click();
+      if (window.__currentSearchTab === "quick") {
+        const items = resultsContainer.querySelectorAll(".search-item");
+        if (selectedIndex >= 0 && selectedIndex < items.length) {
+          items[selectedIndex].click();
+        }
+        return;
+      }
+
+      // Ask AI query
+      const query = input.value.trim();
+      if (!query) return;
+
+      aiStatusPill.textContent = "Sintetizando...";
+      aiStatusPill.className = "ai-status-pill running";
+      aiContentBody.innerHTML = `<div class="ai-loading-pulse">Consultando índice semántico y generando respuesta...</div>`;
+      if (aiSourcesWrap) aiSourcesWrap.style.display = "none";
+
+      try {
+        const res = await fetch("/api/ai/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query })
+        });
+        const data = await res.json();
+
+        aiStatusPill.textContent = "Completado";
+        aiStatusPill.className = "ai-status-pill ready";
+        aiContentBody.innerHTML = formatAiMarkdown(data.answer);
+
+        if (data.sources && data.sources.length > 0) {
+          aiSourcesList.innerHTML = data.sources
+            .map(s => `<a href="${s.url}" class="ai-source-card">${escapeHtml(s.title)}</a>`)
+            .join("");
+          aiSourcesWrap.style.display = "block";
+        }
+      } catch (err) {
+        aiStatusPill.textContent = "Respuesta Local";
+        aiStatusPill.className = "ai-status-pill ready";
+        aiContentBody.innerHTML = `Para <strong>"${escapeHtml(query)}"</strong>, te recomiendo consultar la <a href="/guide/getting-started">Guía de Inicio</a> y explorar el <a href="/playground/">Playground Interactivo</a>.`;
+      }
+    } else if (window.__currentSearchTab === "quick") {
+      const items = resultsContainer.querySelectorAll(".search-item");
+      if (items.length === 0) return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        selectedIndex = (selectedIndex + 1) % items.length;
+        updateSelected(items);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+        updateSelected(items);
       }
     }
   });
@@ -240,6 +358,15 @@ function initSearchModal() {
     const escaped = escapeHtml(text);
     const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
     return escaped.replace(regex, '<span style="color:var(--brand-primary);font-weight:700;">$1</span>');
+  }
+
+  function formatAiMarkdown(text) {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\n\n/g, '<p></p>')
+      .replace(/\n/g, '<br>');
   }
 
   function escapeHtml(str) {

@@ -50,8 +50,9 @@ export const config: ZerhoConfig = {
     nav: [
       { text: "Guía", link: "/guide/getting-started", activeMatch: "/guide/" },
       { text: "Características", link: "/guide/markdown-features", activeMatch: "/guide/markdown-features" },
-      { text: "Playground TS", link: "/playground/", activeMatch: "/playground/", badge: "En vivo" },
-      { text: "API Deno", link: "/api/runtime", activeMatch: "/api/" },
+      { text: "Playground TS", link: "/playground/", activeMatch: "/playground/", badge: "Monaco" },
+      { text: "OpenAPI Explorer", link: "/api/openapi", activeMatch: "/api/openapi", badge: "Live" },
+      { text: "API Deno", link: "/api/runtime", activeMatch: "/api/runtime" },
       { text: "Deploy", link: "/guide/deployment", activeMatch: "/guide/deployment" }
     ],
     sidebar: {
@@ -74,8 +75,9 @@ export const config: ZerhoConfig = {
       ],
       "/api/": [
         {
-          text: "Referencia de Runtime",
+          text: "Referencia y Exploradores",
           items: [
+            { text: "OpenAPI Explorer Interactivo", link: "/api/openapi", badge: "Try It" },
             { text: "Deno Core APIs", link: "/api/runtime" }
           ]
         }
