@@ -37,6 +37,13 @@ Este proyecto se adhiere a:
 
 ---
 
+## [1.6.2] - 2026-10-26
+
+### 🐛 Fixed
+
+- **playground:** resolve Monaco CSP stylesheet blocking, add button spinner and execution feedback (58d91e9)
+
+---
 ## [1.6.1] - 2026-10-26
 
 ### 🐛 Fixed
