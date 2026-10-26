@@ -37,6 +37,13 @@ Este proyecto se adhiere a:
 
 ---
 
+## [1.2.1] - 2026-10-26
+
+### 🔄 Changed
+
+- rename all occurrences of ZerhoPress to Zerho across codebase (b5a9903)
+
+---
 ## [1.2.0] - 2026-10-26
 
 ### ✨ Added
