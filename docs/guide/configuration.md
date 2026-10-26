@@ -110,7 +110,7 @@ opción `editLink`:
 
 ```ts
 editLink: {
-  pattern: "https://github.com/glastor-core/zerhopress/edit/main/docs/:path",
+  pattern: "https://github.com/glastor-core/zerho/edit/main/docs/:path",
   text: "Editar esta página en GitHub"
 }
 ```

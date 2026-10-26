@@ -92,6 +92,14 @@ export async function buildSite(options: BuildOptions = {}) {
     join(outDir, "assets", "openapi-client.js"),
   );
 
+  // Copy Cloudflare Pages routing files if present
+  try {
+    await Deno.copyFile(join(clientDir, "_headers"), join(outDir, "_headers"));
+    await Deno.copyFile(join(clientDir, "_redirects"), join(outDir, "_redirects"));
+  } catch (_e) {
+    // Ignore if not present in test environments
+  }
+
   // Save search index
   await Deno.writeTextFile(join(outDir, "search-index.json"), indexer.toJSON());
 

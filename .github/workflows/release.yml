@@ -1,0 +1,70 @@
+name: Release Standalone Binaries
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_call:
+    inputs:
+      tag_name:
+        description: "Git tag to release"
+        required: false
+        type: string
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Git tag to release"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Compile & Publish Zerho CLI Binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno Runtime
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Run CI Quality Suite
+        run: deno task ci
+
+      - name: Compile Multi-Platform Standalone Binaries
+        run: |
+          mkdir -p dist-bin
+          echo "Compiling Zerho CLI for Linux x86_64..."
+          deno compile --allow-all --unstable-kv --target x86_64-unknown-linux-gnu --output dist-bin/zerho-linux-x86_64 src/cli.ts
+
+          echo "Compiling Zerho CLI for Windows x86_64..."
+          deno compile --allow-all --unstable-kv --target x86_64-pc-windows-msvc --output dist-bin/zerho-windows-x86_64.exe src/cli.ts
+
+          echo "Compiling Zerho CLI for macOS x86_64 (Intel)..."
+          deno compile --allow-all --unstable-kv --target x86_64-apple-darwin --output dist-bin/zerho-darwin-x86_64 src/cli.ts
+
+          echo "Compiling Zerho CLI for macOS ARM64 (Apple Silicon)..."
+          deno compile --allow-all --unstable-kv --target aarch64-apple-darwin --output dist-bin/zerho-darwin-arm64 src/cli.ts
+
+      - name: Generate SHA-256 Checksums
+        run: |
+          cd dist-bin
+          sha256sum * > checksums.txt
+          cat checksums.txt
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag_name || github.ref_name }}
+          files: |
+            dist-bin/zerho-linux-x86_64
+            dist-bin/zerho-windows-x86_64.exe
+            dist-bin/zerho-darwin-x86_64
+            dist-bin/zerho-darwin-arm64
+            dist-bin/checksums.txt
+          generate_release_notes: true

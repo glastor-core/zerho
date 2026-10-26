@@ -1,0 +1,2 @@
+# Clean URL redirects for Zerho on Cloudflare Pages
+/playground  /playground/  301

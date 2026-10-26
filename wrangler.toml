@@ -1,0 +1,8 @@
+name = "zerho"
+compatibility_date = "2026-10-26"
+pages_build_output_dir = "./dist"
+
+[vars]
+PROJECT_NAME = "Zerho"
+PRODUCTION_URL = "https://zerho.xyz"
+GITHUB_REPO = "https://github.com/glastor-core/zerho"

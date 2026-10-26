@@ -1,0 +1,36 @@
+name: CI & Quality Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  ci-pipeline:
+    name: Type Check, Lint, Format & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Deno Runtime
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Run Full CI Suite (Check, Lint, Format, Test)
+        run: deno task ci
+
+      - name: Verify SSG Documentation Build
+        run: deno task build
+
+      - name: Verify CLI Standalone Compilation (Smoke Test)
+        run: |
+          mkdir -p bin
+          deno compile --allow-all --unstable-kv --output bin/zerho src/cli.ts
+          ./bin/zerho --help
+          ./bin/zerho -v

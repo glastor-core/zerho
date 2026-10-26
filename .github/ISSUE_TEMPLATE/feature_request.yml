@@ -1,0 +1,61 @@
+name: "✨ Solicitud de Funcionalidad"
+description: "Propón una nueva funcionalidad, componente interactivo o integración para Zerho"
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias por tu iniciativa para hacer de **Zerho** un motor de documentación aún más potente!
+        Cuanto más claro y fundamentado sea el caso de uso, más rápida será su evaluación técnica.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: "Área o Componente Principal"
+      description: "Selecciona el área técnica donde encaja esta propuesta."
+      options:
+        - "Compilador Markdown y Sintaxis (Callouts, Tabs, Mermaid, Alertas)"
+        - "Playground Interactivo y Monaco Editor (Presets, IntelliSense, Sandbox)"
+        - "Explorador OpenAPI 3.1 y Generación de Snippets"
+        - "Buscador Spotlight (Cmd+K) y Asistente IA RAG"
+        - "Plataformas de Despliegue (Deno Deploy, Cloudflare Pages, Edge)"
+        - "CLI Universal y Developer Experience (DX)"
+        - "Temas, CSS y Sistema de Diseño Visual"
+        - "Otro"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Problema o Necesidad"
+      description: "¿Qué limitación o fricción actual busca resolver esta propuesta?"
+      placeholder: "Actualmente no es posible configurar..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: "Propuesta de Solución"
+      description: "¿Cómo debería funcionar en Zerho? Incluye ejemplos de uso en Markdown o configuración en zerho.config.ts."
+      placeholder: "Me gustaría que Zerho agregara soporte para..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Alternativas Consideradas"
+      description: "¿Qué alternativas o soluciones temporales has evaluado?"
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: "Contexto Adicional / Referencias"
+      description: "Enlaces a documentación técnica, ejemplos en VitePress/Nextra o capturas."
+    validations:
+      required: false

@@ -1,0 +1,39 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# ZERHO DOCUMENTATION ENGINE & EDGE PORTAL - CODEOWNERS CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════════════
+# Propósito: Definir la propiedad del código y protocolos de revisión.
+# Referencia: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# ═══════════════════════════════════════════════════════════════════════════
+
+# [ GLOBAL MAINTAINERS ]
+* @glastor-core @glastor-dev
+
+# [ INFRAESTRUCTURA DE CI/CD & WORKFLOWS ]
+.github/ @glastor-core @glastor-dev
+deno.json @glastor-core @glastor-dev
+deno.lock @glastor-core @glastor-dev
+wrangler.toml @glastor-core @glastor-dev
+
+# [ CÓDIGO FUENTE & NÚCLEO DEL MOTOR ]
+/src/ @glastor-core @glastor-dev
+/src/core/ @glastor-core @glastor-dev
+/src/client/ @glastor-core @glastor-dev
+/src/templates/ @glastor-core @glastor-dev
+/src/cli.ts @glastor-core @glastor-dev
+main.ts @glastor-core @glastor-dev
+zerho.config.ts @glastor-core @glastor-dev
+
+# [ DOCUMENTACIÓN & CONTENIDO ]
+/docs/ @glastor-core @glastor-dev
+
+# [ SUITE DE PRUEBAS AUTOMATIZADAS ]
+/tests/ @glastor-core @glastor-dev
+
+# [ GOBERNANZA, COMPLIANCE & COMUNIDAD ]
+README.md @glastor-core @glastor-dev
+CHANGELOG.md @glastor-core @glastor-dev
+CONTRIBUTING.md @glastor-core @glastor-dev
+CONTRIBUTORS.md @glastor-core @glastor-dev
+CITATION.cff @glastor-core @glastor-dev
+SECURITY.md @glastor-core @glastor-dev
+LICENSE @glastor-core @glastor-dev

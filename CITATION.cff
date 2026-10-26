@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Zerho: Next-Generation Documentation Engine, Interactive Playground & Edge Portal"
+type: software
+version: "1.1.0"
+date-released: "2026-10-26"
+authors:
+  - family-names: "Cardoso"
+    given-names: "Andrés Antonio"
+    email: "glastor.info@gmail.com"
+repository-code: "https://github.com/glastor-core/zerho"
+url: "https://zerho.xyz"
+license: MIT
+keywords:
+  - "Deno 2"
+  - "Documentation Engine"
+  - "VitePress Alternative"
+  - "Static Site Generator"
+  - "SSG"
+  - "Monaco Editor"
+  - "OpenAPI 3.1"
+  - "TypeScript"
+  - "Edge AI"
+  - "RAG"
+  - "Deno Deploy"
+  - "Cloudflare Pages"
+  - "Deno KV"
+abstract: "Motor de documentación técnica y portal de desarrolladores de ultra-alto rendimiento para Deno 2, Deno Deploy y Cloudflare (zerho.xyz). Ofrece compilación estática determinista sub-100ms, sandbox interactivo en el navegador con Monaco Editor, explorador OpenAPI 3.1 con ejecutor de peticiones HTTP en tiempo real ('Try It Out'), búsqueda semántica con asistente de IA perimetral y retroalimentación integrada con Deno KV."

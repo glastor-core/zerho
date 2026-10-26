@@ -1,0 +1,83 @@
+name: "🐛 Reporte de Bug"
+description: "Reporta un problema técnico, error de compilación o fallo en el playground de Zerho"
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por tomarte el tiempo de reportar este problema en **Zerho**.
+        Proporcionar detalles específicos sobre el entorno y la página afectada agiliza enormemente la resolución.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: "Descripción del fallo"
+      description: "Explica de forma concisa qué falló o qué comportamiento anómalo se presentó."
+      placeholder: "Ejemplo: El bloque de código runnable no captura la salida de la consola en..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: "Módulo afectado"
+      description: "¿Qué componente de Zerho presentó el problema?"
+      options:
+        - "Compilador Markdown (Callouts, Tabs, Mermaid)"
+        - "Playground Interactivo (Monaco Editor & Sandbox)"
+        - "Explorador OpenAPI 3.1 (Try It Out & Snippets)"
+        - "Buscador Spotlight (Cmd+K) & Asistente IA RAG"
+        - "Servidor Edge (Deno Deploy & Deno KV feedback)"
+        - "Constructor SSG (builder.ts)"
+        - "Servidor de Desarrollo Local (dev.ts / HMR)"
+        - "CLI Universal (zerho)"
+        - "Cloudflare Pages (zerho.xyz)"
+        - "Otro / General"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: runtime_mode
+    attributes:
+      label: "Modo de Ejecución"
+      description: "¿Cómo estás ejecutando Zerho?"
+      options:
+        - "Deno Dev Server (deno task dev)"
+        - "Compilador SSG (deno task build)"
+        - "Servidor Deno Deploy (deno task serve / main.ts)"
+        - "Cloudflare Pages (producción en zerho.xyz)"
+        - "CLI Universal (src/cli.ts / bin/zerho)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Pasos para reproducir"
+      description: "Secuencia determinista de pasos para replicar el problema."
+      placeholder: |
+        1. Agregar archivo docs/mi-doc.md con...
+        2. Ejecutar `deno task build`
+        3. Observar el error en...
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: "Entorno"
+      description: "Indica versión de Deno, OS y navegador si aplica."
+      placeholder: |
+        - Deno: 2.x
+        - OS: Windows 11 / Ubuntu / macOS
+        - Navegador: Chrome 124 / Firefox / Safari
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: "Logs o Capturas de Pantalla"
+      description: "Pega la traza de error de la terminal o consola del navegador."
+      render: shell

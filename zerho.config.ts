@@ -102,14 +102,14 @@ export const config: ZerhoConfig = {
       ],
     },
     socialLinks: [
-      { icon: "github", link: "https://github.com/glastor-core/zerhopress" },
+      { icon: "github", link: "https://github.com/glastor-core/zerho" },
     ],
     footer: {
-      message: "Publicado bajo licencia MIT. Impulsado por Deno 2.x & Deno Deploy.",
-      copyright: "Copyright © 2026 ZerhoPress. Todos los derechos reservados.",
+      message: "Publicado bajo licencia MIT. Impulsado por Deno 2.x & Cloudflare.",
+      copyright: "Copyright © 2026 Zerho — GLASTOR®. Todos los derechos reservados.",
     },
     editLink: {
-      pattern: "https://github.com/glastor-core/zerhopress/edit/main/docs/:path",
+      pattern: "https://github.com/glastor-core/zerho/edit/main/docs/:path",
       text: "Editar esta página en GitHub",
     },
     search: {
