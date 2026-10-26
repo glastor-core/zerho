@@ -37,6 +37,13 @@ Este proyecto se adhiere a:
 
 ---
 
+## [1.7.0] - 2026-10-26
+
+### ✨ Added
+
+- **playground:** remove manual run button and enable debounced live auto-run (16e1948)
+
+---
 ## [1.6.2] - 2026-10-26
 
 ### 🐛 Fixed
