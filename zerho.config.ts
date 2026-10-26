@@ -41,13 +41,13 @@ export interface ZerhoConfig {
 }
 
 export const config: ZerhoConfig = {
-  title: "ZerhoPress",
+  title: "Zerho",
   tagline: "El motor de documentación de nivel pro diseñado nativamente para Deno & Deno Deploy",
   description:
     "SSG ultrarrápido, playground interactivo en vivo, búsqueda instantánea Cmd+K y estética de clase mundial.",
   lang: "es",
   themeConfig: {
-    siteTitle: "ZerhoPress",
+    siteTitle: "Zerho",
     nav: [
       { text: "Guía", link: "/guide/getting-started", activeMatch: "/guide/" },
       {
@@ -70,7 +70,7 @@ export const config: ZerhoConfig = {
         {
           text: "Introducción",
           items: [
-            { text: "¿Qué es ZerhoPress?", link: "/guide/getting-started" },
+            { text: "¿Qué es Zerho?", link: "/guide/getting-started" },
             { text: "Configuración", link: "/guide/configuration" },
             { text: "Deploy en Deno", link: "/guide/deployment", badge: "Edge" },
           ],

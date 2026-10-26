@@ -16,7 +16,7 @@ Deno 2 simplifica el desarrollo web moderno unificando la compatibilidad complet
 
 ```mermaid
 graph TD
-  App[Tu Aplicación / ZerhoPress] --> Deno2[Deno 2 Runtime Core]
+  App[Tu Aplicación / Zerho] --> Deno2[Deno 2 Runtime Core]
   Deno2 --> WebAPI[Web Standards: fetch, Streams, WebCrypto]
   Deno2 --> JSR[JSR: @std/fs, @std/http, @std/path]
   Deno2 --> NPM[NPM: import direct sin node_modules]
@@ -38,7 +38,7 @@ Deno.serve({ port: 8000 }, (request: Request) => {
     return Response.json({ mensaje: "¡Hola desde Deno 2!" });
   }
 
-  return new Response("Bienvenido a ZerhoPress Edge", { status: 200 });
+  return new Response("Bienvenido a Zerho Edge", { status: 200 });
 });
 ```
 
@@ -78,6 +78,6 @@ const existe = await exists("./deno.json");
 console.log("¿Existe deno.json?", existe);
 ```
 
-::: tip GESTIÓN EFICIENTE DE DEPENDENCIAS Al usar ZerhoPress en Deno Deploy, todas las dependencias
-se descargan y verifican criptográficamente en tiempo de arranque, garantizando compilaciones
+::: tip GESTIÓN EFICIENTE DE DEPENDENCIAS Al usar Zerho en Deno Deploy, todas las dependencias se
+descargan y verifican criptográficamente en tiempo de arranque, garantizando compilaciones
 inmutables y reproducibles. :::

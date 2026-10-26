@@ -1,8 +1,8 @@
 ---
 title: Configuración del Sitio
-description: Cómo personalizar la navegación, barras laterales, temas y metadatos en ZerhoPress.
+description: Cómo personalizar la navegación, barras laterales, temas y metadatos en Zerho.
 prev:
-  text: Comenzando con ZerhoPress
+  text: Comenzando con Zerho
   link: /guide/getting-started
 next:
   text: Superpoderes Markdown
@@ -22,7 +22,7 @@ import { ZerhoConfig } from "./src/core/types.ts";
 
 export const config: ZerhoConfig = {
   title: "Mi Documentación",
-  tagline: "Construida con ZerhoPress en Deno",
+  tagline: "Construida con Zerho en Deno",
   description: "Documentación técnica moderna con soporte Edge",
   lang: "es",
 
@@ -75,7 +75,7 @@ nav: [
 
 ## Configuración de Barra Lateral (`sidebar`)
 
-ZerhoPress permite definir barras laterales específicas por ruta o una estructura global unificada:
+Zerho permite definir barras laterales específicas por ruta o una estructura global unificada:
 
 ```ts
 sidebar: {
@@ -83,7 +83,7 @@ sidebar: {
     {
       text: "Fundamentos",
       items: [
-        { text: "¿Qué es ZerhoPress?", link: "/guide/getting-started" },
+        { text: "¿Qué es Zerho?", link: "/guide/getting-started" },
         { text: "Configuración", link: "/guide/configuration" }
       ]
     },

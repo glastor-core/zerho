@@ -4,10 +4,10 @@ import { buildSite } from "./core/builder.ts";
 import { VERSION } from "./version.ts";
 
 const HELP = `
-⚡ \x1b[35mZerhoPress CLI\x1b[0m - El motor de documentación Pro para Deno
+⚡ \x1b[35mZerho CLI\x1b[0m - El motor de documentación Pro para Deno
 
 \x1b[1mUSO:\x1b[0m
-  deno run -A jsr:@zerhopress/core <comando> [opciones]
+  deno run -A jsr:@zerho/core <comando> [opciones]
 
 \x1b[1mCOMANDOS:\x1b[0m
   \x1b[36mdev\x1b[0m       Inicia el servidor de desarrollo local con recarga en vivo (HMR)
@@ -19,7 +19,7 @@ const HELP = `
 \x1b[1mOPCIONES:\x1b[0m
   -p, --port <puerto>   Puerto para el servidor HTTP (por defecto: 3000 o 8000)
   -h, --help            Muestra este mensaje de ayuda
-  -v, --version         Muestra la versión de ZerhoPress
+  -v, --version         Muestra la versión de Zerho
 `;
 
 export async function runCli(args: string[] = Deno.args) {
@@ -31,12 +31,12 @@ export async function runCli(args: string[] = Deno.args) {
   }
 
   if (command === "--version" || command === "-v" || command === "version") {
-    console.log(`ZerhoPress v${VERSION} (Deno ${Deno.version.deno})`);
+    console.log(`Zerho v${VERSION} (Deno ${Deno.version.deno})`);
     return;
   }
 
   if (command === "build") {
-    console.log("⚡ Iniciando compilación de ZerhoPress...");
+    console.log("⚡ Iniciando compilación de Zerho...");
     await buildSite({ devMode: false });
     return;
   }
@@ -82,7 +82,7 @@ export async function runCli(args: string[] = Deno.args) {
 
   if (command === "init") {
     const targetDir = args[1] || ".";
-    console.log(`\n✨ Inicializando nuevo proyecto ZerhoPress en "${targetDir}"...`);
+    console.log(`\n✨ Inicializando nuevo proyecto Zerho en "${targetDir}"...`);
     const docsDir = join(Deno.cwd(), targetDir, "docs");
     await Deno.mkdir(docsDir, { recursive: true });
 
@@ -92,7 +92,7 @@ export async function runCli(args: string[] = Deno.args) {
       `---
 layout: home
 title: Mi Documentación
-description: Creado con ZerhoPress en Deno
+description: Creado con Zerho en Deno
 ---
 `,
     );
@@ -103,7 +103,7 @@ description: Creado con ZerhoPress en Deno
   if (command === "stats") {
     try {
       const kv = await Deno.openKv();
-      console.log("\n📊 \x1b[36m[ZerhoPress Edge Analytics (Deno KV)]\x1b[0m");
+      console.log("\n📊 \x1b[36m[Zerho Edge Analytics (Deno KV)]\x1b[0m");
       const iter = kv.list({ prefix: ["feedback"] });
       let found = false;
       for await (const entry of iter) {

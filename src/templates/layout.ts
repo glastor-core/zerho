@@ -136,7 +136,7 @@ export function renderPage(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(pageTitle)}</title>
   <meta name="description" content="${escapeHtml(pageDesc)}">
-  <meta name="generator" content="ZerhoPress for Deno">
+  <meta name="generator" content="Zerho for Deno">
   <meta property="og:title" content="${escapeHtml(pageTitle)}">
   <meta property="og:description" content="${escapeHtml(pageDesc)}">
   <meta property="og:type" content="website">
@@ -278,7 +278,7 @@ export function renderPage(
 
 app<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"/api/v1/status"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">c</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
   <span class="token keyword">return</span> c<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
-    engine<span class="token operator">:</span> <span class="token string">"ZerhoPress"</span><span class="token punctuation">,</span>
+    engine<span class="token operator">:</span> <span class="token string">"Zerho"</span><span class="token punctuation">,</span>
     runtime<span class="token operator">:</span> <span class="token string">"Deno Edge"</span><span class="token punctuation">,</span>
     latencyMs<span class="token operator">:</span> <span class="token number">1.4</span><span class="token punctuation">,</span>
     status<span class="token operator">:</span> <span class="token string">"operational"</span>
@@ -466,7 +466,7 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
         <div class="ai-response-card" id="aiResponseCard">
           <div class="ai-card-header">
             <span class="ai-avatar">⚡</span>
-            <span class="ai-bot-name">ZerhoPress Edge AI</span>
+            <span class="ai-bot-name">Zerho Edge AI</span>
             <span class="ai-status-pill" id="aiStatusPill">Listo</span>
           </div>
           <div class="ai-content-body" id="aiContentBody">

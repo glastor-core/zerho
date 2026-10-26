@@ -16,7 +16,7 @@ Deno.test("Builder: Build static site into output directory", async () => {
 title: Inicio de Prueba
 layout: home
 hero:
-  title: ZerhoPress Test
+  title: Zerho Test
   tagline: Probando el compilador SSG
 ---
 # Página de Inicio`,

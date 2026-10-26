@@ -1,4 +1,4 @@
-// ZerhoPress Client Controller
+// Zerho Client Controller
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   initSidebarMobile();
@@ -157,7 +157,7 @@ window.switchSearchTab = function (tab) {
     if (resultsContainer) resultsContainer.style.display = "none";
     if (aiChatView) aiChatView.style.display = "block";
     if (input) {
-      input.placeholder = "Pregunta a la IA sobre ZerhoPress o Deno...";
+      input.placeholder = "Pregunta a la IA sobre Zerho o Deno...";
       input.focus();
     }
   }

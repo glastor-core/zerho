@@ -1,4 +1,4 @@
-# ⚡ ZerhoPress
+# ⚡ Zerho
 
 <p align="center">
   <strong>El motor de documentación técnica de nivel pro diseñado nativamente para Deno 2 y Deno Deploy.</strong>
@@ -13,9 +13,9 @@
 
 ---
 
-## 🚀 ¿Por qué ZerhoPress supera a VitePress en Deno?
+## 🚀 ¿Por qué Zerho supera a VitePress en Deno?
 
-| Característica            |           VitePress Estándar           |            ZerhoPress Pro en Deno             |
+| Característica            |           VitePress Estándar           |               Zerho Pro en Deno               |
 | :------------------------ | :------------------------------------: | :-------------------------------------------: |
 | **Runtime Base**          | Node.js + npm + node_modules (400MB+)  |      **Deno 2 Nativo (0 node_modules)**       |
 | **Playground en Vivo**    | ❌ Requiere plugins externos complejos |  **✅ Sandbox TypeScript / Deno Integrado**   |
@@ -93,4 +93,4 @@ deployctl deploy --project=mi-documentacion main.ts
 
 ## 📄 Licencia
 
-MIT License © 2026 ZerhoPress.
+MIT License © 2026 Zerho.

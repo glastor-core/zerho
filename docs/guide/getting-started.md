@@ -1,5 +1,5 @@
 ---
-title: Comenzando con ZerhoPress
+title: Comenzando con Zerho
 description: Guía de inicio rápido para crear y desplegar tu documentación técnica en Deno.
 prev:
   text: Inicio
@@ -9,13 +9,13 @@ next:
   link: /guide/configuration
 ---
 
-## ¿Qué es ZerhoPress?
+## ¿Qué es Zerho?
 
-**ZerhoPress** es un generador de sitios estáticos (SSG) y de documentación técnica de alta gama
+**Zerho** es un generador de sitios estáticos (SSG) y de documentación técnica de alta gama
 construido específicamente para el ecosistema **Deno 2** y optimizado para distribución global
 instantánea en **Deno Deploy**.
 
-Inspirado en la ergonomía de VitePress, ZerhoPress eleva la experiencia al **Nivel Pro**:
+Inspirado en la ergonomía de VitePress, Zerho eleva la experiencia al **Nivel Pro**:
 
 1. **Nativo para Deno 2**: Cero necesidad de Node.js, `npm` ni paquetes duplicados de 400MB.
 2. **Playground Interactivo Integrado**: Ejecuta código TypeScript/JavaScript directamente dentro de
@@ -29,7 +29,7 @@ Inspirado en la ergonomía de VitePress, ZerhoPress eleva la experiencia al **Ni
 
 ## Inicio Rápido
 
-Para iniciar un proyecto con ZerhoPress en tu equipo, solo necesitas tener [Deno](https://deno.com)
+Para iniciar un proyecto con Zerho en tu equipo, solo necesitas tener [Deno](https://deno.com)
 instalado:
 
 ```bash [Terminal]
@@ -62,7 +62,7 @@ interface RuntimeInfo {
 }
 
 const info: RuntimeInfo = {
-  name: "ZerhoPress Sandbox",
+  name: "Zerho Sandbox",
   version: Deno.version.deno,
   features: ["Web Workers", "WebCrypto", "Streams", "Edge Caching"],
 };
@@ -76,7 +76,7 @@ console.log("Estado de la región:", Deno.env.get("REGION"));
 
 ## Estructura de Directorios
 
-La estructura recomendada para un proyecto ZerhoPress es limpia y modular:
+La estructura recomendada para un proyecto Zerho es limpia y modular:
 
 ```bash
 mi-proyecto/
@@ -95,11 +95,11 @@ mi-proyecto/
 
 ## Arquitectura de Compilación
 
-ZerhoPress sigue un pipeline de compilación directo y sin sobrecarga:
+Zerho sigue un pipeline de compilación directo y sin sobrecarga:
 
 ```mermaid
 graph LR
-  MD[Archivos Markdown] --> Compiler[Compilador ZerhoPress]
+  MD[Archivos Markdown] --> Compiler[Compilador Zerho]
   Config[zerho.config.ts] --> Compiler
   Compiler --> HTML[HTML Semántico + SEO]
   Compiler --> Search[Índice de Búsqueda JSON]

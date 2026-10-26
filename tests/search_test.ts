@@ -7,9 +7,9 @@ Deno.test("SearchIndexer: Add documents and query results", () => {
   indexer.addDocument({
     id: "/guide/getting-started",
     url: "/guide/getting-started",
-    title: "Primeros Pasos con ZerhoPress",
+    title: "Primeros Pasos con Zerho",
     section: "Instalación",
-    content: "Para comenzar a usar ZerhoPress en Deno 2 necesitas configurar deno.json",
+    content: "Para comenzar a usar Zerho en Deno 2 necesitas configurar deno.json",
   });
 
   indexer.addDocument({

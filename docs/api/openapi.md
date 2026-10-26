@@ -11,9 +11,9 @@ next:
 
 ## Explorador de Endpoints REST en Vivo
 
-Esta sección demuestra el motor de documentación de APIs de **ZerhoPress**. Puedes expandir
-cualquier endpoint, consultar los parámetros y esquemas JSON, generar snippets en **cURL, TypeScript
-o Python**, y presionar **"Enviar Request"** para probar la API en tiempo real.
+Esta sección demuestra el motor de documentación de APIs de **Zerho**. Puedes expandir cualquier
+endpoint, consultar los parámetros y esquemas JSON, generar snippets en **cURL, TypeScript o
+Python**, y presionar **"Enviar Request"** para probar la API en tiempo real.
 
 <div id="openapi-container">
   <!-- El contenido interactivo es inyectado por el renderizador de OpenAPI -->
@@ -25,7 +25,7 @@ import { renderOpenApiExplorer } from "/assets/openapi-client.js";
 const spec = {
   title: "Deno Deploy Edge Services API",
   version: "2.1.0",
-  description: "API global para inspección de despliegues, métricas perimetrales y estado de dominios en ZerhoPress.",
+  description: "API global para inspección de despliegues, métricas perimetrales y estado de dominios en Zerho.",
   baseUrl: "https://api.deno.com/v1",
   endpoints: [
     {

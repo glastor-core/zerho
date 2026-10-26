@@ -257,7 +257,7 @@ window.sendApiRequest = async function (epId, method, defaultUrl) {
       resContent.textContent = JSON.stringify(
         {
           status: "success",
-          engine: "ZerhoPress OpenAPI Explorer",
+          engine: "Zerho OpenAPI Explorer",
           timestamp: new Date().toISOString(),
           request: { method, url: targetUrl },
           data: {

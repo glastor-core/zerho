@@ -1,6 +1,6 @@
 ---
 title: Superpoderes Markdown
-description: Descubre todas las capacidades enriquecidas de autoría en ZerhoPress.
+description: Descubre todas las capacidades enriquecidas de autoría en Zerho.
 prev:
   text: Configuración del Sitio
   link: /guide/configuration
@@ -11,7 +11,7 @@ next:
 
 ## Callouts y Contenedores Personalizados
 
-ZerhoPress soporta contenedores estilizados estilo VitePress para resaltar notas, sugerencias,
+Zerho soporta contenedores estilizados estilo VitePress para resaltar notas, sugerencias,
 precauciones y detalles desplegables:
 
 ::: info INFORMACIÓN Este es un bloque de información general con tono azul eléctrico. Ideal para
@@ -33,7 +33,7 @@ sobrecargue la lectura inicial del usuario, como registros de depuración o tabl
 
 ## Compatibilidad con Alertas de GitHub
 
-ZerhoPress también procesa automáticamente la sintaxis estándar de alertas de GitHub:
+Zerho también procesa automáticamente la sintaxis estándar de alertas de GitHub:
 
 > [!NOTE]
 > Esta alerta fue escrita utilizando la sintaxis estándar `> [!NOTE]` de GitHub Flavored Markdown.
@@ -52,7 +52,7 @@ Al documentar código de producción, puedes especificar el nombre del archivo e
 import { serve } from "jsr:@std/http";
 
 serve((req) => {
-  return new Response("¡Hola desde ZerhoPress en Deno 2!");
+  return new Response("¡Hola desde Zerho en Deno 2!");
 }, { port: 8000 });
 ```
 
@@ -60,8 +60,8 @@ serve((req) => {
 
 ## Bloques Ejecutables Interactivos
 
-Si agregas la palabra clave `run` a un bloque de código (por ejemplo: `ts run`), ZerhoPress lo
-transforma en un **Sandbox Interactivo de Deno** con botón de ejecución y consola en vivo:
+Si agregas la palabra clave `run` a un bloque de código (por ejemplo: `ts run`), Zerho lo transforma
+en un **Sandbox Interactivo de Deno** con botón de ejecución y consola en vivo:
 
 ```ts run [calculo-crypto.ts]
 const datos = "Mensaje secreto para Deno";
@@ -81,8 +81,8 @@ console.log("Hash SHA-256 :", hash);
 
 ## Diagramas Mermaid Nativos
 
-Escribe diagramas en texto plano utilizando la sintaxis `mermaid`. ZerhoPress los procesa e
-interactúa dinámicamente:
+Escribe diagramas en texto plano utilizando la sintaxis `mermaid`. Zerho los procesa e interactúa
+dinámicamente:
 
 ```mermaid
 sequenceDiagram
@@ -104,7 +104,7 @@ sequenceDiagram
 
 ## Tablas de Comparación
 
-| Característica           |       VitePress Estándar       |          ZerhoPress Pro           |
+| Característica           |       VitePress Estándar       |             Zerho Pro             |
 | :----------------------- | :----------------------------: | :-------------------------------: |
 | **Runtime Base**         |         Node.js / npm          |         **Deno 2 Nativo**         |
 | **Playground en Vivo**   |      ❌ Requiere plugins       |      **✅ Nativo de Serie**       |

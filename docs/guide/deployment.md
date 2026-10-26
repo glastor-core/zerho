@@ -14,7 +14,7 @@ next:
 **Deno Deploy** es una plataforma distribuida a nivel global que ejecuta código JavaScript y
 TypeScript en el Edge, en más de 35 regiones alrededor del mundo.
 
-ZerhoPress está arquitectado específicamente para Deno Deploy: su archivo raíz `main.ts` sirve como
+Zerho está arquitectado específicamente para Deno Deploy: su archivo raíz `main.ts` sirve como
 servidor HTTP edge nativo y gestor de activos estáticos optimizado con compresión y encabezados de
 caché inmutables.
 
@@ -22,7 +22,7 @@ caché inmutables.
 
 ## Método 1: Integración con GitHub (Recomendado)
 
-1. Sube tu proyecto ZerhoPress a un repositorio de **GitHub**.
+1. Sube tu proyecto Zerho a un repositorio de **GitHub**.
 2. Ingresa a la consola de [Deno Deploy Dashboard](https://dash.deno.com).
 3. Haz clic en **"New Project"** y selecciona tu repositorio.
 4. En la configuración del proyecto:
@@ -51,7 +51,7 @@ deployctl deploy --project=mi-documentacion main.ts
 
 ## Rendimiento y Encabezados Edge
 
-El servidor `main.ts` de ZerhoPress aplica automáticamente las mejores prácticas de rendimiento web:
+El servidor `main.ts` de Zerho aplica automáticamente las mejores prácticas de rendimiento web:
 
 ```ts [main.ts]
 // Configuración de encabezados automáticos de caché
@@ -73,7 +73,7 @@ const cacheControl = isAsset
 Si deseas ejecutar verificaciones de tipos y formateo antes de desplegar:
 
 ```yaml [.github/workflows/deploy.yml]
-name: Deploy ZerhoPress
+name: Deploy Zerho
 
 on:
   push:

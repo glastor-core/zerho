@@ -11,7 +11,7 @@ Deno.test("CLI: Run with --help outputs usage manual", async () => {
   const output = new TextDecoder().decode(stdout);
 
   assertEquals(code, 0);
-  assertStringIncludes(output, "ZerhoPress CLI");
+  assertStringIncludes(output, "Zerho CLI");
   assertStringIncludes(output, "COMANDOS:");
   assertStringIncludes(output, "dev");
   assertStringIncludes(output, "build");
@@ -31,5 +31,5 @@ Deno.test("CLI: Run with -v outputs version string", async () => {
   const output = new TextDecoder().decode(stdout);
 
   assertEquals(code, 0);
-  assertStringIncludes(output, "ZerhoPress v");
+  assertStringIncludes(output, "Zerho v");
 });

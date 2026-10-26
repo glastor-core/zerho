@@ -63,7 +63,7 @@ Deno.test("Server: POST /api/ai/ask synthesizes response with sources", async ()
   const data = await res.json();
   assertEquals(typeof data.answer, "string");
   assertEquals(Array.isArray(data.sources), true);
-  assertEquals(data.engine, "ZerhoPress Edge AI RAG");
+  assertEquals(data.engine, "Zerho Edge AI RAG");
 });
 
 Deno.test("Server: Return 404 for non-existent page", async () => {

@@ -119,7 +119,7 @@ export async function handleRequest(req: Request): Promise<Response> {
           `No encontré coincidencias exactas para "${query}" en la documentación actual. Te sugiero explorar la sección de **Guía de Inicio** o consultar el **Playground Interactivo**.`;
       } else {
         const topDoc = scored[0].doc;
-        answer = `En base a la documentación de **ZerhoPress**:\n\n` +
+        answer = `En base a la documentación de **Zerho**:\n\n` +
           `Para resolver tu consulta sobre **"${query}"**, la sección más relevante es [${
             topSources[0].title
           }](${topSources[0].url}).\n\n` +
@@ -130,7 +130,7 @@ export async function handleRequest(req: Request): Promise<Response> {
       return Response.json({
         answer,
         sources: topSources,
-        engine: "ZerhoPress Edge AI RAG",
+        engine: "Zerho Edge AI RAG",
         timestamp: new Date().toISOString(),
       });
     } catch (e) {
@@ -158,7 +158,7 @@ export async function handleRequest(req: Request): Promise<Response> {
       headers: {
         "content-type": getContentType(diskPath),
         "cache-control": cacheControl,
-        "x-powered-by": "ZerhoPress / Deno 2",
+        "x-powered-by": "Zerho / Deno 2",
       },
     });
   } catch {
@@ -170,11 +170,11 @@ export async function handleRequest(req: Request): Promise<Response> {
         headers: {
           "content-type": "text/html; charset=utf-8",
           "cache-control": "public, max-age=3600",
-          "x-powered-by": "ZerhoPress / Deno 2",
+          "x-powered-by": "Zerho / Deno 2",
         },
       });
     } catch {
-      return new Response("404: Página no encontrada en ZerhoPress", {
+      return new Response("404: Página no encontrada en Zerho", {
         status: 404,
         headers: { "content-type": "text/plain; charset=utf-8" },
       });

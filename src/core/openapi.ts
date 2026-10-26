@@ -279,7 +279,7 @@ window.sendApiRequest = async function(epId, method, defaultUrl) {
     if (resContent) {
       resContent.textContent = JSON.stringify({
         status: "success",
-        engine: "ZerhoPress OpenAPI Explorer",
+        engine: "Zerho OpenAPI Explorer",
         timestamp: new Date().toISOString(),
         request: { method, url: targetUrl },
         data: { message: "Simulación de respuesta exitosa desde el Edge Sandbox" }

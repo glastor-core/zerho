@@ -17,7 +17,7 @@ export async function buildSite(options: BuildOptions = {}) {
   const outDir = options.outDir || join(Deno.cwd(), "dist");
   const devMode = options.devMode || false;
 
-  console.log(`\n⚡ \x1b[35m[ZerhoPress]\x1b[0m Compilando sitio para Deno...`);
+  console.log(`\n⚡ \x1b[35m[Zerho]\x1b[0m Compilando sitio para Deno...`);
 
   // Ensure output directories
   await Deno.mkdir(outDir, { recursive: true });
@@ -105,7 +105,7 @@ export async function buildSite(options: BuildOptions = {}) {
 
   const duration = (performance.now() - startTime).toFixed(1);
   console.log(
-    `✨ \x1b[32m[ZerhoPress Exitoso]\x1b[0m ${pageCount} páginas compiladas e indexadas en ${duration}ms\n`,
+    `✨ \x1b[32m[Zerho Exitoso]\x1b[0m ${pageCount} páginas compiladas e indexadas en ${duration}ms\n`,
   );
 }
 

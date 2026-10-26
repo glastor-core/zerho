@@ -1,6 +1,6 @@
 ---
 title: Playground Interactivo Deno
-description: Entorno de ejecución TypeScript y JavaScript en vivo impulsado por el sandbox de ZerhoPress.
+description: Entorno de ejecución TypeScript y JavaScript en vivo impulsado por el sandbox de Zerho.
 prev:
   text: Despliegue en Deno Deploy
   link: /guide/deployment
@@ -62,9 +62,9 @@ directamente en el navegador.
 
 ## Capacidades del Sandbox
 
-::: tip WEB WORKERS Y TIPADO DINÁMICO El sandbox de ZerhoPress remueve automáticamente las
-anotaciones de tipo de TypeScript para ejecutar el código resultante en el motor V8 nativo de tu
-navegador, garantizando un rendimiento casi instantáneo (menos de 5ms de latencia). :::
+::: tip WEB WORKERS Y TIPADO DINÁMICO El sandbox de Zerho remueve automáticamente las anotaciones de
+tipo de TypeScript para ejecutar el código resultante en el motor V8 nativo de tu navegador,
+garantizando un rendimiento casi instantáneo (menos de 5ms de latencia). :::
 
 ### APIs Soportadas en el Sandbox
 

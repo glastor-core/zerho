@@ -1,4 +1,4 @@
-// ZerhoPress Live Sandbox & Playground Engine
+// Zerho Live Sandbox & Playground Engine
 (function () {
   // Simulated Deno environment inside browser
   function createDenoEnvironment(logs) {
@@ -20,8 +20,8 @@
       },
       readTextFile: (path) => {
         const vfs = {
-          "deno.json": JSON.stringify({ name: "zerhopress", version: "1.0.0" }, null, 2),
-          "README.md": "# Bienvenido a ZerhoPress\nEl motor pro de documentación para Deno.",
+          "deno.json": JSON.stringify({ name: "zerho", version: "1.0.0" }, null, 2),
+          "README.md": "# Bienvenido a Zerho\nEl motor pro de documentación para Deno.",
         };
         if (vfs[path]) return Promise.resolve(vfs[path]);
         return Promise.reject(new Error(`NotFound: No such file or directory: ${path}`));
@@ -176,7 +176,7 @@ Deno.serve((req) => {
   console.log("Incoming request path:", url.pathname);
 
   return new Response(JSON.stringify({
-    server: "ZerhoPress Deno Server",
+    server: "Zerho Deno Server",
     denoVersion: Deno.version.deno,
     timestamp: new Date().toISOString(),
     status: 200
@@ -186,7 +186,7 @@ Deno.serve((req) => {
 });`,
 
       crypto: `// Criptografía moderna con WebCrypto nativo en Deno
-const message = "ZerhoPress Pro Docs Engine";
+const message = "Zerho Pro Docs Engine";
 const encoder = new TextEncoder();
 const data = encoder.encode(message);
 
@@ -198,7 +198,7 @@ console.log("Texto original:", message);
 console.log("SHA-256 Digest:", hashHex);`,
 
       streams: `// Procesamiento de Flujos (Streams) asíncronos
-const words = ["Deno", "Deploy", "TypeScript", "ZerhoPress", "Ultra-Fast"];
+const words = ["Deno", "Deploy", "TypeScript", "Zerho", "Ultra-Fast"];
 
 const stream = new ReadableStream({
   start(controller) {

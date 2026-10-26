@@ -96,4 +96,4 @@ Deno.serve({ port: PORT }, async (req) => {
   }
 });
 
-console.log(`\n🚀 \x1b[36m[ZerhoPress Dev Server]\x1b[0m Listo en http://localhost:${PORT}/\n`);
+console.log(`\n🚀 \x1b[36m[Zerho Dev Server]\x1b[0m Listo en http://localhost:${PORT}/\n`);
