@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "deno",
+      "command": "task",
+      "args": ["dev"],
+      "problemMatcher": ["$deno"],
+      "label": "deno: dev",
+      "detail": "Inicia servidor de desarrollo con HMR"
+    },
+    {
+      "type": "deno",
+      "command": "task",
+      "args": ["build"],
+      "problemMatcher": ["$deno"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "label": "deno: build",
+      "detail": "Compila el sitio estático para producción"
+    },
+    {
+      "type": "deno",
+      "command": "task",
+      "args": ["test"],
+      "problemMatcher": ["$deno"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "label": "deno: test",
+      "detail": "Ejecuta suite de pruebas automatizadas"
+    },
+    {
+      "type": "deno",
+      "command": "task",
+      "args": ["ci"],
+      "problemMatcher": ["$deno"],
+      "label": "deno: ci",
+      "detail": "Ejecuta pipeline completo (check, lint, fmt:check, test)"
+    }
+  ]
+}

@@ -7,5 +7,9 @@ coverage/
 # OS and Editor files
 .DS_Store
 Thumbs.db
-.vscode/
 .idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json

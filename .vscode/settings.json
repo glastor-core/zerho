@@ -1,0 +1,24 @@
+{
+  "deno.enable": true,
+  "deno.lint": true,
+  "deno.unstable": ["kv"],
+  "editor.defaultFormatter": "denoland.vscode-deno",
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "editor.formatOnSave": true,
+  "typescript.suggest.completeFunctionCalls": true,
+  "javascript.suggest.completeFunctionCalls": true
+}

@@ -1,0 +1,70 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Deno: Iniciar Servidor (main.ts)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--allow-net",
+        "--allow-read",
+        "--allow-write",
+        "--allow-env",
+        "--unstable-kv",
+        "--inspect-wait",
+        "main.ts"
+      ],
+      "attachSimplePort": 9229
+    },
+    {
+      "name": "Deno: Servidor de Desarrollo HMR (dev.ts)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--allow-net",
+        "--allow-read",
+        "--allow-write",
+        "--allow-env",
+        "--unstable-kv",
+        "--inspect-wait",
+        "src/core/dev.ts"
+      ],
+      "attachSimplePort": 9229
+    },
+    {
+      "name": "Deno: Debug Archivo de Test Actual",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "test",
+        "-A",
+        "--unstable-kv",
+        "--inspect-wait",
+        "${file}"
+      ],
+      "attachSimplePort": 9229
+    },
+    {
+      "name": "Deno: Debug Todos los Tests",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "test",
+        "-A",
+        "--unstable-kv",
+        "--inspect-wait"
+      ],
+      "attachSimplePort": 9229
+    }
+  ]
+}
