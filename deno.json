@@ -1,0 +1,22 @@
+{
+  "name": "zerhopress",
+  "version": "1.0.0",
+  "description": "Next-generation documentation engine for Deno & Deno Deploy with live interactive playground",
+  "exports": "./main.ts",
+  "tasks": {
+    "dev": "deno run --allow-net --allow-read --allow-write --allow-env --watch src/core/dev.ts",
+    "build": "deno run --allow-net --allow-read --allow-write --allow-env src/core/builder.ts",
+    "serve": "deno run --allow-net --allow-read --allow-env main.ts"
+  },
+  "imports": {
+    "@std/fs": "jsr:@std/fs@^1.0.14",
+    "@std/http": "jsr:@std/http@^1.0.13",
+    "@std/path": "jsr:@std/path@^1.0.8",
+    "@std/yaml": "jsr:@std/yaml@^1.0.5",
+    "marked": "npm:marked@^15.0.7",
+    "prismjs": "npm:prismjs@^1.30.0"
+  },
+  "compilerOptions": {
+    "lib": ["deno.window", "dom"]
+  }
+}

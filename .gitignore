@@ -1,0 +1,8 @@
+# Build artifacts (optional: main.ts auto-compiles if dist is missing on Deno Deploy)
+dist/
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
