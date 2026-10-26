@@ -76,3 +76,30 @@ Deno.test("Server: Return 404 for non-existent page", async () => {
   const text = await res.text();
   assertStringIncludes(text, "404");
 });
+
+Deno.test("Server: POST /api/analytics/search ingests query telemetry", async () => {
+  const req = new Request("http://localhost:8000/api/analytics/search", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query: "deno deploy", count: 5 }),
+  });
+
+  const res = await handleRequest(req);
+  assertEquals(res.status, 200);
+  const data = await res.json();
+  assertEquals(data.success, true);
+});
+
+Deno.test("Server: GET /api/insights returns search and feedback analytics", async () => {
+  const req = new Request("http://localhost:8000/api/insights", {
+    method: "GET",
+  });
+
+  const res = await handleRequest(req);
+  assertEquals(res.status, 200);
+  const data = await res.json();
+  assertEquals(data.success, true);
+  assertEquals(typeof data.insights.totalSearches, "number");
+  assertEquals(Array.isArray(data.insights.topQueries), true);
+  assertEquals(Array.isArray(data.insights.unansweredQueries), true);
+});

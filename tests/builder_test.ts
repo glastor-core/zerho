@@ -73,6 +73,15 @@ Contenido del primer capítulo con información relevante.`,
 
     const robots = await Deno.readTextFile(join(outDir, "robots.txt"));
     assertStringIncludes(robots, "Sitemap: https://zerho.xyz/sitemap.xml");
+
+    // Check llms.txt and llms-full.txt
+    const llmsTxt = await Deno.readTextFile(join(outDir, "llms.txt"));
+    assertStringIncludes(llmsTxt, "# Zerho");
+    assertStringIncludes(llmsTxt, "https://zerho.xyz/guide");
+
+    const llmsFullTxt = await Deno.readTextFile(join(outDir, "llms-full.txt"));
+    assertStringIncludes(llmsFullTxt, "Documentación Técnica Completa para LLMs");
+    assertStringIncludes(llmsFullTxt, "Primer Capítulo");
   } finally {
     // Clean up temp dir
     await Deno.remove(tmpBase, { recursive: true });

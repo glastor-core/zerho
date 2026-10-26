@@ -39,6 +39,7 @@ function getContentType(path: string): string {
     ".ico": "image/x-icon",
     ".xml": "application/xml; charset=utf-8",
     ".txt": "text/plain; charset=utf-8",
+    ".md": "text/markdown; charset=utf-8",
   };
   return types[ext] || "application/octet-stream";
 }
@@ -96,7 +97,86 @@ export async function handleRequest(req: Request): Promise<Response> {
     return Response.json({ success: true, stats });
   }
 
-  // 3. Ask AI Edge Semantic Search & RAG
+  // 3. Search Analytics Telemetry
+  if (url.pathname === "/api/analytics/search" && req.method === "POST") {
+    try {
+      const { query, count } = await req.json();
+      if (!query || typeof query !== "string") {
+        return Response.json({ success: false, error: "query is required" }, { status: 400 });
+      }
+
+      const cleanQuery = query.trim().toLowerCase().slice(0, 100);
+      if (kv && cleanQuery) {
+        await kv.atomic()
+          .sum(["analytics", "searches_total"], 1n)
+          .sum(["analytics", "query", cleanQuery], 1n)
+          .commit();
+
+        if (Number(count) === 0) {
+          await kv.atomic()
+            .sum(["analytics", "zero_results", cleanQuery], 1n)
+            .commit();
+        }
+      }
+
+      return Response.json({ success: true, message: "Búsqueda registrada en Deno KV" });
+    } catch {
+      return Response.json({ success: false }, { status: 400 });
+    }
+  }
+
+  // 4. Documentation Insights & KV Analytics
+  if (url.pathname === "/api/insights" && req.method === "GET") {
+    let totalSearches = 0;
+    const topQueries: Array<{ query: string; count: number }> = [];
+    const unansweredQueries: Array<{ query: string; count: number }> = [];
+    const feedbackSummary: Record<string, { positive: number; negative: number }> = {};
+
+    if (kv) {
+      // 1. Total Searches
+      const totalEntry = await kv.get<Deno.KvU64>(["analytics", "searches_total"]);
+      if (totalEntry?.value) {
+        totalSearches = Number(totalEntry.value.value);
+      }
+
+      // 2. Top Queries
+      const queryIter = kv.list<Deno.KvU64>({ prefix: ["analytics", "query"] });
+      for await (const entry of queryIter) {
+        const q = entry.key[2] as string;
+        topQueries.push({ query: q, count: Number(entry.value.value) });
+      }
+      topQueries.sort((a, b) => b.count - a.count);
+
+      // 3. Unanswered Queries (zero results)
+      const zeroIter = kv.list<Deno.KvU64>({ prefix: ["analytics", "zero_results"] });
+      for await (const entry of zeroIter) {
+        const q = entry.key[2] as string;
+        unansweredQueries.push({ query: q, count: Number(entry.value.value) });
+      }
+      unansweredQueries.sort((a, b) => b.count - a.count);
+
+      // 4. Feedback Summary
+      const fbIter = kv.list({ prefix: ["feedback"] });
+      for await (const entry of fbIter) {
+        const path = entry.key[1] as string;
+        const type = entry.key[2] as "positive" | "negative";
+        feedbackSummary[path] = feedbackSummary[path] || { positive: 0, negative: 0 };
+        feedbackSummary[path][type] = Number(entry.value);
+      }
+    }
+
+    return Response.json({
+      success: true,
+      insights: {
+        totalSearches,
+        topQueries: topQueries.slice(0, 10),
+        unansweredQueries: unansweredQueries.slice(0, 10),
+        feedbackSummary,
+      },
+    });
+  }
+
+  // 5. Ask AI Edge Semantic Search & RAG
   if (url.pathname === "/api/ai/ask" && req.method === "POST") {
     try {
       const { query } = await req.json();

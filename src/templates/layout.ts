@@ -145,6 +145,7 @@ export function renderPage(
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM context">
   
   <link rel="stylesheet" href="/assets/theme.css?v=${VERSION}">
   ${
@@ -192,6 +193,37 @@ export function renderPage(
           <span class="search-placeholder">Buscar docs...</span>
           <kbd class="search-kbd"><abbr title="Command">⌘</abbr> K</kbd>
         </button>
+
+        ${
+    config.locales && Object.keys(config.locales).length > 1
+      ? (() => {
+        const isEn = currentPath.startsWith("/en/") || currentPath === "/en";
+        const currentLangLabel = isEn ? "English" : "Español";
+        const targetEn = isEn
+          ? currentPath
+          : (currentPath === "/" ? "/en/guide/getting-started" : `/en${currentPath}`);
+        const targetEs = isEn ? (currentPath.replace(/^\/en/, "") || "/") : currentPath;
+
+        return `
+        <!-- Language Switcher (i18n) -->
+        <div class="locale-switcher" id="localeSwitcher">
+          <button class="locale-btn" id="localeBtn" aria-label="Cambiar idioma" title="Cambiar idioma">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span class="locale-text">${currentLangLabel}</span>
+            <svg class="locale-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="locale-dropdown" id="localeDropdown" style="display: none;">
+            <a href="${targetEs}" class="locale-item ${
+          !isEn ? "active" : ""
+        }" data-lang="es">🇪🇸 Español</a>
+            <a href="${targetEn}" class="locale-item ${
+          isEn ? "active" : ""
+        }" data-lang="en">🇬🇧 English</a>
+          </div>
+        </div>`;
+      })()
+      : ""
+  }
 
         <!-- Theme Toggle -->
         <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Alternar tema">

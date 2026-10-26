@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initTocScrollSpy();
   initSearchModal();
   initCodeGroups();
+  initLocaleSwitcher();
 });
 
 // Polyglot Synchronized Code Groups
@@ -101,6 +102,34 @@ function initCodeGroups() {
         });
       }
     }
+  });
+}
+
+// Language Switcher (i18n)
+function initLocaleSwitcher() {
+  const switcher = document.getElementById("localeSwitcher");
+  const btn = document.getElementById("localeBtn");
+  const dropdown = document.getElementById("localeDropdown");
+
+  if (!switcher || !btn || !dropdown) return;
+
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = dropdown.style.display === "flex";
+    dropdown.style.display = isOpen ? "none" : "flex";
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!switcher.contains(e.target)) {
+      dropdown.style.display = "none";
+    }
+  });
+
+  dropdown.querySelectorAll(".locale-item").forEach((item) => {
+    item.addEventListener("click", () => {
+      const lang = item.getAttribute("data-lang");
+      if (lang) localStorage.setItem("zerho-locale", lang);
+    });
   });
 }
 
@@ -341,6 +370,19 @@ function initSearchModal() {
     }
   });
 
+  let telemetryTimer = null;
+  function reportSearchAnalytics(query, count) {
+    if (!query || query.length < 2) return;
+    clearTimeout(telemetryTimer);
+    telemetryTimer = setTimeout(() => {
+      fetch("/api/analytics/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query, count, path: window.location.pathname }),
+      }).catch(() => {});
+    }, 800);
+  }
+
   // Input listener for Quick Search
   input.addEventListener("input", () => {
     if (window.__currentSearchTab !== "quick") return;
@@ -361,6 +403,7 @@ function initSearchModal() {
     }).slice(0, 8);
 
     renderResults(matches, query);
+    reportSearchAnalytics(query, matches.length);
   });
 
   // Enter handler for Ask AI or selecting search item

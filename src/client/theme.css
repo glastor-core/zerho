@@ -376,6 +376,75 @@ body {
   background: var(--bg-surface-elevated);
 }
 
+/* ==========================================================================
+   Language Switcher (i18n)
+   ========================================================================== */
+.locale-switcher {
+  position: relative;
+  display: inline-block;
+}
+
+.locale-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.65rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.locale-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-prominent);
+  background: var(--bg-surface-elevated);
+}
+
+.locale-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 130px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevated);
+  backdrop-filter: blur(16px);
+  padding: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  z-index: 100;
+}
+
+.locale-item {
+  display: flex;
+  align-items: center;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.locale-item:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.locale-item.active {
+  color: var(--cyan-accent);
+  background: rgba(6, 182, 212, 0.1);
+  font-weight: 600;
+}
+
 [data-theme="dark"] .theme-icon-sun {
   display: none;
 }

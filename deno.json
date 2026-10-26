@@ -30,8 +30,8 @@
     ]
   },
   "tasks": {
-    "dev": "deno run --allow-net --allow-read --allow-write --allow-env --unstable-kv --watch src/core/dev.ts",
-    "build": "deno run --allow-net --allow-read --allow-write --allow-env src/core/builder.ts",
+    "dev": "deno run --allow-net --allow-read --allow-write --allow-env --allow-run --unstable-kv --watch src/core/dev.ts",
+    "build": "deno run --allow-net --allow-read --allow-write --allow-env --allow-run src/core/builder.ts",
     "serve": "deno run --allow-net --allow-read --allow-write --allow-env --unstable-kv main.ts",
     "cli": "deno run -A --unstable-kv src/cli.ts",
     "stats": "deno run -A --unstable-kv src/cli.ts stats",
@@ -82,7 +82,8 @@
   },
   "fmt": {
     "exclude": [
-      "dist/"
+      "dist/",
+      "docs/reference.md"
     ],
     "indentWidth": 2,
     "lineWidth": 100,
