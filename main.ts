@@ -22,7 +22,7 @@ const SECURITY_HEADERS: Record<string, string> = {
   "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
   "permissions-policy": "camera=(), microphone=(), geolocation=()",
   "content-security-policy":
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' ws: wss: https:; frame-ancestors 'none';",
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; img-src 'self' data: https:; connect-src 'self' ws: wss: https:; frame-ancestors 'none';",
   "x-powered-by": "Zerho / Deno 2",
 };
 
@@ -242,10 +242,7 @@ export async function handleRequest(req: Request): Promise<Response> {
   const diskPath = join(Deno.cwd(), "dist", filePath);
   try {
     const file = await Deno.readFile(diskPath);
-    const isAsset = filePath.startsWith("/assets/");
-    const cacheControl = isAsset
-      ? "public, max-age=31536000, immutable"
-      : "no-cache, must-revalidate";
+    const cacheControl = "no-cache, must-revalidate";
 
     return new Response(file, {
       headers: {

@@ -1030,6 +1030,39 @@ body {
   transform: translateY(0);
 }
 
+.run-execute-btn:disabled,
+.run-execute-btn.is-executing {
+  opacity: 0.85;
+  cursor: wait;
+}
+
+@keyframes btnSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin-icon {
+  animation: btnSpin 0.75s linear infinite;
+  display: inline-block;
+}
+
+@keyframes terminalFlash {
+  0% {
+    background-color: rgba(139, 92, 246, 0.22);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.output-pulse {
+  animation: terminalFlash 0.35s ease-out;
+}
+
 .runnable-console {
   border-top: 1px solid var(--border-subtle);
   background: #050609;

@@ -33,7 +33,7 @@ directamente en el navegador.
 </select>
 </div>
 <div style="display:flex; align-items:center; gap:0.6rem;">
-<button id="pgRunBtn" class="run-execute-btn" style="padding:0.45rem 1rem; font-size:0.88rem;">
+<button id="pgRunBtn" class="run-execute-btn" onclick="window.executePlaygroundCode && window.executePlaygroundCode()" style="padding:0.45rem 1rem; font-size:0.88rem;">
 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
 <span>Ejecutar Código</span>
 </button>

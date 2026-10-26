@@ -252,9 +252,17 @@ try {
               paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs" },
             });
             // @ts-ignore: Monaco AMD require load
-            window.require(["vs/editor/editor.main"], () => {
-              setupMonaco();
-            });
+            window.require(
+              ["vs/editor/editor.main"],
+              () => {
+                setupMonaco();
+              },
+              (err) => {
+                console.warn("[Monaco] Fallback a textarea por error de carga:", err);
+                if (textarea) textarea.style.display = "block";
+                if (monacoContainer) monacoContainer.style.display = "none";
+              },
+            );
           }
         };
         script.onerror = () => {
@@ -311,23 +319,55 @@ try {
       }
     }
 
+    let executionCount = 0;
+
     async function execute() {
+      executionCount++;
       // @ts-ignore: Monaco Editor getValue API
-      const code = window.monacoEditor ? window.monacoEditor.getValue() : textarea.value;
+      const code = (window.monacoEditor && typeof window.monacoEditor.getValue === "function")
+        ? window.monacoEditor.getValue()
+        : (textarea ? textarea.value : "");
+
+      const origBtnHtml = runBtn.innerHTML;
+      runBtn.disabled = true;
+      runBtn.classList.add("is-executing");
+      runBtn.innerHTML = `
+        <svg class="spin-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-dasharray="30" stroke-linecap="round"/>
+        </svg>
+        <span>Ejecutando...</span>
+      `;
+
       statusEl.textContent = "Ejecutando...";
       statusEl.style.color = "var(--brand-primary)";
-      outputEl.textContent = "Procesando...";
+      outputEl.style.opacity = "0.6";
+
+      // Small tick so browser renders the "Ejecutando..." UI
+      await new Promise((r) => setTimeout(r, 60));
 
       const res = await runCodeInSandbox(code);
 
+      outputEl.style.opacity = "1";
+      outputEl.classList.remove("output-pulse");
+      void outputEl.offsetWidth; // Force CSS reflow to re-trigger pulse
+      outputEl.classList.add("output-pulse");
+
       statusEl.textContent = res.success
-        ? `Completado (${res.durationMs}ms)`
-        : `Error (${res.durationMs}ms)`;
+        ? `Completado (${res.durationMs}ms) · #${executionCount}`
+        : `Error (${res.durationMs}ms) · #${executionCount}`;
       statusEl.style.color = res.success ? "var(--emerald-accent)" : "var(--rose-accent)";
+
       outputEl.textContent = res.output || "(Ejecutado sin mensajes de consola)";
       outputEl.style.color = res.success ? "#38bdf8" : "#fb7185";
+
+      runBtn.disabled = false;
+      runBtn.classList.remove("is-executing");
+      runBtn.innerHTML = origBtnHtml;
     }
 
+    // Expose globally so inline onclick or programmatic calls always work
+    window.executePlaygroundCode = execute;
+    runBtn.onclick = execute;
     runBtn.addEventListener("click", execute);
 
     // Ctrl+Enter or Cmd+Enter to execute on fallback textarea
@@ -358,9 +398,15 @@ try {
     }
   };
 
-  document.addEventListener("DOMContentLoaded", () => {
+  function bootPlayground() {
     if (document.getElementById("pgCodeInput") || document.getElementById("pgMonacoEditor")) {
       window.initPlaygroundPage();
     }
-  });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootPlayground);
+  } else {
+    bootPlayground();
+  }
 })();
