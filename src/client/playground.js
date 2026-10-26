@@ -267,41 +267,48 @@ try {
 
     function setupMonaco() {
       if (!monacoContainer) return;
-      monacoContainer.innerHTML = "";
-      const isDark = document.documentElement.getAttribute("data-theme") !== "light";
-      // @ts-ignore: Monaco Editor global from CDN
-      window.monacoEditor = monaco.editor.create(monacoContainer, {
-        value: initialCode,
-        language: "typescript",
-        theme: isDark ? "vs-dark" : "vs",
-        automaticLayout: true,
-        fontSize: 13.5,
-        fontFamily: "'JetBrains Mono', Consolas, monospace",
-        minimap: { enabled: false },
-        scrollBeyondLastLine: false,
-        lineNumbers: "on",
-        renderLineHighlight: "all",
-        padding: { top: 12, bottom: 12 },
-      });
+      try {
+        monacoContainer.innerHTML = "";
+        const isDark = document.documentElement.getAttribute("data-theme") !== "light";
+        // @ts-ignore: Monaco Editor global from CDN
+        window.monacoEditor = monaco.editor.create(monacoContainer, {
+          value: textarea.value || initialCode,
+          language: "typescript",
+          theme: isDark ? "vs-dark" : "vs",
+          automaticLayout: true,
+          fontSize: 13.5,
+          fontFamily: "'JetBrains Mono', Consolas, monospace",
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+          lineNumbers: "on",
+          renderLineHighlight: "all",
+          padding: { top: 12, bottom: 12 },
+        });
 
-      // @ts-ignore: Monaco KeyMod and KeyCode globals
-      window.monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
-        execute();
-      });
+        // Switch visibility seamlessly
+        if (textarea) textarea.style.display = "none";
+        monacoContainer.style.display = "block";
 
-      // Observe theme changes to adjust Monaco theme
-      const observer = new MutationObserver(() => {
-        const dark = document.documentElement.getAttribute("data-theme") !== "light";
-        // @ts-ignore: Monaco Editor theme API
-        if (window.monaco) monaco.editor.setTheme(dark ? "vs-dark" : "vs");
-      });
-      observer.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ["data-theme"],
-      });
+        // @ts-ignore: Monaco KeyMod and KeyCode globals
+        window.monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+          execute();
+        });
 
-      // Run initial execution after Monaco is ready
-      setTimeout(() => execute(), 250);
+        // Observe theme changes to adjust Monaco theme
+        const observer = new MutationObserver(() => {
+          const dark = document.documentElement.getAttribute("data-theme") !== "light";
+          // @ts-ignore: Monaco Editor theme API
+          if (window.monaco) monaco.editor.setTheme(dark ? "vs-dark" : "vs");
+        });
+        observer.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ["data-theme"],
+        });
+      } catch (err) {
+        console.warn("Failed to initialize Monaco Editor, using fallback textarea:", err);
+        if (textarea) textarea.style.display = "block";
+        if (monacoContainer) monacoContainer.style.display = "none";
+      }
     }
 
     async function execute() {

@@ -98,8 +98,9 @@ sidebar: {
 }
 ```
 
-::: tip ACTIVACIÓN AUTOMÁTICA El sidebar detecta automáticamente la ruta actual y aplica la clase
-activa con un sutil resplandor violeta en el enlace correspondiente. :::
+> [!TIP]
+> **Activación Automática**: El sidebar detecta automáticamente la ruta actual y aplica la clase
+> activa con un sutil resplandor violeta en el enlace correspondiente.
 
 ---
 

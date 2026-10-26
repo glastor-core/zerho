@@ -45,8 +45,8 @@ directamente en el navegador.
 <span>Editor VS Code / Monaco (TypeScript)</span>
 <span style="font-size:0.7rem; color:var(--brand-primary); font-weight:700;">IntelliSense Activo</span>
 </div>
-<div id="pgMonacoEditor" class="playground-monaco-container"></div>
-<textarea id="pgCodeInput" class="playground-textarea" style="display:none;" spellcheck="false" placeholder="Escribe tu código TypeScript aquí..."></textarea>
+<div id="pgMonacoEditor" class="playground-monaco-container" style="display:none;"></div>
+<textarea id="pgCodeInput" class="playground-textarea" spellcheck="false" placeholder="Escribe tu código TypeScript aquí..."></textarea>
 </div>
 <div class="playground-output-pane">
 <div class="playground-pane-title">
@@ -62,9 +62,10 @@ directamente en el navegador.
 
 ## Capacidades del Sandbox
 
-::: tip WEB WORKERS Y TIPADO DINÁMICO El sandbox de Zerho remueve automáticamente las anotaciones de
-tipo de TypeScript para ejecutar el código resultante en el motor V8 nativo de tu navegador,
-garantizando un rendimiento casi instantáneo (menos de 5ms de latencia). :::
+> [!TIP]
+> **Web Workers y Tipado Dinámico**: El sandbox de Zerho remueve automáticamente las anotaciones de
+> tipo de TypeScript para ejecutar el código resultante en el motor V8 nativo de tu navegador,
+> garantizando un rendimiento casi instantáneo (menos de 5ms de latencia).
 
 ### APIs Soportadas en el Sandbox
 
