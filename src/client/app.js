@@ -290,6 +290,22 @@ window.switchSearchTab = function (tab) {
   }
 };
 
+window.askAiPrompt = function (promptText) {
+  const input = document.getElementById("searchInput");
+  if (!input) return;
+  input.value = promptText;
+  window.switchSearchTab("ai");
+  const event = new KeyboardEvent("keydown", { key: "Enter", bubbles: true });
+  input.dispatchEvent(event);
+};
+
+window.submitSearchOrAi = function () {
+  const input = document.getElementById("searchInput");
+  if (!input) return;
+  const event = new KeyboardEvent("keydown", { key: "Enter", bubbles: true });
+  input.dispatchEvent(event);
+};
+
 window.openSearchModal = function () {
   const backdrop = document.getElementById("searchModalBackdrop");
   const input = document.getElementById("searchInput");

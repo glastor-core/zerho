@@ -48,7 +48,8 @@ Este proyecto se adhiere a:
 
 ### 🐛 Fixed
 
-- **playground:** resolve Monaco CSP stylesheet blocking, add button spinner and execution feedback (58d91e9)
+- **playground:** resolve Monaco CSP stylesheet blocking, add button spinner and execution feedback
+  (58d91e9)
 
 ---
 ## [1.6.1] - 2026-10-26
@@ -56,14 +57,15 @@ Este proyecto se adhiere a:
 ### 🐛 Fixed
 
 - **playground:** add unsafe-eval and worker-src to CSP and improve Monaco fallback (285b984)
-
 ---
+
 ## [1.6.0] - 2026-10-26
 
 ### ✨ Added
 
 - **ai-i18n:** implement llms.txt standard, deno doc auto-reference, kv search insights, and
   declarative i18n (b2da55c)
+
 ---
 
 ## [1.5.0] - 2026-10-26

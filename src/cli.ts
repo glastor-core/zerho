@@ -1,5 +1,5 @@
 #!/usr/bin/env -S deno run -A
-import { join } from "@std/path";
+import { isAbsolute, join } from "@std/path";
 import { buildSite } from "./core/builder.ts";
 import { VERSION } from "./version.ts";
 
@@ -83,7 +83,8 @@ export async function runCli(args: string[] = Deno.args) {
   if (command === "init") {
     const targetDir = args[1] || ".";
     console.log(`\n✨ Inicializando nuevo proyecto Zerho en "${targetDir}"...`);
-    const docsDir = join(Deno.cwd(), targetDir, "docs");
+    const baseDir = isAbsolute(targetDir) ? targetDir : join(Deno.cwd(), targetDir);
+    const docsDir = join(baseDir, "docs");
     await Deno.mkdir(docsDir, { recursive: true });
 
     // Sample index.md

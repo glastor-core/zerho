@@ -100,7 +100,15 @@ export const config: ZerhoConfig = {
             text: "Introduction",
             items: [
               { text: "What is Zerho?", link: "/en/guide/getting-started" },
+              { text: "Configuration", link: "/en/guide/configuration" },
+              { text: "Deploy on Deno", link: "/en/guide/deployment", badge: "Edge" },
+            ],
+          },
+          {
+            text: "Content & Syntax",
+            items: [
               { text: "Markdown Superpowers", link: "/en/guide/markdown-features" },
+              { text: "Interactive Playground", link: "/playground/", badge: "PRO" },
             ],
           },
         ],

@@ -39,17 +39,26 @@ export function renderPage(
   { config, parsed, currentPath, devMode = false }: RenderPageOptions,
 ): string {
   const { frontmatter, html, toc, readingTimeMin } = parsed;
-  const isHome = frontmatter.layout === "home" || currentPath === "/" || currentPath === "/index";
-  const isPlayground = currentPath.startsWith("/playground");
+  const isEn = currentPath.startsWith("/en/") || currentPath === "/en";
+  const isHome = frontmatter.layout === "home" || currentPath === "/" || currentPath === "/index" ||
+    currentPath === "/en" || currentPath === "/en/";
+  const isPlayground = currentPath.startsWith("/playground") ||
+    currentPath.startsWith("/en/playground");
   const pageTitle = frontmatter.title
     ? `${frontmatter.title} | ${config.title}`
     : `${config.title} - ${config.tagline}`;
   const pageDesc = frontmatter.description || config.description;
 
-  const sidebarItems = isHome ? [] : getSidebarForPath(config.themeConfig.sidebar, currentPath);
+  const sidebarConfig = (isEn && config.locales?.en?.sidebar)
+    ? config.locales.en.sidebar
+    : config.themeConfig.sidebar;
+  const sidebarItems = isHome ? [] : getSidebarForPath(sidebarConfig, currentPath);
 
   // Render navigation items
-  const navHtml = config.themeConfig.nav
+  const activeNav = (isEn && config.locales?.en?.nav)
+    ? config.locales.en.nav
+    : config.themeConfig.nav;
+  const navHtml = activeNav
     .map((item) => {
       const isActive = item.activeMatch
         ? currentPath.startsWith(item.activeMatch)
@@ -199,10 +208,12 @@ export function renderPage(
       ? (() => {
         const isEn = currentPath.startsWith("/en/") || currentPath === "/en";
         const currentLangLabel = isEn ? "English" : "Español";
-        const targetEn = isEn
-          ? currentPath
-          : (currentPath === "/" ? "/en/guide/getting-started" : `/en${currentPath}`);
-        const targetEs = isEn ? (currentPath.replace(/^\/en/, "") || "/") : currentPath;
+        const targetEn = isEn ? currentPath : (currentPath === "/" ? "/en/" : `/en${currentPath}`);
+        const targetEs = isEn
+          ? (currentPath === "/en/" || currentPath === "/en"
+            ? "/"
+            : (currentPath.replace(/^\/en/, "") || "/"))
+          : currentPath;
 
         return `
         <!-- Language Switcher (i18n) -->
@@ -269,24 +280,34 @@ export function renderPage(
       <section class="home-hero">
         <div class="hero-badge">
           <span class="badge-icon">⚡</span>
-          <span>Nativo para Deno 2 & Deno Deploy</span>
-          <span class="badge-tag">NIVEL PRO</span>
+          <span>${
+        isEn ? "Native for Deno 2 & Deno Deploy" : "Nativo para Deno 2 & Deno Deploy"
+      }</span>
+          <span class="badge-tag">${isEn ? "PRO GRADE" : "NIVEL PRO"}</span>
         </div>
         <h1 class="hero-title">
-          Documentación técnica <span class="gradient-text">ultrarrápida</span> y viva
+          ${
+        isEn
+          ? 'Technical documentation <span class="gradient-text">ultra-fast</span> and live'
+          : 'Documentación técnica <span class="gradient-text">ultrarrápida</span> y viva'
+      }
         </h1>
         <p class="hero-tagline">${escapeHtml(config.tagline)}</p>
         
         <div class="hero-actions">
-          <a href="/guide/getting-started" class="btn btn-primary glow-btn">
-            <span>Comenzar Ahora</span>
+          <a href="${
+        isEn ? "/en/guide/getting-started" : "/guide/getting-started"
+      }" class="btn btn-primary glow-btn">
+            <span>${isEn ? "Get Started" : "Comenzar Ahora"}</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
           <a href="/playground/" class="btn btn-interactive">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            <span>Playground Interactivo</span>
+            <span>${isEn ? "Interactive Playground" : "Playground Interactivo"}</span>
           </a>
-          <a href="/guide/deployment" class="btn btn-secondary">
+          <a href="${
+        isEn ? "/en/guide/deployment" : "/guide/deployment"
+      }" class="btn btn-secondary">
             <span>Deno Deploy</span>
           </a>
         </div>
@@ -329,48 +350,78 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
             <div class="feature-icon-wrap icon-cyan">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
             </div>
-            <h3 class="feature-title">Motor Nativo Deno 2</h3>
-            <p class="feature-desc">Construido en TypeScript puro sin node_modules gigantes. Tiempos de arranque en milisegundos y cero fricción.</p>
+            <h3 class="feature-title">${isEn ? "Deno 2 Native Engine" : "Motor Nativo Deno 2"}</h3>
+            <p class="feature-desc">${
+        isEn
+          ? "Built in pure TypeScript with zero bloated node_modules. Millisecond boot times and zero friction."
+          : "Construido en TypeScript puro sin node_modules gigantes. Tiempos de arranque en milisegundos y cero fricción."
+      }</p>
           </div>
 
           <div class="feature-card">
             <div class="feature-icon-wrap icon-violet">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
             </div>
-            <h3 class="feature-title">Playground Interactivo</h3>
-            <p class="feature-desc">Ejecuta código TypeScript y JavaScript directamente en el navegador dentro de la documentación sin salir de la página.</p>
+            <h3 class="feature-title">${
+        isEn ? "Interactive Playground" : "Playground Interactivo"
+      }</h3>
+            <p class="feature-desc">${
+        isEn
+          ? "Run TypeScript and JavaScript code directly in the browser within docs without leaving the page."
+          : "Ejecuta código TypeScript y JavaScript directamente en el navegador dentro de la documentación sin salir de la página."
+      }</p>
           </div>
 
           <div class="feature-card">
             <div class="feature-icon-wrap icon-emerald">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
             </div>
-            <h3 class="feature-title">Listo para Deno Deploy</h3>
-            <p class="feature-desc">Distribución en el Edge en más de 35 regiones mundiales con ETags, compresión gzip/brotli y latencia casi cero.</p>
+            <h3 class="feature-title">${isEn ? "Deno Deploy Ready" : "Listo para Deno Deploy"}</h3>
+            <p class="feature-desc">${
+        isEn
+          ? "Edge distribution across 35+ global regions with ETags, gzip/brotli compression and near-zero latency."
+          : "Distribución en el Edge en más de 35 regiones mundiales con ETags, compresión gzip/brotli y latencia casi cero."
+      }</p>
           </div>
 
           <div class="feature-card">
             <div class="feature-icon-wrap icon-amber">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </div>
-            <h3 class="feature-title">Búsqueda Instantánea Cmd+K</h3>
-            <p class="feature-desc">Índice de búsqueda client-side ultrarrápido con navegación por teclado y destacados de contexto sin dependencias externas.</p>
+            <h3 class="feature-title">${
+        isEn ? "Instant Cmd+K Search" : "Búsqueda Instantánea Cmd+K"
+      }</h3>
+            <p class="feature-desc">${
+        isEn
+          ? "Ultra-fast client-side search index with keyboard navigation and context highlights without external dependencies."
+          : "Índice de búsqueda client-side ultrarrápido con navegación por teclado y destacados de contexto sin dependencias externas."
+      }</p>
           </div>
 
           <div class="feature-card">
             <div class="feature-icon-wrap icon-pink">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 15-6-6-6 6"/></svg>
             </div>
-            <h3 class="feature-title">Superpoderes Markdown</h3>
-            <p class="feature-desc">Callouts tipo VitePress, diagramas Mermaid automáticos, tabs con nombres de archivo y resaltado de sintaxis Shiki/Prism.</p>
+            <h3 class="feature-title">${
+        isEn ? "Markdown Superpowers" : "Superpoderes Markdown"
+      }</h3>
+            <p class="feature-desc">${
+        isEn
+          ? "VitePress-style callouts, automated Mermaid diagrams, file name tabs, and syntax highlighting."
+          : "Callouts tipo VitePress, diagramas Mermaid automáticos, tabs con nombres de archivo y resaltado de sintaxis Shiki/Prism."
+      }</p>
           </div>
 
           <div class="feature-card">
             <div class="feature-icon-wrap icon-blue">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             </div>
-            <h3 class="feature-title">Estética Nivel Pro</h3>
-            <p class="feature-desc">Diseño hiper-cuidado inspirado en Linear y Vercel, modo oscuro inmersivo, efectos de vidrio esmerilado y micro-animaciones fluidas.</p>
+            <h3 class="feature-title">${isEn ? "Pro-Grade Aesthetics" : "Estética Nivel Pro"}</h3>
+            <p class="feature-desc">${
+        isEn
+          ? "Hyper-refined design inspired by Linear and Vercel, immersive dark mode, frosted glassmorphism, and fluid micro-animations."
+          : "Diseño hiper-cuidado inspirado en Linear y Vercel, modo oscuro inmersivo, efectos de vidrio esmerilado y micro-animaciones fluidas."
+      }</p>
           </div>
         </div>
       </section>
@@ -382,14 +433,14 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
           <div class="doc-meta-bar">
             <span class="reading-time">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              ${readingTimeMin} min de lectura
+              ${readingTimeMin} ${isEn ? "min read" : "min de lectura"}
             </span>
             ${
         editLinkUrl
           ? `
             <a href="${editLinkUrl}" target="_blank" rel="noopener noreferrer" class="doc-edit-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-              <span>Editar en GitHub</span>
+              <span>${isEn ? "Edit on GitHub" : "Editar en GitHub"}</span>
             </a>`
           : ""
       }
@@ -408,11 +459,13 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
 
         <!-- Feedback Widget (Edge Deno KV) -->
         <div class="feedback-widget" id="feedbackWidget">
-          <div class="feedback-text">¿Te ha resultado útil esta página?</div>
+          <div class="feedback-text">${
+        isEn ? "Was this page helpful?" : "¿Te ha resultado útil esta página?"
+      }</div>
           <div class="feedback-buttons">
             <button class="feedback-btn" onclick="submitFeedback(true)" id="fbYes">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
-              <span>Sí</span>
+              <span>${isEn ? "Yes" : "Sí"}</span>
             </button>
             <button class="feedback-btn" onclick="submitFeedback(false)" id="fbNo">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
@@ -421,7 +474,11 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
           </div>
           <div class="feedback-msg" id="feedbackMsg" style="display:none;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>¡Gracias! Retroalimentación guardada en Deno KV.</span>
+            <span>${
+        isEn
+          ? "Thank you! Feedback saved in Deno KV."
+          : "¡Gracias! Retroalimentación guardada en Deno KV."
+      }</span>
           </div>
         </div>
 
@@ -432,7 +489,7 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
         frontmatter.prev
           ? `
             <a href="${frontmatter.prev.link}" class="doc-nav-card prev">
-              <span class="nav-direction">ANTERIOR</span>
+              <span class="nav-direction">${isEn ? "PREVIOUS" : "ANTERIOR"}</span>
               <span class="nav-title">← ${escapeHtml(frontmatter.prev.text)}</span>
             </a>`
           : `<div></div>`
@@ -441,7 +498,7 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
         frontmatter.next
           ? `
             <a href="${frontmatter.next.link}" class="doc-nav-card next">
-              <span class="nav-direction">SIGUIENTE</span>
+              <span class="nav-direction">${isEn ? "NEXT" : "SIGUIENTE"}</span>
               <span class="nav-title">${escapeHtml(frontmatter.next.text)} →</span>
             </a>`
           : `<div></div>`
@@ -473,28 +530,51 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
       <div class="search-tabs-bar">
         <button class="search-tab-btn active" id="searchTabQuick" onclick="switchSearchTab('quick')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <span>Búsqueda Rápida</span>
+          <span>${isEn ? "Quick Search" : "Búsqueda Rápida"}</span>
         </button>
         <button class="search-tab-btn" id="searchTabAi" onclick="switchSearchTab('ai')">
           <span class="ai-tab-glow">✨</span>
-          <span>Preguntar a la IA</span>
+          <span>${isEn ? "Ask AI" : "Preguntar a la IA"}</span>
           <span class="ai-tab-badge">RAG</span>
         </button>
       </div>
 
       <div class="search-input-wrap">
         <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="searchInput" class="search-input" placeholder="Buscar temas, funciones o APIs..." autocomplete="off">
+        <input type="text" id="searchInput" class="search-input" placeholder="${
+    isEn ? "Search topics, functions or APIs..." : "Buscar temas, funciones o APIs..."
+  }" autocomplete="off">
+        <button class="search-action-btn" id="searchSubmitBtn" onclick="window.submitSearchOrAi && window.submitSearchOrAi()" title="Consultar">↵</button>
         <button class="search-close-btn" id="searchCloseBtn">ESC</button>
       </div>
 
       <!-- Quick Search Results List -->
       <div class="search-results-list" id="searchResultsList">
-        <div class="search-empty">Comienza a escribir para buscar en toda la documentación...</div>
+        <div class="search-empty">${
+    isEn
+      ? "Start typing to search documentation..."
+      : "Comienza a escribir para buscar en toda la documentación..."
+  }</div>
       </div>
 
       <!-- Ask AI Chat Response Box -->
       <div class="ai-chat-view" id="aiChatView" style="display: none;">
+        <div class="ai-quick-prompts">
+          <span class="ai-prompts-label">${
+    isEn ? "Suggested Prompts:" : "Preguntas Frecuentes:"
+  }</span>
+          <div class="ai-prompt-chips">
+            <button type="button" class="ai-chip" onclick="window.askAiPrompt && window.askAiPrompt('${
+    isEn ? "How do I deploy to Deno Deploy?" : "¿Cómo desplegar en Deno Deploy?"
+  }')">🚀 ${isEn ? "Deploy to Deno" : "Deploy en Deno"}</button>
+            <button type="button" class="ai-chip" onclick="window.askAiPrompt && window.askAiPrompt('${
+    isEn ? "How does the Live Playground work?" : "¿Cómo funciona el Playground?"
+  }')">⚡ ${isEn ? "Live Playground" : "Playground Interactivo"}</button>
+            <button type="button" class="ai-chip" onclick="window.askAiPrompt && window.askAiPrompt('${
+    isEn ? "What is llms.txt standard?" : "¿Qué es llms.txt para IA?"
+  }')">🤖 ${isEn ? "LLMs.txt Support" : "Soporte LLMs.txt"}</button>
+          </div>
+        </div>
         <div class="ai-response-card" id="aiResponseCard">
           <div class="ai-card-header">
             <span class="ai-avatar">⚡</span>
@@ -502,19 +582,25 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
             <span class="ai-status-pill" id="aiStatusPill">Listo</span>
           </div>
           <div class="ai-content-body" id="aiContentBody">
-            Escribe tu consulta en lenguaje natural arriba y presiona <kbd>Enter</kbd> para que la IA sintetice una respuesta basada en la documentación oficial.
+            ${
+    isEn
+      ? "Ask any question in natural language above and press <kbd>Enter</kbd> to synthesize an answer from the official documentation."
+      : "Escribe tu consulta en lenguaje natural arriba y presiona <kbd>Enter</kbd> para que la IA sintetice una respuesta basada en la documentación oficial."
+  }
           </div>
           <div class="ai-sources-wrap" id="aiSourcesWrap" style="display:none;">
-            <div class="ai-sources-title">Fuentes y Citas:</div>
+            <div class="ai-sources-title">${
+    isEn ? "Sources & Citations:" : "Fuentes y Citas:"
+  }</div>
             <div class="ai-sources-list" id="aiSourcesList"></div>
           </div>
         </div>
       </div>
 
       <div class="search-footer-hint">
-        <span><kbd>↑</kbd> <kbd>↓</kbd> Navegar</span>
-        <span><kbd>↵</kbd> Consultar</span>
-        <span><kbd>ESC</kbd> Cerrar</span>
+        <span><kbd>↑</kbd> <kbd>↓</kbd> ${isEn ? "Navigate" : "Navegar"}</span>
+        <span><kbd>↵</kbd> ${isEn ? "Select / Ask" : "Consultar"}</span>
+        <span><kbd>ESC</kbd> ${isEn ? "Close" : "Cerrar"}</span>
       </div>
     </div>
   </div>

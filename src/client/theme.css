@@ -2066,6 +2066,66 @@ body {
   overflow-y: auto;
 }
 
+.ai-quick-prompts {
+  margin-bottom: 1rem;
+}
+
+.ai-prompts-label {
+  display: block;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.ai-prompt-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ai-chip {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-family: var(--font-sans);
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.ai-chip:hover {
+  color: #ffffff;
+  border-color: var(--brand-primary);
+  background: rgba(139, 92, 246, 0.2);
+  transform: translateY(-1px);
+}
+
+.search-action-btn {
+  background: var(--brand-primary);
+  color: #ffffff;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-right: 0.4rem;
+}
+
+.search-action-btn:hover {
+  background: var(--brand-light);
+  transform: scale(1.05);
+}
+
 .ai-response-card {
   background: var(--bg-surface);
   border: 1px solid rgba(139, 92, 246, 0.25);
