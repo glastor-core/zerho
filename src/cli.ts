@@ -1,6 +1,7 @@
 #!/usr/bin/env -S deno run -A
 import { join } from "@std/path";
 import { buildSite } from "./core/builder.ts";
+import { VERSION } from "./version.ts";
 
 const HELP = `
 ⚡ \x1b[35mZerhoPress CLI\x1b[0m - El motor de documentación Pro para Deno
@@ -20,8 +21,6 @@ const HELP = `
   -h, --help            Muestra este mensaje de ayuda
   -v, --version         Muestra la versión de ZerhoPress
 `;
-
-const VERSION = "1.1.0";
 
 export async function runCli(args: string[] = Deno.args) {
   const command = args[0] || "--help";

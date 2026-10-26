@@ -1,5 +1,6 @@
 import type { SidebarItem, ZerhoConfig } from "../../zerho.config.ts";
 import type { ParsedMarkdown } from "../core/markdown.ts";
+import { VERSION } from "../version.ts";
 
 export interface RenderPageOptions {
   config: ZerhoConfig;
@@ -145,7 +146,7 @@ export function renderPage(
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="/assets/theme.css?v=1.1.0">
+  <link rel="stylesheet" href="/assets/theme.css?v=${VERSION}">
   ${
     devMode
       ? `<script>
@@ -487,9 +488,9 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
   </div>
 
   <!-- Scripts -->
-  <script src="/assets/app.js?v=1.1.0"></script>
-  <script src="/assets/playground.js?v=1.1.0"></script>
-  <script type="module" src="/assets/openapi-client.js?v=1.1.0"></script>
+  <script src="/assets/app.js?v=${VERSION}"></script>
+  <script src="/assets/playground.js?v=${VERSION}"></script>
+  <script type="module" src="/assets/openapi-client.js?v=${VERSION}"></script>
   <!-- Mermaid.js for diagrams -->
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';

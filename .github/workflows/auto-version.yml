@@ -7,6 +7,18 @@ on:
       - "docs/**"
       - "*.md"
       - "!CHANGELOG.md"
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: "Tipo de incremento semántico"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - auto
 
 permissions:
   contents: write
@@ -33,7 +45,13 @@ jobs:
 
       - name: Calculate & Bump Semantic Version
         id: semver
-        run: deno run --allow-all scripts/bump-version.ts
+        run: |
+          BUMP_ARG="${{ inputs.bump_type }}"
+          if [ "$BUMP_ARG" = "auto" ] || [ -z "$BUMP_ARG" ]; then
+            deno run --allow-all scripts/bump-version.ts
+          else
+            deno run --allow-all scripts/bump-version.ts "$BUMP_ARG"
+          fi
 
       - name: Commit and Push Version Bump & Tag
         if: steps.semver.outputs.has_bump == 'true'
@@ -41,12 +59,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add deno.json CITATION.cff CHANGELOG.md
+          git add deno.json CITATION.cff CHANGELOG.md src/version.ts
           git commit -m "chore(release): bump version to ${{ steps.semver.outputs.tag_name }} [skip ci]"
 
           git tag -a "${{ steps.semver.outputs.tag_name }}" -m "Release ${{ steps.semver.outputs.tag_name }}"
 
-          # Update floating major version tag (e.g. v1) for GitHub Actions Marketplace
+          # Update floating major version tag (e.g. v1)
           MAJOR_TAG=$(echo "${{ steps.semver.outputs.tag_name }}" | cut -d. -f1)
           git tag -fa "$MAJOR_TAG" -m "Release $MAJOR_TAG"
 
