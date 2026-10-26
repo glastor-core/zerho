@@ -1,0 +1,23 @@
+# Nemesis Security, Hygiene & Compliance Configuration (.nemesis.yml)
+version: "1"
+
+# Reglas de exclusión y justificación de falsos positivos
+# Toda exclusión requiere obligatoriamente una razón ('reason')
+ignore:
+  - path: "dist/"
+    reason: "Directorio de artefactos estáticos compilados para producción"
+  - path: "tests/"
+    reason: "Suites de pruebas automatizadas y fixtures de código"
+  - path: ".git/"
+    reason: "Directorio interno de control de versiones Git"
+
+# Configuración de escaneo
+settings:
+  max_file_size_mb: 10
+  scan_secrets: true
+  scan_sast: true
+  scan_sca: true
+  scan_hygiene: true
+  scan_licenses: true
+  generate_sbom: true
+  require_license: true

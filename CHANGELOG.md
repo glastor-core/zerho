@@ -57,8 +57,8 @@ Este proyecto se adhiere a:
 - complete Pro suite with Monaco editor, Ask AI RAG, OpenAPI explorer, Deno KV analytics, and
   universal CLI ( 5055a61)
 - initial commit of Zerho pro documentation engine for Deno ( 7acb69b)
-
 ---
+
 ## [1.1.0] - 2026-10-26
 
 **Nombre del Release:** "Pro Developer Experience, Interactive Playground & Edge AI Suite"\
@@ -101,6 +101,7 @@ Este proyecto se adhiere a:
   [glastor-core/zerho](https://github.com/glastor-core/zerho).
 - Configuración para despliegue perimetral global en [zerho.xyz](https://zerho.xyz) (Cloudflare
   Pages y Deno Deploy).
+
 ---
 
 ## [1.0.0] - 2026-10-25

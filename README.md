@@ -9,6 +9,7 @@
   <img src="https://img.shields.io/badge/Deno_Deploy-Ready-06b6d4?style=for-the-badge&logo=deno&logoColor=white" alt="Deno Deploy" />
   <img src="https://img.shields.io/badge/Build_Time-67ms-10b981?style=for-the-badge" alt="Build Time" />
   <img src="https://img.shields.io/badge/Licencia-MIT-8b5cf6?style=for-the-badge" alt="MIT License" />
+  <a href="https://github.com/glastor-core/nemesis"><img src="https://img.shields.io/badge/Security-Nemesis_Audit-purple?style=for-the-badge" alt="Nemesis Security Audit" /></a>
 </p>
 
 ---
