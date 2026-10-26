@@ -1,4 +1,4 @@
-import { join, extname } from "@std/path";
+import { extname, join } from "@std/path";
 import { buildSite } from "./builder.ts";
 
 const PORT = 3000;
@@ -9,8 +9,12 @@ await buildSite({ devMode: true });
 
 // Watcher loop for live reload
 (async () => {
-  const watcher = Deno.watchFs([join(Deno.cwd(), "docs"), join(Deno.cwd(), "src"), join(Deno.cwd(), "zerho.config.ts")]);
-  let debounceTimeout: number | undefined;
+  const watcher = Deno.watchFs([
+    join(Deno.cwd(), "docs"),
+    join(Deno.cwd(), "src"),
+    join(Deno.cwd(), "zerho.config.ts"),
+  ]);
+  let debounceTimeout: ReturnType<typeof setTimeout> | undefined;
 
   for await (const _event of watcher) {
     clearTimeout(debounceTimeout);

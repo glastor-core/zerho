@@ -45,7 +45,16 @@ export async function runCli(args: string[] = Deno.args) {
   if (command === "dev") {
     const devPath = join(import.meta.dirname || Deno.cwd(), "core", "dev.ts");
     const p = new Deno.Command(Deno.execPath(), {
-      args: ["run", "--allow-net", "--allow-read", "--allow-write", "--allow-env", "--unstable-kv", "--watch", devPath],
+      args: [
+        "run",
+        "--allow-net",
+        "--allow-read",
+        "--allow-write",
+        "--allow-env",
+        "--unstable-kv",
+        "--watch",
+        devPath,
+      ],
       stdout: "inherit",
       stderr: "inherit",
     }).spawn();
@@ -56,7 +65,15 @@ export async function runCli(args: string[] = Deno.args) {
   if (command === "serve") {
     const mainPath = join(import.meta.dirname || Deno.cwd(), "..", "main.ts");
     const p = new Deno.Command(Deno.execPath(), {
-      args: ["run", "--allow-net", "--allow-read", "--allow-write", "--allow-env", "--unstable-kv", mainPath],
+      args: [
+        "run",
+        "--allow-net",
+        "--allow-read",
+        "--allow-write",
+        "--allow-env",
+        "--unstable-kv",
+        mainPath,
+      ],
       stdout: "inherit",
       stderr: "inherit",
     }).spawn();
@@ -69,14 +86,17 @@ export async function runCli(args: string[] = Deno.args) {
     console.log(`\n✨ Inicializando nuevo proyecto ZerhoPress en "${targetDir}"...`);
     const docsDir = join(Deno.cwd(), targetDir, "docs");
     await Deno.mkdir(docsDir, { recursive: true });
-    
+
     // Sample index.md
-    await Deno.writeTextFile(join(docsDir, "index.md"), `---
+    await Deno.writeTextFile(
+      join(docsDir, "index.md"),
+      `---
 layout: home
 title: Mi Documentación
 description: Creado con ZerhoPress en Deno
 ---
-`);
+`,
+    );
     console.log("✅ Estructura creada con éxito. Ejecuta 'deno task dev' para comenzar.");
     return;
   }
@@ -92,7 +112,9 @@ description: Creado con ZerhoPress en Deno
         console.log(`- ${entry.key.join(" > ")}: \x1b[32m${entry.value}\x1b[0m`);
       }
       if (!found) {
-        console.log("No hay métricas registradas aún. Interactúa con el widget de feedback en las páginas de la documentación.");
+        console.log(
+          "No hay métricas registradas aún. Interactúa con el widget de feedback en las páginas de la documentación.",
+        );
       }
     } catch (e) {
       console.error("Error al abrir Deno KV:", e);
@@ -100,7 +122,9 @@ description: Creado con ZerhoPress en Deno
     return;
   }
 
-  console.log(`Comando desconocido: "${command}". Ejecuta "deno task cli --help" para ver los comandos disponibles.`);
+  console.log(
+    `Comando desconocido: "${command}". Ejecuta "deno task cli --help" para ver los comandos disponibles.`,
+  );
 }
 
 if (import.meta.main) {

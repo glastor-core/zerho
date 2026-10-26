@@ -1,30 +1,30 @@
 // ZerhoPress Live Sandbox & Playground Engine
-(function() {
+(function () {
   // Simulated Deno environment inside browser
   function createDenoEnvironment(logs) {
     return {
       version: {
         deno: "2.9.7",
         v8: "15.0.245.2",
-        typescript: "6.0.3"
+        typescript: "6.0.3",
       },
       env: {
         get: (key) => {
           const mockEnv = {
             DENO_ENV: "production",
             REGION: "deno-deploy-sao-1",
-            PORT: "8000"
+            PORT: "8000",
           };
           return mockEnv[key] || undefined;
-        }
+        },
       },
-      readTextFile: async (path) => {
+      readTextFile: (path) => {
         const vfs = {
           "deno.json": JSON.stringify({ name: "zerhopress", version: "1.0.0" }, null, 2),
-          "README.md": "# Bienvenido a ZerhoPress\nEl motor pro de documentación para Deno."
+          "README.md": "# Bienvenido a ZerhoPress\nEl motor pro de documentación para Deno.",
         };
-        if (vfs[path]) return vfs[path];
-        throw new Error(`NotFound: No such file or directory: ${path}`);
+        if (vfs[path]) return Promise.resolve(vfs[path]);
+        return Promise.reject(new Error(`NotFound: No such file or directory: ${path}`));
       },
       serve: (handler) => {
         logs.push(`[Deno.serve] Servidor HTTP escuchando en http://localhost:8000/`);
@@ -32,14 +32,14 @@
           const dummyReq = new Request("http://localhost:8000/api/status");
           const res = handler(dummyReq);
           if (res instanceof Promise) {
-            res.then(r => logs.push(`[Deno.serve] Request respondido con status ${r.status}`));
+            res.then((r) => logs.push(`[Deno.serve] Request respondido con status ${r.status}`));
           } else {
             logs.push(`[Deno.serve] Request respondido con status ${res.status}`);
           }
-        } catch(e) {
+        } catch (e) {
           logs.push(`[Deno.serve] Error: ${e.message}`);
         }
-      }
+      },
     };
   }
 
@@ -50,7 +50,10 @@
       .replace(/^import\s+.*?;?\s*$/gm, (m) => `// ${m}`) // comment imports for sandbox
       .replace(/^export\s+default\s+/gm, "")
       .replace(/^export\s+/gm, "")
-      .replace(/:\s*(string|number|boolean|any|void|unknown|never|Record<[^>]+>|Array<[^>]+>|[\w]+\[\])\b/g, "")
+      .replace(
+        /:\s*(string|number|boolean|any|void|unknown|never|Record<[^>]+>|Array<[^>]+>|[\w]+\[\])\b/g,
+        "",
+      )
       .replace(/as\s+[A-Za-z0-9_<>[\]]+/g, "")
       .replace(/interface\s+\w+\s*\{[^}]*\}/g, "")
       .replace(/type\s+\w+\s*=\s*[^;]+;/g, "");
@@ -63,7 +66,7 @@
       log: (...args) => logs.push(args.map(formatArg).join(" ")),
       info: (...args) => logs.push("[INFO] " + args.map(formatArg).join(" ")),
       warn: (...args) => logs.push("[WARN] " + args.map(formatArg).join(" ")),
-      error: (...args) => logs.push("[ERROR] " + args.map(formatArg).join(" "))
+      error: (...args) => logs.push("[ERROR] " + args.map(formatArg).join(" ")),
     };
 
     function formatArg(arg) {
@@ -85,11 +88,15 @@
     let hasError = false;
 
     try {
-      const asyncFn = new Function("Deno", "console", `
+      const asyncFn = new Function(
+        "Deno",
+        "console",
+        `
         return (async () => {
           ${cleanedCode}
         })();
-      `);
+      `,
+      );
       result = await asyncFn(Deno, customConsole);
     } catch (err) {
       hasError = true;
@@ -105,12 +112,12 @@
     return {
       output: logs.join("\n"),
       durationMs: duration,
-      success: !hasError
+      success: !hasError,
     };
   }
 
   // Inline Snippet Execution (for docs)
-  window.executeSnippet = async function(cardId) {
+  window.executeSnippet = async function (cardId) {
     const card = document.getElementById(cardId);
     if (!card) return;
 
@@ -131,7 +138,9 @@
     const res = await runCodeInSandbox(code);
 
     if (statusEl) {
-      statusEl.textContent = res.success ? `Éxito (${res.durationMs}ms)` : `Error (${res.durationMs}ms)`;
+      statusEl.textContent = res.success
+        ? `Éxito (${res.durationMs}ms)`
+        : `Error (${res.durationMs}ms)`;
       statusEl.style.color = res.success ? "var(--emerald-accent)" : "var(--rose-accent)";
     }
     if (outputEl) {
@@ -141,7 +150,7 @@
   };
 
   // Copy Snippet Code
-  window.copySnippet = function(cardId) {
+  window.copySnippet = function (cardId) {
     const card = document.getElementById(cardId);
     if (!card) return;
     const code = decodeURIComponent(card.getAttribute("data-code"));
@@ -151,7 +160,7 @@
   };
 
   // Dedicated Playground Page
-  window.initPlaygroundPage = function() {
+  window.initPlaygroundPage = function () {
     const textarea = document.getElementById("pgCodeInput");
     const outputEl = document.getElementById("pgOutput");
     const statusEl = document.getElementById("pgStatus");
@@ -221,11 +230,11 @@ try {
   console.log(readme);
 } catch (e) {
   console.error(e.message);
-}`
+}`,
     };
 
     const monacoContainer = document.getElementById("pgMonacoEditor");
-    let initialCode = PRESETS.server;
+    const initialCode = PRESETS.server;
 
     // Load Monaco Editor dynamically
     if (monacoContainer) {
@@ -233,13 +242,16 @@ try {
         setupMonaco();
       } else {
         const script = document.createElement("script");
-        script.src = "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js";
+        script.src =
+          "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js";
         script.onload = () => {
-          // @ts-ignore
+          // @ts-ignore: Monaco AMD require loader
           if (window.require) {
-            // @ts-ignore
-            window.require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs" } });
-            // @ts-ignore
+            // @ts-ignore: Monaco AMD require config
+            window.require.config({
+              paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs" },
+            });
+            // @ts-ignore: Monaco AMD require load
             window.require(["vs/editor/editor.main"], () => {
               setupMonaco();
             });
@@ -257,7 +269,7 @@ try {
       if (!monacoContainer) return;
       monacoContainer.innerHTML = "";
       const isDark = document.documentElement.getAttribute("data-theme") !== "light";
-      // @ts-ignore
+      // @ts-ignore: Monaco Editor global from CDN
       window.monacoEditor = monaco.editor.create(monacoContainer, {
         value: initialCode,
         language: "typescript",
@@ -269,10 +281,10 @@ try {
         scrollBeyondLastLine: false,
         lineNumbers: "on",
         renderLineHighlight: "all",
-        padding: { top: 12, bottom: 12 }
+        padding: { top: 12, bottom: 12 },
       });
 
-      // @ts-ignore
+      // @ts-ignore: Monaco KeyMod and KeyCode globals
       window.monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
         execute();
       });
@@ -280,17 +292,20 @@ try {
       // Observe theme changes to adjust Monaco theme
       const observer = new MutationObserver(() => {
         const dark = document.documentElement.getAttribute("data-theme") !== "light";
-        // @ts-ignore
+        // @ts-ignore: Monaco Editor theme API
         if (window.monaco) monaco.editor.setTheme(dark ? "vs-dark" : "vs");
       });
-      observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-theme"],
+      });
 
       // Run initial execution after Monaco is ready
       setTimeout(() => execute(), 250);
     }
 
     async function execute() {
-      // @ts-ignore
+      // @ts-ignore: Monaco Editor getValue API
       const code = window.monacoEditor ? window.monacoEditor.getValue() : textarea.value;
       statusEl.textContent = "Ejecutando...";
       statusEl.style.color = "var(--brand-primary)";
@@ -298,7 +313,9 @@ try {
 
       const res = await runCodeInSandbox(code);
 
-      statusEl.textContent = res.success ? `Completado (${res.durationMs}ms)` : `Error (${res.durationMs}ms)`;
+      statusEl.textContent = res.success
+        ? `Completado (${res.durationMs}ms)`
+        : `Error (${res.durationMs}ms)`;
       statusEl.style.color = res.success ? "var(--emerald-accent)" : "var(--rose-accent)";
       outputEl.textContent = res.output || "(Ejecutado sin mensajes de consola)";
       outputEl.style.color = res.success ? "#38bdf8" : "#fb7185";
@@ -318,9 +335,9 @@ try {
       presetSelect.addEventListener("change", (e) => {
         const val = e.target.value;
         if (PRESETS[val]) {
-          // @ts-ignore
+          // @ts-ignore: Monaco Editor is loaded dynamically from CDN
           if (window.monacoEditor) {
-            // @ts-ignore
+            // @ts-ignore: Monaco Editor API setValue
             window.monacoEditor.setValue(PRESETS[val]);
           } else {
             textarea.value = PRESETS[val];

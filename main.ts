@@ -1,4 +1,4 @@
-import { join, extname } from "@std/path";
+import { extname, join } from "@std/path";
 import { exists } from "@std/fs";
 import { buildSite } from "./src/core/builder.ts";
 
@@ -31,7 +31,9 @@ function getContentType(path: string): string {
 }
 
 // In-memory search index for Ask AI
-let cachedSearchIndex: Array<{ id: string; url: string; title: string; section?: string; content: string }> | null = null;
+let cachedSearchIndex:
+  | Array<{ id: string; url: string; title: string; section?: string; content: string }>
+  | null = null;
 async function getSearchIndex() {
   if (cachedSearchIndex) return cachedSearchIndex;
   try {
@@ -43,7 +45,7 @@ async function getSearchIndex() {
   return cachedSearchIndex || [];
 }
 
-Deno.serve(async (req) => {
+export async function handleRequest(req: Request): Promise<Response> {
   const url = new URL(req.url);
 
   // 1. Deno KV Edge Feedback API
@@ -51,6 +53,11 @@ Deno.serve(async (req) => {
     try {
       const body = await req.json();
       const { path, helpful } = body;
+      if (!path || typeof helpful !== "boolean") {
+        return Response.json({ success: false, error: "path and helpful are required" }, {
+          status: 400,
+        });
+      }
       if (kv && path) {
         const key = ["feedback", path, helpful ? "positive" : "negative"];
         await kv.atomic().sum(key, 1n).commit();
@@ -108,11 +115,14 @@ Deno.serve(async (req) => {
       // Synthesize intelligent response
       let answer = "";
       if (topSources.length === 0) {
-        answer = `No encontré coincidencias exactas para "${query}" en la documentación actual. Te sugiero explorar la sección de **Guía de Inicio** o consultar el **Playground Interactivo**.`;
+        answer =
+          `No encontré coincidencias exactas para "${query}" en la documentación actual. Te sugiero explorar la sección de **Guía de Inicio** o consultar el **Playground Interactivo**.`;
       } else {
         const topDoc = scored[0].doc;
         answer = `En base a la documentación de **ZerhoPress**:\n\n` +
-          `Para resolver tu consulta sobre **"${query}"**, la sección más relevante es [${topSources[0].title}](${topSources[0].url}).\n\n` +
+          `Para resolver tu consulta sobre **"${query}"**, la sección más relevante es [${
+            topSources[0].title
+          }](${topSources[0].url}).\n\n` +
           `> ${topDoc.content.slice(0, 240)}...\n\n` +
           `Puedes utilizar los bloques interactivos con \`\`\`ts run para probar el código en vivo en el navegador o revisar la configuración en \`zerho.config.ts\`.`;
       }
@@ -140,7 +150,9 @@ Deno.serve(async (req) => {
   try {
     const file = await Deno.readFile(diskPath);
     const isAsset = filePath.startsWith("/assets/");
-    const cacheControl = "no-cache, must-revalidate";
+    const cacheControl = isAsset
+      ? "public, max-age=31536000, immutable"
+      : "no-cache, must-revalidate";
 
     return new Response(file, {
       headers: {
@@ -168,4 +180,8 @@ Deno.serve(async (req) => {
       });
     }
   }
-});
+}
+
+if (import.meta.main) {
+  Deno.serve(handleRequest);
+}

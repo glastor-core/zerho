@@ -1,4 +1,4 @@
-import type { ZerhoConfig, SidebarItem } from "../../zerho.config.ts";
+import type { SidebarItem, ZerhoConfig } from "../../zerho.config.ts";
 import type { ParsedMarkdown } from "../core/markdown.ts";
 
 export interface RenderPageOptions {
@@ -17,7 +17,10 @@ function escapeHtml(str: string): string {
     .replace(/'/g, "&#039;");
 }
 
-function getSidebarForPath(sidebarConfig: Record<string, SidebarItem[]> | SidebarItem[], path: string): SidebarItem[] {
+function getSidebarForPath(
+  sidebarConfig: Record<string, SidebarItem[]> | SidebarItem[],
+  path: string,
+): SidebarItem[] {
   if (Array.isArray(sidebarConfig)) {
     return sidebarConfig;
   }
@@ -31,11 +34,15 @@ function getSidebarForPath(sidebarConfig: Record<string, SidebarItem[]> | Sideba
   return sidebarConfig["/"] || [];
 }
 
-export function renderPage({ config, parsed, currentPath, devMode = false }: RenderPageOptions): string {
+export function renderPage(
+  { config, parsed, currentPath, devMode = false }: RenderPageOptions,
+): string {
   const { frontmatter, html, toc, readingTimeMin } = parsed;
   const isHome = frontmatter.layout === "home" || currentPath === "/" || currentPath === "/index";
   const isPlayground = currentPath.startsWith("/playground");
-  const pageTitle = frontmatter.title ? `${frontmatter.title} | ${config.title}` : `${config.title} - ${config.tagline}`;
+  const pageTitle = frontmatter.title
+    ? `${frontmatter.title} | ${config.title}`
+    : `${config.title} - ${config.tagline}`;
   const pageDesc = frontmatter.description || config.description;
 
   const sidebarItems = isHome ? [] : getSidebarForPath(config.themeConfig.sidebar, currentPath);
@@ -43,9 +50,11 @@ export function renderPage({ config, parsed, currentPath, devMode = false }: Ren
   // Render navigation items
   const navHtml = config.themeConfig.nav
     .map((item) => {
-      const isActive = item.activeMatch ? currentPath.startsWith(item.activeMatch) : currentPath === item.link;
+      const isActive = item.activeMatch
+        ? currentPath.startsWith(item.activeMatch)
+        : currentPath === item.link;
       return `
-      <a href="${item.link}" class="nav-link ${isActive ? 'active' : ''}">
+      <a href="${item.link}" class="nav-link ${isActive ? "active" : ""}">
         ${escapeHtml(item.text)}
         ${item.badge ? `<span class="nav-badge">${escapeHtml(item.badge)}</span>` : ""}
       </a>`;
@@ -57,12 +66,19 @@ export function renderPage({ config, parsed, currentPath, devMode = false }: Ren
     .map((section) => {
       const itemsHtml = (section.items || [])
         .map((subItem) => {
-          const isActive = currentPath === subItem.link || (currentPath.replace(/\/$/, "") === (subItem.link || "").replace(/\/$/, ""));
+          const isActive = currentPath === subItem.link ||
+            (currentPath.replace(/\/$/, "") === (subItem.link || "").replace(/\/$/, ""));
           return `
-          <li class="sidebar-item ${isActive ? 'active' : ''}">
-            <a href="${subItem.link || '#'}" class="sidebar-link ${isActive ? 'active' : ''}">
+          <li class="sidebar-item ${isActive ? "active" : ""}">
+            <a href="${subItem.link || "#"}" class="sidebar-link ${isActive ? "active" : ""}">
               <span class="sidebar-text">${escapeHtml(subItem.text)}</span>
-              ${subItem.badge ? `<span class="item-badge ${subItem.badge.toLowerCase()}">${escapeHtml(subItem.badge)}</span>` : ''}
+              ${
+            subItem.badge
+              ? `<span class="item-badge ${subItem.badge.toLowerCase()}">${
+                escapeHtml(subItem.badge)
+              }</span>`
+              : ""
+          }
             </a>
           </li>`;
         })
@@ -87,14 +103,16 @@ export function renderPage({ config, parsed, currentPath, devMode = false }: Ren
         <span>EN ESTA PÁGINA</span>
       </div>
       <ul class="toc-list" id="tocList">
-        ${toc
-          .map(
-            (item) => `
+        ${
+      toc
+        .map(
+          (item) => `
           <li class="toc-item level-${item.level}">
             <a href="#${item.id}" class="toc-link" data-id="${item.id}">${escapeHtml(item.text)}</a>
-          </li>`
-          )
-          .join("")}
+          </li>`,
+        )
+        .join("")
+    }
       </ul>
       <div class="toc-footer">
         <a href="#top" class="toc-action-link" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">
@@ -128,13 +146,17 @@ export function renderPage({ config, parsed, currentPath, devMode = false }: Ren
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="/assets/theme.css?v=1.1.0">
-  ${devMode ? `<script>
+  ${
+    devMode
+      ? `<script>
     // Live Reload WebSocket
     const ws = new WebSocket("ws://" + location.host + "/_hmr");
     ws.onmessage = (msg) => { if (msg.data === "reload") location.reload(); };
-  </script>` : ""}
+  </script>`
+      : ""
+  }
 </head>
-<body class="${isHome ? 'is-home' : ''} ${isPlayground ? 'is-playground' : ''}">
+<body class="${isHome ? "is-home" : ""} ${isPlayground ? "is-playground" : ""}">
   <div id="top"></div>
 
   <!-- Ambient background glow effects -->
@@ -192,18 +214,24 @@ export function renderPage({ config, parsed, currentPath, devMode = false }: Ren
 
   <!-- Layout Container -->
   <div class="site-layout">
-    ${!isHome && sidebarItems.length > 0 ? `
+    ${
+    !isHome && sidebarItems.length > 0
+      ? `
     <!-- Left Sidebar -->
     <aside class="site-sidebar" id="siteSidebar">
       <div class="sidebar-scroller">
         ${sidebarHtml}
       </div>
     </aside>
-    ` : ""}
+    `
+      : ""
+  }
 
     <!-- Main Content -->
-    <main class="site-content ${isHome ? 'content-home' : ''}">
-      ${isHome ? `
+    <main class="site-content ${isHome ? "content-home" : ""}">
+      ${
+    isHome
+      ? `
       <!-- Hero Section -->
       <section class="home-hero">
         <div class="hero-badge">
@@ -313,7 +341,8 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
           </div>
         </div>
       </section>
-      ` : `
+      `
+      : `
       <!-- Documentation Body -->
       <article class="doc-container">
         <header class="doc-header">
@@ -322,14 +351,22 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               ${readingTimeMin} min de lectura
             </span>
-            ${editLinkUrl ? `
+            ${
+        editLinkUrl
+          ? `
             <a href="${editLinkUrl}" target="_blank" rel="noopener noreferrer" class="doc-edit-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
               <span>Editar en GitHub</span>
-            </a>` : ""}
+            </a>`
+          : ""
+      }
           </div>
           ${frontmatter.title ? `<h1 class="page-title">${escapeHtml(frontmatter.title)}</h1>` : ""}
-          ${frontmatter.description ? `<p class="page-subtitle">${escapeHtml(frontmatter.description)}</p>` : ""}
+          ${
+        frontmatter.description
+          ? `<p class="page-subtitle">${escapeHtml(frontmatter.description)}</p>`
+          : ""
+      }
         </header>
 
         <div class="markdown-body">
@@ -358,16 +395,24 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
         <!-- Doc Footer: Prev/Next -->
         <footer class="doc-footer">
           <div class="doc-nav-cards">
-            ${frontmatter.prev ? `
+            ${
+        frontmatter.prev
+          ? `
             <a href="${frontmatter.prev.link}" class="doc-nav-card prev">
               <span class="nav-direction">ANTERIOR</span>
               <span class="nav-title">← ${escapeHtml(frontmatter.prev.text)}</span>
-            </a>` : `<div></div>`}
-            ${frontmatter.next ? `
+            </a>`
+          : `<div></div>`
+      }
+            ${
+        frontmatter.next
+          ? `
             <a href="${frontmatter.next.link}" class="doc-nav-card next">
               <span class="nav-direction">SIGUIENTE</span>
               <span class="nav-title">${escapeHtml(frontmatter.next.text)} →</span>
-            </a>` : `<div></div>`}
+            </a>`
+          : `<div></div>`
+      }
           </div>
         </footer>
       </article>
@@ -376,7 +421,8 @@ app<span class="token punctuation">.</span><span class="token function">get</spa
       <aside class="site-toc">
         ${tocHtml}
       </aside>
-      `}
+      `
+  }
     </main>
   </div>
 

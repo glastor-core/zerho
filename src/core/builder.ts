@@ -1,5 +1,5 @@
 import { walk } from "@std/fs";
-import { join, relative, dirname } from "@std/path";
+import { dirname, join, relative } from "@std/path";
 import config from "../../zerho.config.ts";
 import { parseMarkdown } from "./markdown.ts";
 import { SearchIndexer } from "./search.ts";
@@ -47,7 +47,7 @@ export async function buildSite(options: BuildOptions = {}) {
       url: routePath,
       title: parsed.frontmatter.title || config.title,
       section: parsed.frontmatter.layout === "home" ? "Inicio" : routePath.split("/")[1] || "Docs",
-      content: parsed.plainText.slice(0, 1500)
+      content: parsed.plainText.slice(0, 1500),
     });
 
     // Also index individual h2/h3 sections for direct anchor jumping!
@@ -57,7 +57,7 @@ export async function buildSite(options: BuildOptions = {}) {
         url: `${routePath}#${heading.id}`,
         title: parsed.frontmatter.title || config.title,
         section: heading.text,
-        content: heading.text
+        content: heading.text,
       });
     }
 
@@ -66,7 +66,7 @@ export async function buildSite(options: BuildOptions = {}) {
       config,
       parsed,
       currentPath: routePath,
-      devMode
+      devMode,
     });
 
     // Write file to output directory
@@ -87,13 +87,18 @@ export async function buildSite(options: BuildOptions = {}) {
   await Deno.copyFile(join(clientDir, "theme.css"), join(outDir, "assets", "theme.css"));
   await Deno.copyFile(join(clientDir, "app.js"), join(outDir, "assets", "app.js"));
   await Deno.copyFile(join(clientDir, "playground.js"), join(outDir, "assets", "playground.js"));
-  await Deno.copyFile(join(clientDir, "openapi-client.js"), join(outDir, "assets", "openapi-client.js"));
+  await Deno.copyFile(
+    join(clientDir, "openapi-client.js"),
+    join(outDir, "assets", "openapi-client.js"),
+  );
 
   // Save search index
   await Deno.writeTextFile(join(outDir, "search-index.json"), indexer.toJSON());
 
   const duration = (performance.now() - startTime).toFixed(1);
-  console.log(`✨ \x1b[32m[ZerhoPress Exitoso]\x1b[0m ${pageCount} páginas compiladas e indexadas en ${duration}ms\n`);
+  console.log(
+    `✨ \x1b[32m[ZerhoPress Exitoso]\x1b[0m ${pageCount} páginas compiladas e indexadas en ${duration}ms\n`,
+  );
 }
 
 if (import.meta.main) {

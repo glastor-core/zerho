@@ -77,7 +77,9 @@ export function renderOpenApiExplorer(spec: OpenApiSpec): string {
 
           <div class="endpoint-grid">
             <div class="endpoint-left-col">
-              ${ep.parameters && ep.parameters.length > 0 ? `
+              ${
+        ep.parameters && ep.parameters.length > 0
+          ? `
               <div class="endpoint-section-title">Parámetros</div>
               <div class="table-responsive">
                 <table class="docs-table params-table">
@@ -85,30 +87,42 @@ export function renderOpenApiExplorer(spec: OpenApiSpec): string {
                     <tr><th>Nombre</th><th>Tipo</th><th>Ubicación</th><th>Requerido</th><th>Descripción</th></tr>
                   </thead>
                   <tbody>
-                    ${ep.parameters.map(p => `
+                    ${
+            ep.parameters.map((p) => `
                     <tr>
                       <td><code>${p.name}</code></td>
                       <td><span class="type-pill">${p.type}</span></td>
                       <td><span class="in-pill">${p.in}</span></td>
-                      <td>${p.required ? '<span class="req-yes">Sí</span>' : '<span class="req-no">No</span>'}</td>
+                      <td>${
+              p.required ? '<span class="req-yes">Sí</span>' : '<span class="req-no">No</span>'
+            }</td>
                       <td>${p.description}</td>
-                    </tr>`).join("")}
+                    </tr>`).join("")
+          }
                   </tbody>
                 </table>
-              </div>` : ""}
+              </div>`
+          : ""
+      }
 
-              ${ep.requestBody ? `
+              ${
+        ep.requestBody
+          ? `
               <div class="endpoint-section-title">Cuerpo de la Petición (${ep.requestBody.contentType})</div>
               <pre class="code-pre"><code class="language-json">${reqBodyJson}</code></pre>
-              ` : ""}
+              `
+          : ""
+      }
 
               <div class="endpoint-section-title">Respuestas</div>
               <div class="responses-list">
-                ${Object.entries(ep.responses).map(([code, res]) => `
-                <div class="response-item status-${code.startsWith('2') ? '2xx' : '4xx'}">
+                ${
+        Object.entries(ep.responses).map(([code, res]) => `
+                <div class="response-item status-${code.startsWith("2") ? "2xx" : "4xx"}">
                   <span class="response-status-badge">${code}</span>
                   <span class="response-desc">${res.description}</span>
-                </div>`).join("")}
+                </div>`).join("")
+      }
               </div>
             </div>
 
@@ -128,11 +142,15 @@ export function renderOpenApiExplorer(spec: OpenApiSpec): string {
                   <input type="text" class="tryout-url-input" id="${epId}_url" value="${spec.baseUrl}${ep.path}">
                 </div>
 
-                ${ep.requestBody ? `
+                ${
+        ep.requestBody
+          ? `
                 <div class="tryout-body-wrap">
                   <div class="tryout-label">JSON Request Body</div>
                   <textarea class="tryout-body-textarea" id="${epId}_body">${reqBodyJson}</textarea>
-                </div>` : ""}
+                </div>`
+          : ""
+      }
 
                 <!-- Snippets Generator Tabs -->
                 <div class="snippets-tabs">

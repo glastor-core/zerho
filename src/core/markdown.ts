@@ -6,11 +6,11 @@ import Prism from "prismjs";
 (globalThis as unknown as { Prism: typeof Prism }).Prism = Prism;
 
 // Import languages
-await import("npm:prismjs/components/prism-typescript.js");
-await import("npm:prismjs/components/prism-bash.js");
-await import("npm:prismjs/components/prism-json.js");
-await import("npm:prismjs/components/prism-yaml.js");
-await import("npm:prismjs/components/prism-css.js");
+await import("prismjs/components/prism-typescript");
+await import("prismjs/components/prism-bash");
+await import("prismjs/components/prism-json");
+await import("prismjs/components/prism-yaml");
+await import("prismjs/components/prism-css");
 
 export interface TocItem {
   id: string;
@@ -103,7 +103,8 @@ function highlightCode(code: string, lang: string): string {
  * Transforms custom container callouts like ::: tip, ::: info, ::: warning, ::: danger
  */
 function processCallouts(markdown: string): string {
-  const containerRegex = /^:::\s*(info|tip|warning|danger|details)(?:[ \t]+([^\r\n]+))?\r?\n([\s\S]*?)\r?\n:::/gm;
+  const containerRegex =
+    /^:::\s*(info|tip|warning|danger|details)(?:[ \t]+([^\r\n]+))?\r?\n([\s\S]*?)\r?\n:::/gm;
 
   return markdown.replace(containerRegex, (_match, type, title, content) => {
     const defaultTitles: Record<string, string> = {
@@ -116,11 +117,16 @@ function processCallouts(markdown: string): string {
     const displayTitle = title ? title.trim() : defaultTitles[type] || type.toUpperCase();
 
     const icons: Record<string, string> = {
-      info: `<svg class="callout-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-      tip: `<svg class="callout-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`,
-      warning: `<svg class="callout-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
-      danger: `<svg class="callout-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
-      details: `<svg class="callout-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>`,
+      info:
+        `<svg class="callout-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+      tip:
+        `<svg class="callout-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`,
+      warning:
+        `<svg class="callout-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+      danger:
+        `<svg class="callout-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+      details:
+        `<svg class="callout-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>`,
     };
 
     if (type === "details") {
@@ -141,7 +147,8 @@ function processCallouts(markdown: string): string {
  * Transforms GitHub style alerts (> [!NOTE], > [!TIP], etc.)
  */
 function processGitHubAlerts(markdown: string): string {
-  const alertRegex = /^>\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\][ \t]*\r?\n((?:>[ \t]*[^\r\n]*\r?\n?)*)/gim;
+  const alertRegex =
+    /^>\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\][ \t]*\r?\n((?:>[ \t]*[^\r\n]*\r?\n?)*)/gim;
   return markdown.replace(alertRegex, (_match, alertType, bodyLines) => {
     const rawContent = bodyLines
       .split(/\r?\n/)
@@ -277,7 +284,11 @@ export async function parseMarkdown(rawContent: string): Promise<ParsedMarkdown>
 <div class="code-block-wrap" id="${copyId}">
   <div class="code-block-header">
     <div class="code-header-left">
-      ${filename ? `<span class="code-title-tab">${escapeHtml(filename)}</span>` : `<span class="code-lang-badge">${langLabel}</span>`}
+      ${
+      filename
+        ? `<span class="code-title-tab">${escapeHtml(filename)}</span>`
+        : `<span class="code-lang-badge">${langLabel}</span>`
+    }
     </div>
     <button class="copy-code-btn" onclick="copyCodeBlock('${copyId}')" aria-label="Copiar código">
       <svg class="copy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -293,9 +304,17 @@ export async function parseMarkdown(rawContent: string): Promise<ParsedMarkdown>
   renderer.table = ({ header, rows }) => {
     let headerHtml = "";
     if (header) {
-      headerHtml = `<thead><tr>${header.map((cell) => `<th>${cell.tokens.map((t) => t.raw).join("")}</th>`).join("")}</tr></thead>`;
+      headerHtml = `<thead><tr>${
+        header.map((cell) => `<th>${cell.tokens.map((t) => t.raw).join("")}</th>`).join("")
+      }</tr></thead>`;
     }
-    const rowsHtml = `<tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${cell.tokens.map((t) => t.raw).join("")}</td>`).join("")}</tr>`).join("")}</tbody>`;
+    const rowsHtml = `<tbody>${
+      rows.map((row) =>
+        `<tr>${
+          row.map((cell) => `<td>${cell.tokens.map((t) => t.raw).join("")}</td>`).join("")
+        }</tr>`
+      ).join("")
+    }</tbody>`;
     return `<div class="table-responsive"><table class="docs-table">${headerHtml}${rowsHtml}</table></div>`;
   };
 
@@ -308,7 +327,10 @@ export async function parseMarkdown(rawContent: string): Promise<ParsedMarkdown>
   const html = await marked.parse(processedMarkdown);
 
   // Calculate words and reading time
-  const plainText = markdownBody.replace(/<[^>]+>/g, " ").replace(/[#*`~_-]/g, " ").replace(/\s+/g, " ").trim();
+  const plainText = markdownBody.replace(/<[^>]+>/g, " ").replace(/[#*`~_-]/g, " ").replace(
+    /\s+/g,
+    " ",
+  ).trim();
   const words = plainText ? plainText.split(/\s+/).length : 0;
   const readingTimeMin = Math.max(1, Math.ceil(words / 200));
 

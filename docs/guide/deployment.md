@@ -11,9 +11,12 @@ next:
 
 ## Despliegue en Deno Deploy
 
-**Deno Deploy** es una plataforma distribuida a nivel global que ejecuta código JavaScript y TypeScript en el Edge, en más de 35 regiones alrededor del mundo.
+**Deno Deploy** es una plataforma distribuida a nivel global que ejecuta código JavaScript y
+TypeScript en el Edge, en más de 35 regiones alrededor del mundo.
 
-ZerhoPress está arquitectado específicamente para Deno Deploy: su archivo raíz `main.ts` sirve como servidor HTTP edge nativo y gestor de activos estáticos optimizado con compresión y encabezados de caché inmutables.
+ZerhoPress está arquitectado específicamente para Deno Deploy: su archivo raíz `main.ts` sirve como
+servidor HTTP edge nativo y gestor de activos estáticos optimizado con compresión y encabezados de
+caché inmutables.
 
 ---
 
@@ -27,9 +30,8 @@ ZerhoPress está arquitectado específicamente para Deno Deploy: su archivo raí
    - **Install step**: Ninguno requerido (Deno descarga automáticamente en caché).
 5. Haz clic en **Deploy Project**.
 
-::: tip DESPLIEGUE CONTINUO
-Cada vez que hagas `git push` a tu rama principal (`main` o `master`), Deno Deploy generará un nuevo despliegue instantáneo sin tiempo de inactividad.
-:::
+::: tip DESPLIEGUE CONTINUO Cada vez que hagas `git push` a tu rama principal (`main` o `master`),
+Deno Deploy generará un nuevo despliegue instantáneo sin tiempo de inactividad. :::
 
 ---
 
@@ -54,13 +56,14 @@ El servidor `main.ts` de ZerhoPress aplica automáticamente las mejores práctic
 ```ts [main.ts]
 // Configuración de encabezados automáticos de caché
 const isAsset = filePath.startsWith("/assets/");
-const cacheControl = isAsset 
-  ? "public, max-age=31536000, immutable" 
+const cacheControl = isAsset
+  ? "public, max-age=31536000, immutable"
   : "public, max-age=3600, stale-while-revalidate=86400";
 ```
 
 - **Activos estáticos (CSS, JS)**: Almacenados en caché inmutable por 1 año (`max-age=31536000`).
-- **Páginas HTML**: Cacheadas por 1 hora con revalidación en segundo plano (`stale-while-revalidate=86400`).
+- **Páginas HTML**: Cacheadas por 1 hora con revalidación en segundo plano
+  (`stale-while-revalidate=86400`).
 - **Cero Cold Starts**: Arranque en el Edge en menos de 5ms.
 
 ---

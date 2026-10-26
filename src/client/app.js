@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Theme Management
 function initTheme() {
   const toggleBtn = document.getElementById("themeToggleBtn");
-  const storedTheme = localStorage.getItem("zerho-theme") || 
+  const storedTheme = localStorage.getItem("zerho-theme") ||
     (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
 
   setTheme(storedTheme);
@@ -40,7 +40,10 @@ function initSidebarMobile() {
 
     // Close when clicking outside on mobile
     document.addEventListener("click", (e) => {
-      if (!sidebar.contains(e.target) && !menuBtn.contains(e.target) && sidebar.classList.contains("mobile-open")) {
+      if (
+        !sidebar.contains(e.target) && !menuBtn.contains(e.target) &&
+        sidebar.classList.contains("mobile-open")
+      ) {
         sidebar.classList.remove("mobile-open");
       }
     });
@@ -48,7 +51,7 @@ function initSidebarMobile() {
 }
 
 // Copy Code Block functionality
-window.copyCodeBlock = function(id) {
+window.copyCodeBlock = function (id) {
   const wrap = document.getElementById(id);
   if (!wrap) return;
   const textarea = wrap.querySelector(".raw-code");
@@ -70,7 +73,7 @@ window.copyCodeBlock = function(id) {
 };
 
 // Feedback Widget (Edge Deno KV)
-window.submitFeedback = async function(helpful) {
+window.submitFeedback = async function (helpful) {
   const yesBtn = document.getElementById("fbYes");
   const noBtn = document.getElementById("fbNo");
   const msgEl = document.getElementById("feedbackMsg");
@@ -84,8 +87,8 @@ window.submitFeedback = async function(helpful) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         path: window.location.pathname,
-        helpful
-      })
+        helpful,
+      }),
     });
   } catch (e) {
     console.warn("Feedback offline fallback:", e);
@@ -129,7 +132,7 @@ function initTocScrollSpy() {
 
 // Search Tab Switcher (Quick Search vs Ask AI)
 window.__currentSearchTab = "quick";
-window.switchSearchTab = function(tab) {
+window.switchSearchTab = function (tab) {
   window.__currentSearchTab = tab;
   const tabQuick = document.getElementById("searchTabQuick");
   const tabAi = document.getElementById("searchTabAi");
@@ -160,7 +163,7 @@ window.switchSearchTab = function(tab) {
   }
 };
 
-window.openSearchModal = function() {
+window.openSearchModal = function () {
   const backdrop = document.getElementById("searchModalBackdrop");
   const input = document.getElementById("searchInput");
   if (!backdrop) return;
@@ -174,7 +177,7 @@ window.openSearchModal = function() {
   }
 };
 
-window.closeSearchModal = function() {
+window.closeSearchModal = function () {
   const backdrop = document.getElementById("searchModalBackdrop");
   if (backdrop) backdrop.style.display = "none";
 };
@@ -186,7 +189,6 @@ function initSearchModal() {
   const closeBtn = document.getElementById("searchCloseBtn");
   const input = document.getElementById("searchInput");
   const resultsContainer = document.getElementById("searchResultsList");
-  const aiChatView = document.getElementById("aiChatView");
   const aiStatusPill = document.getElementById("aiStatusPill");
   const aiContentBody = document.getElementById("aiContentBody");
   const aiSourcesWrap = document.getElementById("aiSourcesWrap");
@@ -198,7 +200,7 @@ function initSearchModal() {
   let isIndexLoaded = false;
   let selectedIndex = -1;
 
-  window.loadSearchIndex = async function() {
+  window.loadSearchIndex = async function () {
     if (isIndexLoaded) return;
     try {
       const res = await fetch("/search-index.json");
@@ -247,7 +249,8 @@ function initSearchModal() {
 
     const query = input.value.trim().toLowerCase();
     if (!query) {
-      resultsContainer.innerHTML = `<div class="search-empty">Comienza a escribir para buscar en toda la documentación...</div>`;
+      resultsContainer.innerHTML =
+        `<div class="search-empty">Comienza a escribir para buscar en toda la documentación...</div>`;
       return;
     }
 
@@ -281,14 +284,15 @@ function initSearchModal() {
 
       aiStatusPill.textContent = "Sintetizando...";
       aiStatusPill.className = "ai-status-pill running";
-      aiContentBody.innerHTML = `<div class="ai-loading-pulse">Consultando índice semántico y generando respuesta...</div>`;
+      aiContentBody.innerHTML =
+        `<div class="ai-loading-pulse">Consultando índice semántico y generando respuesta...</div>`;
       if (aiSourcesWrap) aiSourcesWrap.style.display = "none";
 
       try {
         const res = await fetch("/api/ai/ask", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query })
+          body: JSON.stringify({ query }),
         });
         const data = await res.json();
 
@@ -298,14 +302,16 @@ function initSearchModal() {
 
         if (data.sources && data.sources.length > 0) {
           aiSourcesList.innerHTML = data.sources
-            .map(s => `<a href="${s.url}" class="ai-source-card">${escapeHtml(s.title)}</a>`)
+            .map((s) => `<a href="${s.url}" class="ai-source-card">${escapeHtml(s.title)}</a>`)
             .join("");
           aiSourcesWrap.style.display = "block";
         }
-      } catch (err) {
+      } catch (_err) {
         aiStatusPill.textContent = "Respuesta Local";
         aiStatusPill.className = "ai-status-pill ready";
-        aiContentBody.innerHTML = `Para <strong>"${escapeHtml(query)}"</strong>, te recomiendo consultar la <a href="/guide/getting-started">Guía de Inicio</a> y explorar el <a href="/playground/">Playground Interactivo</a>.`;
+        aiContentBody.innerHTML = `Para <strong>"${
+          escapeHtml(query)
+        }"</strong>, te recomiendo consultar la <a href="/guide/getting-started">Guía de Inicio</a> y explorar el <a href="/playground/">Playground Interactivo</a>.`;
       }
     } else if (window.__currentSearchTab === "quick") {
       const items = resultsContainer.querySelectorAll(".search-item");
@@ -337,7 +343,10 @@ function initSearchModal() {
   function renderResults(matches, query = "") {
     selectedIndex = -1;
     if (matches.length === 0 && query) {
-      resultsContainer.innerHTML = `<div class="search-empty">No se encontraron resultados para "<strong>${escapeHtml(query)}</strong>"</div>`;
+      resultsContainer.innerHTML =
+        `<div class="search-empty">No se encontraron resultados para "<strong>${
+          escapeHtml(query)
+        }</strong>"</div>`;
       return;
     }
 
@@ -346,7 +355,13 @@ function initSearchModal() {
         const snippet = highlightMatches(item.content.slice(0, 110), query);
         return `
         <a href="${item.url}" class="search-item">
-          <div class="search-item-title">${escapeHtml(item.title)} ${item.section ? `<span style="font-size:0.75rem; color:var(--text-muted)"> &rsaquo; ${escapeHtml(item.section)}</span>` : ""}</div>
+          <div class="search-item-title">${escapeHtml(item.title)} ${
+          item.section
+            ? `<span style="font-size:0.75rem; color:var(--text-muted)"> &rsaquo; ${
+              escapeHtml(item.section)
+            }</span>`
+            : ""
+        }</div>
           <div class="search-item-snippet">${snippet}...</div>
         </a>`;
       })
@@ -357,16 +372,19 @@ function initSearchModal() {
     if (!query) return escapeHtml(text);
     const escaped = escapeHtml(text);
     const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
-    return escaped.replace(regex, '<span style="color:var(--brand-primary);font-weight:700;">$1</span>');
+    return escaped.replace(
+      regex,
+      '<span style="color:var(--brand-primary);font-weight:700;">$1</span>',
+    );
   }
 
   function formatAiMarkdown(text) {
     return text
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
       .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>')
-      .replace(/`([^`]+)`/g, '<code>$1</code>')
-      .replace(/\n\n/g, '<p></p>')
-      .replace(/\n/g, '<br>');
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      .replace(/\n\n/g, "<p></p>")
+      .replace(/\n/g, "<br>");
   }
 
   function escapeHtml(str) {

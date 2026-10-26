@@ -11,11 +11,15 @@ next:
 
 ## Entorno de Ejecución en Vivo
 
-Este playground te permite experimentar con código **TypeScript** y simular APIs clave de **Deno 2** directamente en el navegador.
+Este playground te permite experimentar con código **TypeScript** y simular APIs clave de **Deno 2**
+directamente en el navegador.
 
-- **Sandbox aislado**: Tu código se ejecuta de manera segura en un hilo independiente sin bloquear la interfaz.
-- **APIs simuladas**: Soporta `Deno.version`, `Deno.env.get()`, `Deno.readTextFile()`, `crypto.subtle` y flujos `ReadableStream`.
-- **Atajo de teclado**: Presiona <kbd>Ctrl</kbd> + <kbd>Enter</kbd> (o <kbd>⌘</kbd> + <kbd>Enter</kbd> en Mac) para ejecutar.
+- **Sandbox aislado**: Tu código se ejecuta de manera segura en un hilo independiente sin bloquear
+  la interfaz.
+- **APIs simuladas**: Soporta `Deno.version`, `Deno.env.get()`, `Deno.readTextFile()`,
+  `crypto.subtle` y flujos `ReadableStream`.
+- **Atajo de teclado**: Presiona <kbd>Ctrl</kbd> + <kbd>Enter</kbd> (o <kbd>⌘</kbd> +
+  <kbd>Enter</kbd> en Mac) para ejecutar.
 
 <div class="playground-workspace">
 <div class="playground-toolbar">
@@ -58,17 +62,17 @@ Este playground te permite experimentar con código **TypeScript** y simular API
 
 ## Capacidades del Sandbox
 
-::: tip WEB WORKERS Y TIPADO DINÁMICO
-El sandbox de ZerhoPress remueve automáticamente las anotaciones de tipo de TypeScript para ejecutar el código resultante en el motor V8 nativo de tu navegador, garantizando un rendimiento casi instantáneo (menos de 5ms de latencia).
-:::
+::: tip WEB WORKERS Y TIPADO DINÁMICO El sandbox de ZerhoPress remueve automáticamente las
+anotaciones de tipo de TypeScript para ejecutar el código resultante en el motor V8 nativo de tu
+navegador, garantizando un rendimiento casi instantáneo (menos de 5ms de latencia). :::
 
 ### APIs Soportadas en el Sandbox
 
-| API | Estado | Descripción |
-| :--- | :---: | :--- |
-| `Deno.version` | ✅ Activa | Retorna versiones de Deno, V8 y TypeScript. |
-| `Deno.env.get(key)` | ✅ Activa | Simula acceso a variables de entorno (`DENO_ENV`, `REGION`, `PORT`). |
+| API                       |  Estado   | Descripción                                                          |
+| :------------------------ | :-------: | :------------------------------------------------------------------- |
+| `Deno.version`            | ✅ Activa | Retorna versiones de Deno, V8 y TypeScript.                          |
+| `Deno.env.get(key)`       | ✅ Activa | Simula acceso a variables de entorno (`DENO_ENV`, `REGION`, `PORT`). |
 | `Deno.readTextFile(path)` | ✅ Activa | Lectura de archivos virtuales en memoria (`deno.json`, `README.md`). |
-| `Deno.serve(handler)` | ✅ Activa | Simula peticiones HTTP entrantes y salida formateada. |
-| `crypto.subtle` | ✅ Nativa | Acceso a WebCrypto nativo del navegador para hashing y cifrado. |
-| `ReadableStream` | ✅ Nativa | Creación y lectura de flujos asíncronos. |
+| `Deno.serve(handler)`     | ✅ Activa | Simula peticiones HTTP entrantes y salida formateada.                |
+| `crypto.subtle`           | ✅ Nativa | Acceso a WebCrypto nativo del navegador para hashing y cifrado.      |
+| `ReadableStream`          | ✅ Nativa | Creación y lectura de flujos asíncronos.                             |

@@ -45,7 +45,9 @@ export function renderOpenApiExplorer(spec) {
 
           <div class="endpoint-grid">
             <div class="endpoint-left-col">
-              ${ep.parameters && ep.parameters.length > 0 ? `
+              ${
+        ep.parameters && ep.parameters.length > 0
+          ? `
               <div class="endpoint-section-title">Parámetros</div>
               <div class="table-responsive">
                 <table class="docs-table params-table">
@@ -53,30 +55,42 @@ export function renderOpenApiExplorer(spec) {
                     <tr><th>Nombre</th><th>Tipo</th><th>Ubicación</th><th>Requerido</th><th>Descripción</th></tr>
                   </thead>
                   <tbody>
-                    ${ep.parameters.map(p => `
+                    ${
+            ep.parameters.map((p) => `
                     <tr>
                       <td><code>${p.name}</code></td>
                       <td><span class="type-pill">${p.type}</span></td>
                       <td><span class="in-pill">${p.in}</span></td>
-                      <td>${p.required ? '<span class="req-yes">Sí</span>' : '<span class="req-no">No</span>'}</td>
+                      <td>${
+              p.required ? '<span class="req-yes">Sí</span>' : '<span class="req-no">No</span>'
+            }</td>
                       <td>${p.description}</td>
-                    </tr>`).join("")}
+                    </tr>`).join("")
+          }
                   </tbody>
                 </table>
-              </div>` : ""}
+              </div>`
+          : ""
+      }
 
-              ${ep.requestBody ? `
+              ${
+        ep.requestBody
+          ? `
               <div class="endpoint-section-title">Cuerpo de la Petición (${ep.requestBody.contentType})</div>
               <pre class="code-pre"><code class="language-json">${reqBodyJson}</code></pre>
-              ` : ""}
+              `
+          : ""
+      }
 
               <div class="endpoint-section-title">Respuestas</div>
               <div class="responses-list">
-                ${Object.entries(ep.responses).map(([code, res]) => `
-                <div class="response-item status-${code.startsWith('2') ? '2xx' : '4xx'}">
+                ${
+        Object.entries(ep.responses).map(([code, res]) => `
+                <div class="response-item status-${code.startsWith("2") ? "2xx" : "4xx"}">
                   <span class="response-status-badge">${code}</span>
                   <span class="response-desc">${res.description}</span>
-                </div>`).join("")}
+                </div>`).join("")
+      }
               </div>
             </div>
 
@@ -96,11 +110,15 @@ export function renderOpenApiExplorer(spec) {
                   <input type="text" class="tryout-url-input" id="${epId}_url" value="${spec.baseUrl}${ep.path}">
                 </div>
 
-                ${ep.requestBody ? `
+                ${
+        ep.requestBody
+          ? `
                 <div class="tryout-body-wrap">
                   <div class="tryout-label">JSON Request Body</div>
                   <textarea class="tryout-body-textarea" id="${epId}_body">${reqBodyJson}</textarea>
-                </div>` : ""}
+                </div>`
+          : ""
+      }
 
                 <!-- Snippets Generator Tabs -->
                 <div class="snippets-tabs">
@@ -162,90 +180,96 @@ if (typeof window !== "undefined") {
   window.renderOpenApiExplorer = renderOpenApiExplorer;
 }
 
-window.toggleEndpoint = function(id) {
+window.toggleEndpoint = function (id) {
   const card = document.getElementById(id);
   if (!card) return;
-  const details = card.querySelector('.endpoint-details');
-  const chevron = card.querySelector('.endpoint-chevron');
-  if (details.style.display === 'none') {
-    details.style.display = 'block';
-    if (chevron) chevron.style.transform = 'rotate(180deg)';
+  const details = card.querySelector(".endpoint-details");
+  const chevron = card.querySelector(".endpoint-chevron");
+  if (details.style.display === "none") {
+    details.style.display = "block";
+    if (chevron) chevron.style.transform = "rotate(180deg)";
   } else {
-    details.style.display = 'none';
-    if (chevron) chevron.style.transform = 'rotate(0deg)';
+    details.style.display = "none";
+    if (chevron) chevron.style.transform = "rotate(0deg)";
   }
 };
 
-window.switchSnippetTab = function(epId, lang) {
+window.switchSnippetTab = function (epId, lang) {
   const card = document.getElementById(epId);
   if (!card) return;
-  card.querySelectorAll('.snippet-tab-btn').forEach(b => b.classList.remove('active'));
-  if (event && event.target) event.target.classList.add('active');
-  ['curl', 'ts', 'py'].forEach(l => {
-    const el = document.getElementById(epId + '_snippet_' + l);
-    if (el) el.style.display = l === lang ? 'block' : 'none';
+  card.querySelectorAll(".snippet-tab-btn").forEach((b) => b.classList.remove("active"));
+  if (event && event.target) event.target.classList.add("active");
+  ["curl", "ts", "py"].forEach((l) => {
+    const el = document.getElementById(epId + "_snippet_" + l);
+    if (el) el.style.display = l === lang ? "block" : "none";
   });
 };
 
-window.sendApiRequest = async function(epId, method, defaultUrl) {
-  const urlInput = document.getElementById(epId + '_url');
-  const bodyInput = document.getElementById(epId + '_body');
-  const resBox = document.getElementById(epId + '_res_box');
-  const resStatus = document.getElementById(epId + '_res_status');
-  const resTime = document.getElementById(epId + '_res_time');
-  const resContent = document.getElementById(epId + '_res_content');
+window.sendApiRequest = async function (epId, method, defaultUrl) {
+  const urlInput = document.getElementById(epId + "_url");
+  const bodyInput = document.getElementById(epId + "_body");
+  const resBox = document.getElementById(epId + "_res_box");
+  const resStatus = document.getElementById(epId + "_res_status");
+  const resTime = document.getElementById(epId + "_res_time");
+  const resContent = document.getElementById(epId + "_res_content");
 
   const targetUrl = urlInput ? urlInput.value : defaultUrl;
   let bodyData = null;
-  if (bodyInput && (method === 'POST' || method === 'PUT')) {
+  if (bodyInput && (method === "POST" || method === "PUT")) {
     bodyData = bodyInput.value;
   }
 
-  if (resBox) resBox.style.display = 'block';
+  if (resBox) resBox.style.display = "block";
   if (resStatus) {
-    resStatus.textContent = 'Enviando...';
-    resStatus.className = 'tryout-status-pill';
+    resStatus.textContent = "Enviando...";
+    resStatus.className = "tryout-status-pill";
   }
-  if (resContent) resContent.textContent = 'Procesando request HTTP...';
+  if (resContent) resContent.textContent = "Procesando request HTTP...";
 
   const start = performance.now();
   try {
     const res = await fetch(targetUrl, {
       method,
-      headers: { 'Content-Type': 'application/json' },
-      body: bodyData
+      headers: { "Content-Type": "application/json" },
+      body: bodyData,
     });
     const duration = (performance.now() - start).toFixed(0);
     const data = await res.json().catch(() => res.text());
 
     if (resStatus) {
-      resStatus.textContent = res.status + ' ' + res.statusText;
-      resStatus.className = 'tryout-status-pill ' + (res.ok ? 'status-ok' : 'status-err');
+      resStatus.textContent = res.status + " " + res.statusText;
+      resStatus.className = "tryout-status-pill " + (res.ok ? "status-ok" : "status-err");
     }
-    if (resTime) resTime.textContent = duration + 'ms';
+    if (resTime) resTime.textContent = duration + "ms";
     if (resContent) {
-      resContent.textContent = typeof data === 'object' ? JSON.stringify(data, null, 2) : String(data);
+      resContent.textContent = typeof data === "object"
+        ? JSON.stringify(data, null, 2)
+        : String(data);
     }
   } catch (_e) {
     const duration = (performance.now() - start).toFixed(0);
     if (resStatus) {
-      resStatus.textContent = 'Simulado 200 OK';
-      resStatus.className = 'tryout-status-pill status-ok';
+      resStatus.textContent = "Simulado 200 OK";
+      resStatus.className = "tryout-status-pill status-ok";
     }
-    if (resTime) resTime.textContent = duration + 'ms';
+    if (resTime) resTime.textContent = duration + "ms";
     if (resContent) {
-      resContent.textContent = JSON.stringify({
-        status: "success",
-        engine: "ZerhoPress OpenAPI Explorer",
-        timestamp: new Date().toISOString(),
-        request: { method, url: targetUrl },
-        data: {
-          region: "sao-1",
-          latencyMs: 1.2,
-          deploymentsActive: 4,
-          message: "Simulación de respuesta exitosa desde el Edge Sandbox de Deno"
-        }
-      }, null, 2);
+      resContent.textContent = JSON.stringify(
+        {
+          status: "success",
+          engine: "ZerhoPress OpenAPI Explorer",
+          timestamp: new Date().toISOString(),
+          request: { method, url: targetUrl },
+          data: {
+            region: "sao-1",
+            latencyMs: 1.2,
+            deploymentsActive: 4,
+            message: "Simulación de respuesta exitosa desde el Edge Sandbox de Deno",
+          },
+        },
+        null,
+        2,
+      );
     }
   }
 };

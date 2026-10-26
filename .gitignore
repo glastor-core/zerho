@@ -1,6 +1,9 @@
 # Build artifacts (optional: main.ts auto-compiles if dist is missing on Deno Deploy)
 dist/
 
+# Coverage reports
+coverage/
+
 # OS and Editor files
 .DS_Store
 Thumbs.db

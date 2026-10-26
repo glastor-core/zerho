@@ -15,16 +15,16 @@
 
 ## 🚀 ¿Por qué ZerhoPress supera a VitePress en Deno?
 
-| Característica | VitePress Estándar | ZerhoPress Pro en Deno |
-| :--- | :---: | :---: |
-| **Runtime Base** | Node.js + npm + node_modules (400MB+) | **Deno 2 Nativo (0 node_modules)** |
-| **Playground en Vivo** | ❌ Requiere plugins externos complejos | **✅ Sandbox TypeScript / Deno Integrado** |
-| **Bloques Ejecutables** | Solo estáticos con copy | **✅ ````ts run```` con salida de consola en vivo** |
-| **Despliegue Edge** | Configuración manual de adapters | **✅ 1 Clic en Deno Deploy (`main.ts`)** |
-| **Búsqueda Instantánea** | Algolia externo o local básico | **✅ Buscador Cmd+K spotlight indexado** |
-| **Diagramas Mermaid** | Plugin extra | **✅ Soporte nativo de serie** |
-| **Tiempo de Compilación** | ~2.5 segundos | **~67 milisegundos (7 páginas)** |
-| **Estética UI** | Tema default clásico | **Estilo Linear / Vercel con Glassmorphism** |
+| Característica            |           VitePress Estándar           |            ZerhoPress Pro en Deno             |
+| :------------------------ | :------------------------------------: | :-------------------------------------------: |
+| **Runtime Base**          | Node.js + npm + node_modules (400MB+)  |      **Deno 2 Nativo (0 node_modules)**       |
+| **Playground en Vivo**    | ❌ Requiere plugins externos complejos |  **✅ Sandbox TypeScript / Deno Integrado**   |
+| **Bloques Ejecutables**   |        Solo estáticos con copy         | **✅ `ts run` con salida de consola en vivo** |
+| **Despliegue Edge**       |    Configuración manual de adapters    |   **✅ 1 Clic en Deno Deploy (`main.ts`)**    |
+| **Búsqueda Instantánea**  |     Algolia externo o local básico     |   **✅ Buscador Cmd+K spotlight indexado**    |
+| **Diagramas Mermaid**     |              Plugin extra              |        **✅ Soporte nativo de serie**         |
+| **Tiempo de Compilación** |             ~2.5 segundos              |       **~67 milisegundos (7 páginas)**        |
+| **Estética UI**           |          Tema default clásico          | **Estilo Linear / Vercel con Glassmorphism**  |
 
 ---
 
@@ -77,11 +77,13 @@ zerho/
 ## 🌐 Despliegue en Deno Deploy
 
 ### Opción 1: Conexión Automática con GitHub
+
 1. Conecta tu repositorio en [dash.deno.com](https://dash.deno.com).
 2. Selecciona `main.ts` como entrypoint.
 3. ¡Listo! Cada `git push` despliega en más de 35 regiones mundiales con latencia inferior a 10ms.
 
 ### Opción 2: Despliegue directo por CLI
+
 ```bash
 deno install -A jsr:@deno/deployctl -g
 deployctl deploy --project=mi-documentacion main.ts
