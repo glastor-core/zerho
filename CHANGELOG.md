@@ -37,6 +37,13 @@ Este proyecto se adhiere a:
 
 ---
 
+## [1.5.0] - 2026-10-26
+
+### ✨ Added
+
+- **dx:** implement polyglot code-groups, dynamic sitemaps, and security hardening (53920ad)
+
+---
 ## [1.4.0] - 2026-10-26
 
 ### ✨ Added
