@@ -37,6 +37,13 @@ Este proyecto se adhiere a:
 
 ---
 
+## [1.3.0] - 2026-10-26
+
+### ✨ Added
+
+- **security:** incorporate glastor-core/nemesis DevSecOps audit pipeline, .nemesis.yml config, and local audit task (17b705d)
+
+---
 ## [1.2.1] - 2026-10-26
 
 ### 🔄 Changed
