@@ -37,6 +37,13 @@ Este proyecto se adhiere a:
 
 ---
 
+## [1.8.0] - 2026-10-26
+
+### ✨ Added
+
+- **i18n-ai:** complete english docs parity, enhance ask ai modal, and boost cli test coverage (649fed4)
+
+---
 ## [1.7.0] - 2026-10-26
 
 ### ✨ Added
