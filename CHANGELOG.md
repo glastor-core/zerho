@@ -57,13 +57,14 @@ Este proyecto se adhiere a:
 
 - **ai-i18n:** implement llms.txt standard, deno doc auto-reference, kv search insights, and
   declarative i18n (b2da55c)
-
 ---
+
 ## [1.5.0] - 2026-10-26
 
 ### ✨ Added
 
 - **dx:** implement polyglot code-groups, dynamic sitemaps, and security hardening (53920ad)
+
 ---
 
 ## [1.4.0] - 2026-10-26

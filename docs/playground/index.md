@@ -16,27 +16,26 @@ directamente en el navegador.
 
 - **Sandbox aislado**: Tu código se ejecuta de manera segura en un hilo independiente sin bloquear
   la interfaz.
+- **Auto-Run en tiempo real**: Tu código se ejecuta automáticamente mientras escribes o cambias de
+  ejemplo preconfigurado.
 - **APIs simuladas**: Soporta `Deno.version`, `Deno.env.get()`, `Deno.readTextFile()`,
   `crypto.subtle` y flujos `ReadableStream`.
-- **Atajo de teclado**: Presiona <kbd>Ctrl</kbd> + <kbd>Enter</kbd> (o <kbd>⌘</kbd> +
-  <kbd>Enter</kbd> en Mac) para ejecutar.
+- **Atajo opcional**: Presiona <kbd>Ctrl</kbd> + <kbd>Enter</kbd> (o <kbd>⌘</kbd> +
+  <kbd>Enter</kbd> en Mac) para forzar ejecución instantánea.
 
 <div class="playground-workspace">
 <div class="playground-toolbar">
 <div style="display:flex; align-items:center; gap:0.75rem;">
-<span style="font-weight:700; font-size:0.85rem; color:var(--text-primary);">Ejemplos Preconfigurados:</span>
-<select id="pgPresetSelect" class="playground-select-preset">
+<select id="pgPresetSelect" class="playground-select-preset" aria-label="Seleccionar ejemplo preconfigurado">
 <option value="server">⚡ Deno.serve (Servidor HTTP Edge)</option>
 <option value="crypto">🔒 WebCrypto (SHA-256 Digest)</option>
 <option value="streams">🌊 Streams Asíncronos</option>
 <option value="vfs">📂 Sistema de Archivos Virtual (VFS)</option>
 </select>
 </div>
-<div style="display:flex; align-items:center; gap:0.6rem;">
-<button id="pgRunBtn" class="run-execute-btn" onclick="window.executePlaygroundCode && window.executePlaygroundCode()" style="padding:0.45rem 1rem; font-size:0.88rem;">
-<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-<span>Ejecutar Código</span>
-</button>
+<div class="playground-live-badge">
+<span class="live-dot"></span>
+<span>Auto-Run en Vivo</span>
 </div>
 </div>
 <div class="playground-split">

@@ -167,7 +167,15 @@
     const runBtn = document.getElementById("pgRunBtn");
     const presetSelect = document.getElementById("pgPresetSelect");
 
-    if (!textarea || !outputEl || !runBtn) return;
+    if (!textarea || !outputEl) return;
+
+    let debounceTimer = null;
+    function scheduleExecute(delay = 250) {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        execute();
+      }, delay);
+    }
 
     const PRESETS = {
       server: `// Simulación de Deno.serve en el Edge
@@ -297,6 +305,11 @@ try {
         if (textarea) textarea.style.display = "none";
         monacoContainer.style.display = "block";
 
+        // Auto-run reactivo en vivo al tipear en Monaco (debounced 250ms)
+        window.monacoEditor.onDidChangeModelContent(() => {
+          scheduleExecute(250);
+        });
+
         // @ts-ignore: Monaco KeyMod and KeyCode globals
         window.monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
           execute();
@@ -328,18 +341,23 @@ try {
         ? window.monacoEditor.getValue()
         : (textarea ? textarea.value : "");
 
-      const origBtnHtml = runBtn.innerHTML;
-      runBtn.disabled = true;
-      runBtn.classList.add("is-executing");
-      runBtn.innerHTML = `
-        <svg class="spin-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-dasharray="30" stroke-linecap="round"/>
-        </svg>
-        <span>Ejecutando...</span>
-      `;
+      let origBtnHtml = "";
+      if (runBtn) {
+        origBtnHtml = runBtn.innerHTML;
+        runBtn.disabled = true;
+        runBtn.classList.add("is-executing");
+        runBtn.innerHTML = `
+          <svg class="spin-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-dasharray="30" stroke-linecap="round"/>
+          </svg>
+          <span>Ejecutando...</span>
+        `;
+      }
 
-      statusEl.textContent = "Ejecutando...";
-      statusEl.style.color = "var(--brand-primary)";
+      if (statusEl) {
+        statusEl.textContent = "Ejecutando...";
+        statusEl.style.color = "var(--brand-primary)";
+      }
       outputEl.style.opacity = "0.6";
 
       // Small tick so browser renders the "Ejecutando..." UI
@@ -352,23 +370,34 @@ try {
       void outputEl.offsetWidth; // Force CSS reflow to re-trigger pulse
       outputEl.classList.add("output-pulse");
 
-      statusEl.textContent = res.success
-        ? `Completado (${res.durationMs}ms) · #${executionCount}`
-        : `Error (${res.durationMs}ms) · #${executionCount}`;
-      statusEl.style.color = res.success ? "var(--emerald-accent)" : "var(--rose-accent)";
+      if (statusEl) {
+        statusEl.textContent = res.success
+          ? `Completado (${res.durationMs}ms) · #${executionCount}`
+          : `Error (${res.durationMs}ms) · #${executionCount}`;
+        statusEl.style.color = res.success ? "var(--emerald-accent)" : "var(--rose-accent)";
+      }
 
       outputEl.textContent = res.output || "(Ejecutado sin mensajes de consola)";
       outputEl.style.color = res.success ? "#38bdf8" : "#fb7185";
 
-      runBtn.disabled = false;
-      runBtn.classList.remove("is-executing");
-      runBtn.innerHTML = origBtnHtml;
+      if (runBtn) {
+        runBtn.disabled = false;
+        runBtn.classList.remove("is-executing");
+        runBtn.innerHTML = origBtnHtml;
+      }
     }
 
     // Expose globally so inline onclick or programmatic calls always work
     window.executePlaygroundCode = execute;
-    runBtn.onclick = execute;
-    runBtn.addEventListener("click", execute);
+    if (runBtn) {
+      runBtn.onclick = execute;
+      runBtn.addEventListener("click", execute);
+    }
+
+    // Live auto-run en fallback textarea al tipear
+    textarea.addEventListener("input", () => {
+      scheduleExecute(250);
+    });
 
     // Ctrl+Enter or Cmd+Enter to execute on fallback textarea
     textarea.addEventListener("keydown", (e) => {
