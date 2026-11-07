@@ -71,6 +71,15 @@ Este proyecto se adhiere a:
 
 ---
 
+## [1.9.0] - 2026-11-07
+
+### ✨ Added
+
+- **core:** implement universal multi-project engine, openapi 3.1, mcp server and ui components (
+  4f46a6f)
+
+---
+
 ## [1.8.0] - 2026-10-26
 
 ### ✨ Added
