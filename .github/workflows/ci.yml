@@ -5,25 +5,42 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
+  pull-requests: write
+  security-events: write
 
 jobs:
   ci-pipeline:
-    name: Type Check, Lint, Format & Test
+    name: Type Check, Lint, Format, Specter & Vortex AST
     runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.vortex.outputs.should-run }}
+      execution_mode: ${{ steps.vortex.outputs.execution-mode }}
+      matrix: ${{ steps.vortex.outputs.matrix }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Setup Deno Runtime
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
 
-      - name: Run Full CI Suite (Check, Lint, Format, Test)
-        run: deno task ci
+      - name: Run Static Quality Checks & Doc Tests
+        run: |
+          deno task check
+          deno task lint
+          deno task fmt:check
+          deno task test:docs
 
       - name: Verify SSG Documentation Build
         run: deno task build
@@ -34,3 +51,52 @@ jobs:
           deno compile --allow-all --unstable-kv --output bin/zerho src/cli.ts
           ./bin/zerho --help
           ./bin/zerho -v
+          rm -rf bin
+
+      - name: Run Specter Polyglot AST API Contract & SemVer Gatekeeper
+        id: specter
+        uses: glastor-core/specter@v1
+        with:
+          head-dir: "."
+          base-ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || 'HEAD~1' }}
+          fail-on-trojan: "true"
+          output-json: ".specter/audit.json"
+          output-sarif: ".specter/specter.sarif"
+          output-sbom: ".specter/specter.cdx.json"
+
+      - name: Run Vortex AST Predictive CI & LPT Sharding
+        id: vortex
+        uses: glastor-core/vortex@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          shards: "2"
+          symbol-pruning: "true"
+          post-pr-comment: "true"
+          base-ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || 'HEAD~1' }}
+          head-ref: "HEAD"
+
+  surgical-tests:
+    name: "Surgical Test Shard (${{ matrix.shard_id }}/${{ matrix.shard_total }})"
+    needs: ci-pipeline
+    if: needs.ci-pipeline.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.ci-pipeline.outputs.matrix) }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Setup Deno Runtime
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Execute Assigned Test Suites
+        shell: bash
+        env:
+          VORTEX_SHARD_FILES: ${{ matrix.test_files }}
+        run: |
+          read -r -a TEST_FILES <<< "$VORTEX_SHARD_FILES"
+          deno test -A --unstable-kv "${TEST_FILES[@]}"

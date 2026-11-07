@@ -10,6 +10,10 @@ on:
   workflow_dispatch:
   workflow_call:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write # Permite auto-commits de limpieza (Auto-Fix)
   pull-requests: write # Permite PR comments y 1-click review suggestions
@@ -22,14 +26,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Run Nemesis Security Audit
-        uses: glastor-core/nemesis@v1.3.0
+        uses: glastor-core/nemesis@v1
         with:
-          auto-fix: true
+          auto-fix: false
           pr-suggestions: true
           diff-mode: ${{ github.event_name == 'pull_request' }}
           scan-secrets: true
@@ -41,3 +45,4 @@ jobs:
           max-file-size-mb: "10"
           github-token: ${{ secrets.GITHUB_TOKEN }}
           upload-sarif: "true"
+          fail-on-critical: true
