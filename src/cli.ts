@@ -22,8 +22,22 @@ const HELP = `
   -v, --version         Muestra la versión de Zerho
 `;
 
+function parsePortArg(args: string[]): string | undefined {
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if ((arg === "-p" || arg === "--port") && args[i + 1]) {
+      return args[i + 1];
+    }
+    if (arg.startsWith("--port=")) {
+      return arg.split("=")[1];
+    }
+  }
+  return undefined;
+}
+
 export async function runCli(args: string[] = Deno.args) {
   const command = args[0] || "--help";
+  const customPort = parsePortArg(args);
 
   if (command === "--help" || command === "-h" || command === "help") {
     console.log(HELP);
@@ -43,6 +57,7 @@ export async function runCli(args: string[] = Deno.args) {
 
   if (command === "dev") {
     const devPath = join(import.meta.dirname || Deno.cwd(), "core", "dev.ts");
+    const env = customPort ? { PORT: customPort } : undefined;
     const p = new Deno.Command(Deno.execPath(), {
       args: [
         "run",
@@ -50,10 +65,12 @@ export async function runCli(args: string[] = Deno.args) {
         "--allow-read",
         "--allow-write",
         "--allow-env",
+        "--allow-run",
         "--unstable-kv",
         "--watch",
         devPath,
       ],
+      env,
       stdout: "inherit",
       stderr: "inherit",
     }).spawn();
@@ -63,6 +80,7 @@ export async function runCli(args: string[] = Deno.args) {
 
   if (command === "serve") {
     const mainPath = join(import.meta.dirname || Deno.cwd(), "..", "main.ts");
+    const env = customPort ? { PORT: customPort } : undefined;
     const p = new Deno.Command(Deno.execPath(), {
       args: [
         "run",
@@ -73,6 +91,7 @@ export async function runCli(args: string[] = Deno.args) {
         "--unstable-kv",
         mainPath,
       ],
+      env,
       stdout: "inherit",
       stderr: "inherit",
     }).spawn();
@@ -81,22 +100,125 @@ export async function runCli(args: string[] = Deno.args) {
   }
 
   if (command === "init") {
-    const targetDir = args[1] || ".";
+    const targetDir = args[1] && !args[1].startsWith("-") ? args[1] : ".";
     console.log(`\n✨ Inicializando nuevo proyecto Zerho en "${targetDir}"...`);
     const baseDir = isAbsolute(targetDir) ? targetDir : join(Deno.cwd(), targetDir);
     const docsDir = join(baseDir, "docs");
-    await Deno.mkdir(docsDir, { recursive: true });
+    const guideDir = join(docsDir, "guide");
+    const publicDir = join(docsDir, "public");
+    await Deno.mkdir(guideDir, { recursive: true });
+    await Deno.mkdir(publicDir, { recursive: true });
 
-    // Sample index.md
+    // 1. Sample docs/index.md with customizable Hero & Features
     await Deno.writeTextFile(
       join(docsDir, "index.md"),
       `---
 layout: home
 title: Mi Documentación
 description: Creado con Zerho en Deno
+hero:
+  title: Documentación Técnica Moderna
+  tagline: Guía oficial, referencia de API y ejemplos interactivos para tu proyecto.
+  actions:
+    - theme: brand
+      text: Comenzar Ahora
+      link: /guide/getting-started
+features:
+  - icon: ⚡
+    title: Rápido y Ligero
+    details: Compilación instantánea con búsqueda semántica Cmd+K integrada.
+  - icon: 🧩
+    title: Ejemplos Ejecutables
+    details: Bloques de código verificados automáticamente y listos para el Playground.
 ---
 `,
     );
+
+    // 2. Sample docs/guide/getting-started.md (Batteries-included showcase)
+    const guidePath = join(guideDir, "getting-started.md");
+    try {
+      await Deno.stat(guidePath);
+    } catch {
+      await Deno.writeTextFile(
+        guidePath,
+        `---
+title: Guía de Inicio Rápido
+description: Primeros pasos con Zerho (Mermaid, Callouts, Playground y OpenAPI incluidos de serie).
+---
+
+## Bienvenido a Zerho
+
+::: tip TODO INCLUIDO DE SERIE
+Tu proyecto ya cuenta con soporte nativo para bloques ejecutables TypeScript, diagramas Mermaid y explorador OpenAPI sin configurar plugins externos.
+:::
+
+\`\`\`ts run [hola.ts]
+const saludo: string = "¡Hola desde el Sandbox de Zerho en Deno 2!";
+console.log(saludo);
+\`\`\`
+`,
+      );
+    }
+
+    // 3. Starter zerho.config.ts if not already present
+    const configPath = join(baseDir, "zerho.config.ts");
+    try {
+      await Deno.stat(configPath);
+    } catch {
+      await Deno.writeTextFile(
+        configPath,
+        `export default {
+  title: "Mi Documentación",
+  tagline: "Documentación técnica impulsada por Zerho y Deno 2",
+  description: "Sitio estático ultrarrápido con búsqueda instantánea y playground interactivo.",
+  lang: "es",
+  siteUrl: "https://example.com",
+  themeConfig: {
+    nav: [
+      { text: "Inicio", link: "/" },
+      { text: "Guía", link: "/guide/getting-started", activeMatch: "/guide/" },
+    ],
+    sidebar: {
+      "/guide/": [
+        {
+          text: "Introducción",
+          items: [
+            { text: "Primeros Pasos", link: "/guide/getting-started" },
+          ],
+        },
+      ],
+    },
+    socialLinks: [],
+    footer: {
+      message: "Impulsado por Zerho y Deno 2.",
+      copyright: "Copyright © ${new Date().getFullYear()}",
+    },
+  },
+};\n`,
+      );
+    }
+
+    // 4. Starter deno.json if not already present
+    const denoJsonPath = join(baseDir, "deno.json");
+    try {
+      await Deno.stat(denoJsonPath);
+    } catch {
+      await Deno.writeTextFile(
+        denoJsonPath,
+        JSON.stringify(
+          {
+            tasks: {
+              dev: "deno run -A --unstable-kv jsr:@zerho/core/cli dev",
+              build: "deno run -A jsr:@zerho/core/cli build",
+              serve: "deno run -A --unstable-kv jsr:@zerho/core/cli serve",
+            },
+          },
+          null,
+          2,
+        ) + "\n",
+      );
+    }
+
     console.log("✅ Estructura creada con éxito. Ejecuta 'deno task dev' para comenzar.");
     return;
   }
@@ -105,17 +227,33 @@ description: Creado con Zerho en Deno
     try {
       const kv = await Deno.openKv();
       console.log("\n📊 \x1b[36m[Zerho Edge Analytics (Deno KV)]\x1b[0m");
-      const iter = kv.list({ prefix: ["feedback"] });
+      const iter = kv.list({ prefix: ["feedback"] }, { limit: 100 });
       let found = false;
       for await (const entry of iter) {
         found = true;
         console.log(`- ${entry.key.join(" > ")}: \x1b[32m${entry.value}\x1b[0m`);
       }
+
+      const searchesTotal = await kv.get<Deno.KvU64>(["analytics", "searches_total"]);
+      if (searchesTotal?.value) {
+        found = true;
+        console.log(`- Búsquedas totales: \x1b[33m${Number(searchesTotal.value.value)}\x1b[0m`);
+      }
+
+      const queryIter = kv.list<Deno.KvU64>({ prefix: ["analytics", "query"] }, { limit: 20 });
+      for await (const entry of queryIter) {
+        found = true;
+        console.log(
+          `- Query "${String(entry.key[2])}": \x1b[36m${Number(entry.value.value)}\x1b[0m`,
+        );
+      }
+
       if (!found) {
         console.log(
           "No hay métricas registradas aún. Interactúa con el widget de feedback en las páginas de la documentación.",
         );
       }
+      kv.close();
     } catch (e) {
       console.error("Error al abrir Deno KV:", e);
     }

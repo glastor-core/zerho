@@ -5,6 +5,17 @@ export interface DocgenOptions {
   entrypoints: string[];
   title?: string;
   description?: string;
+  /** Fail compilation if any exported public symbol lacks JSDoc documentation */
+  strict?: boolean;
+  /** Optional base repository URL to generate direct links to source files and lines */
+  repoUrl?: string;
+}
+
+export interface DocValidationIssue {
+  symbol: string;
+  kind: string;
+  location: string;
+  message: string;
 }
 
 interface DenoDocLocation {
@@ -192,6 +203,7 @@ export async function extractDenoDoc(entrypoint: string): Promise<DenoDocSymbol[
 export function formatSymbolsToMarkdown(
   symbols: DenoDocSymbol[],
   title = "Referencia de API",
+  repoUrl?: string,
 ): string {
   const sections: string[] = [];
 
@@ -226,26 +238,48 @@ layout: doc
     const kind = decl.kind;
     const docText = decl.jsDoc?.doc || "Sin descripción JSDoc proporcionada.";
 
-    // Parse JSDoc tags (@param, @returns)
+    // Parse JSDoc tags (@param, @returns, @deprecated, @example)
     const paramDocs = new Map<string, string>();
     let returnDoc = "";
+    let deprecatedDoc: string | undefined;
+    const exampleDocs: string[] = [];
     if (decl.jsDoc?.tags) {
       for (const tag of decl.jsDoc.tags) {
         if (tag.kind === "param" && tag.name) {
           paramDocs.set(tag.name, tag.doc || "");
         } else if (tag.kind === "return") {
           returnDoc = tag.doc || "";
+        } else if (tag.kind === "deprecated") {
+          deprecatedDoc = tag.doc || "Este símbolo está marcado como obsoleto.";
+        } else if (tag.kind === "example" && tag.doc) {
+          exampleDocs.push(tag.doc.trim());
         }
       }
     }
 
+    const shortFile = decl.location.filename.split("/").pop() || "source.ts";
+    const lineNum = decl.location.line;
+    let locationBadge = `\`${shortFile}:${lineNum}\``;
+    if (repoUrl) {
+      const cleanRepo = repoUrl.replace(/\/$/, "");
+      const relMatch = decl.location.filename.match(/\/(src\/.*)$/);
+      const relFile = relMatch ? relMatch[1] : shortFile;
+      locationBadge = `[\`${shortFile}:${lineNum}\`](${cleanRepo}/${relFile}#L${lineNum})`;
+    }
+
     sections.push(`## ${sym.name}`);
-    sections.push(
-      `**Tipo:** \`${kind}\` | **Ubicación:** \`${
-        decl.location.filename.split("/").pop()
-      }:${decl.location.line}\`\n`,
-    );
+    sections.push(`**Tipo:** \`${kind}\` | **Ubicación:** ${locationBadge}\n`);
+    if (deprecatedDoc !== undefined) {
+      sections.push(`::: warning OBSOLETO (DEPRECATED)\n${deprecatedDoc}\n:::\n`);
+    }
     sections.push(`${docText}\n`);
+    for (const ex of exampleDocs) {
+      if (ex.startsWith("```")) {
+        sections.push(`${ex}\n`);
+      } else {
+        sections.push(`\`\`\`ts\n${ex}\n\`\`\`\n`);
+      }
+    }
 
     if (kind === "interface" && decl.def?.properties) {
       sections.push("### Propiedades\n");
@@ -354,11 +388,57 @@ layout: doc
   return sections.join("\n");
 }
 
+/**
+ * Validates that all exported symbols contain JSDoc descriptions.
+ * Used in strict CI pipelines to prevent undocumented public APIs.
+ */
+export function validateSymbolsDocumentation(symbols: DenoDocSymbol[]): DocValidationIssue[] {
+  const issues: DocValidationIssue[] = [];
+
+  for (const sym of symbols) {
+    const decl = sym.declarations[0];
+    if (!decl) continue;
+
+    const fileShort = decl.location?.filename?.split("/").pop() || "unknown";
+    const loc = `${fileShort}:${decl.location?.line || 0}`;
+    const docText = decl.jsDoc?.doc?.trim() || "";
+
+    if (!docText) {
+      issues.push({
+        symbol: sym.name,
+        kind: decl.kind,
+        location: loc,
+        message:
+          `El símbolo público exportado '${sym.name}' (${decl.kind}) no tiene documentación JSDoc.`,
+      });
+    }
+  }
+
+  return issues;
+}
+
 export async function generateApiDocs(options: DocgenOptions): Promise<string> {
   const allSymbols: DenoDocSymbol[] = [];
   for (const ep of options.entrypoints) {
     const syms = await extractDenoDoc(ep);
     allSymbols.push(...syms);
   }
-  return formatSymbolsToMarkdown(allSymbols, options.title || "Referencia de API");
+
+  if (options.strict) {
+    const issues = validateSymbolsDocumentation(allSymbols);
+    if (issues.length > 0) {
+      const details = issues
+        .map((i) => `  - [${i.location}] ${i.symbol} (${i.kind}): ${i.message}`)
+        .join("\n");
+      throw new Error(
+        `[Docgen Strict] Se detectaron ${issues.length} símbolo(s) público(s) sin documentar:\n${details}`,
+      );
+    }
+  }
+
+  return formatSymbolsToMarkdown(
+    allSymbols,
+    options.title || "Referencia de API",
+    options.repoUrl,
+  );
 }

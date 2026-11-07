@@ -145,5 +145,6 @@ if (import.meta.main) {
       );
     }
     console.log("");
+    Deno.exit(1);
   }
 }

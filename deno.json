@@ -6,7 +6,11 @@
   "exports": {
     ".": "./main.ts",
     "./cli": "./src/cli.ts",
+    "./init": "./src/init.ts",
+    "./config": "./zerho.config.ts",
     "./builder": "./src/core/builder.ts",
+    "./markdown": "./src/core/markdown.ts",
+    "./docgen": "./src/core/docgen.ts",
     "./openapi": "./src/core/openapi.ts"
   },
   "publish": {
@@ -36,12 +40,13 @@
     "cli": "deno run -A --unstable-kv src/cli.ts",
     "stats": "deno run -A --unstable-kv src/cli.ts stats",
     "test": "deno test -A --unstable-kv",
+    "test:docs": "deno run -A scripts/test-docs.ts",
     "test:cov": "deno test -A --unstable-kv --coverage=coverage && deno coverage coverage",
     "lint": "deno lint",
     "fmt": "deno fmt",
     "fmt:check": "deno fmt --check",
-    "check": "deno check main.ts src/cli.ts src/core/*.ts scripts/*.ts tests/*.ts",
-    "ci": "deno task check && deno task lint && deno task fmt:check && deno task test",
+    "check": "deno check main.ts src/cli.ts src/init.ts src/core/*.ts scripts/*.ts tests/*.ts",
+    "ci": "deno task check && deno task lint && deno task fmt:check && deno task test && deno task test:docs",
     "audit": "deno run -A scripts/audit.ts",
     "hooks:install": "git config core.hooksPath .githooks",
     "version": "deno run -A scripts/bump-version.ts",
@@ -63,7 +68,15 @@
     "prismjs/components/prism-bash": "npm:prismjs@^1.30.0/components/prism-bash.js",
     "prismjs/components/prism-json": "npm:prismjs@^1.30.0/components/prism-json.js",
     "prismjs/components/prism-yaml": "npm:prismjs@^1.30.0/components/prism-yaml.js",
-    "prismjs/components/prism-css": "npm:prismjs@^1.30.0/components/prism-css.js"
+    "prismjs/components/prism-css": "npm:prismjs@^1.30.0/components/prism-css.js",
+    "prismjs/components/prism-python": "npm:prismjs@^1.30.0/components/prism-python.js",
+    "prismjs/components/prism-go": "npm:prismjs@^1.30.0/components/prism-go.js",
+    "prismjs/components/prism-rust": "npm:prismjs@^1.30.0/components/prism-rust.js",
+    "prismjs/components/prism-sql": "npm:prismjs@^1.30.0/components/prism-sql.js",
+    "prismjs/components/prism-graphql": "npm:prismjs@^1.30.0/components/prism-graphql.js",
+    "prismjs/components/prism-docker": "npm:prismjs@^1.30.0/components/prism-docker.js",
+    "prismjs/components/prism-toml": "npm:prismjs@^1.30.0/components/prism-toml.js",
+    "prismjs/components/prism-diff": "npm:prismjs@^1.30.0/components/prism-diff.js"
   },
   "lint": {
     "exclude": [

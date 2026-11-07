@@ -78,3 +78,71 @@ Deno.test("OpenAPI: Render Try It Out panel and snippet generators", () => {
   assertStringIncludes(html, "curl -X GET");
   assertStringIncludes(html, "const res = await fetch");
 });
+
+Deno.test("OpenAPI: Sanitize HTML special characters against XSS", () => {
+  const maliciousSpec: OpenApiSpec = {
+    ...sampleSpec,
+    title: 'API <script>alert("xss")</script>',
+  };
+  const html = renderOpenApiExplorer(maliciousSpec);
+  assertStringIncludes(html, "API &lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;");
+});
+
+Deno.test("OpenAPI 3.1 Official Spec: Parses standard paths, servers, and $ref schemas", () => {
+  const officialSpec = {
+    openapi: "3.1.0",
+    info: {
+      title: "Payments Standard API",
+      version: "3.1.0",
+      description: "Official OpenAPI 3.1 format with paths and components",
+    },
+    servers: [{ url: "https://api.payments.io/v3" }],
+    components: {
+      schemas: {
+        ChargeInput: {
+          type: "object",
+          properties: {
+            amount: { type: "number", example: 4999 },
+            currency: { type: "string", example: "USD" },
+          },
+        },
+      },
+    },
+    paths: {
+      "/charges": {
+        post: {
+          tags: ["Billing"],
+          summary: "Create a charge",
+          description: "Charges a customer card",
+          parameters: [
+            {
+              name: "Idempotency-Key",
+              in: "header",
+              required: true,
+              schema: { type: "string" },
+              description: "Unique key",
+            },
+          ],
+          requestBody: {
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ChargeInput" },
+              },
+            },
+          },
+          responses: {
+            "201": { description: "Charge created" },
+          },
+        },
+      },
+    },
+  };
+
+  const html = renderOpenApiExplorer(officialSpec);
+  assertStringIncludes(html, "Payments Standard API");
+  assertStringIncludes(html, "https://api.payments.io/v3");
+  assertStringIncludes(html, "/charges");
+  assertStringIncludes(html, "Idempotency-Key");
+  assertStringIncludes(html, "4999");
+  assertStringIncludes(html, "USD");
+});

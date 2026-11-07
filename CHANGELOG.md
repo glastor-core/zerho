@@ -30,6 +30,40 @@ Este proyecto se adhiere a:
 
 ## [Unreleased]
 
+### ✨ Added
+
+- **mcp:** servidor nativo **Model Context Protocol (MCP)** JSON-RPC 2.0 en `POST /api/mcp` con
+  herramientas `search_docs` y `get_llms_context` para Cursor, Claude Desktop y Windsurf.
+- **openapi:** parser oficial **OpenAPI 3.0 y 3.1** (`normalizeOpenApiSpec`, `resolveOpenApiRef`),
+  resolución de punteros `$ref`, síntesis automática de payloads JSON y generador de código cliente
+  en 5 lenguajes (`cURL`, `Deno (TS)`, `Python`, `Go` y `Rust`).
+- **markdown:** componentes UI declarativos sin JS manual (`::: steps`, `::: tabs` / `@tab`,
+  `::: cards`, `::: file-tree`), fórmulas matemáticas **LaTeX / KaTeX** (`$...$` y `$$...$$`),
+  transclusión de archivos (`<<< @/ruta#L1-L20` y `<!-- @include: ... -->`) y resaltado políglota
+  PrismJS (Python, Go, Rust, SQL, YAML, Docker, TOML, C/C++).
+- **plugins:** arquitectura de plugins y hooks de ciclo de vida (`ZerhoPlugin`: `onBuildStart`,
+  `transformMarkdown`, `transformHtml`, `onBuildEnd`) en `zerho.config.ts`.
+- **seo-social:** generación automática de tarjetas **OpenGraph SVG** dinámicas por página
+  (`/og/*.svg`), feed **RSS 2.0** (`/feed.xml`) y hoja de estilos `@media print` para exportación a
+  PDF limpia.
+- **dx:** inicializador de 1 comando (`jsr:@zerho/core/init`), runner de pruebas para bloques de
+  código en documentación (`deno task test:docs`), `sidebar: "auto"`, validador de enlaces internos
+  (`strictLinks`), modo estricto de JSDoc (`apiDocs.strict`), botón `"Abrir en Playground"` y botón
+  `"Copiar Markdown para IA"`.
+- **jsr:** nuevos sub-exports modulares en `deno.json` (`./config`, `./markdown`, `./docgen`).
+
+### 🐛 Fixed
+
+- **markdown:** resiliencia de `processCallouts` ante bloques `::: type ... :::` colapsados en una
+  sola línea por `deno fmt`.
+- **routing:** resolución de rutas de subdirectorios con barra final (`/playground/`, `/en/`) y
+  delegación de endpoints `/api/*` en el servidor de desarrollo (`src/core/dev.ts`).
+
+### 🔒 Security
+
+- **server:** blindaje contra Path Traversal (`resolveSafeDistPath`) con validación canónica sobre
+  `dist/` y cabeceras `Cache-Control` diferenciadas.
+
 ### 💡 Planned
 
 - Soporte para pre-renderizado de diagramas de arquitectura en SVG estático.
@@ -41,9 +75,11 @@ Este proyecto se adhiere a:
 
 ### ✨ Added
 
-- **i18n-ai:** complete english docs parity, enhance ask ai modal, and boost cli test coverage (649fed4)
+- **i18n-ai:** complete english docs parity, enhance ask ai modal, and boost cli test coverage
+  (649fed4)
 
 ---
+
 ## [1.7.0] - 2026-10-26
 
 ### ✨ Added
@@ -57,13 +93,14 @@ Este proyecto se adhiere a:
 
 - **playground:** resolve Monaco CSP stylesheet blocking, add button spinner and execution feedback
   (58d91e9)
-
 ---
+
 ## [1.6.1] - 2026-10-26
 
 ### 🐛 Fixed
 
 - **playground:** add unsafe-eval and worker-src to CSP and improve Monaco fallback (285b984)
+
 ---
 
 ## [1.6.0] - 2026-10-26

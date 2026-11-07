@@ -1,7 +1,11 @@
-import { extname, join } from "@std/path";
+import { extname, join, resolve, SEPARATOR } from "@std/path";
 import { buildSite } from "./builder.ts";
+import { handleRequest } from "../../main.ts";
 
-const PORT = 3000;
+const portEnv = Deno.env.get("PORT");
+const PORT = portEnv && Number.isFinite(Number(portEnv)) && Number(portEnv) > 0
+  ? Number(portEnv)
+  : 3000;
 const clients = new Set<WebSocket>();
 
 // Initial build with devMode enabled
@@ -66,14 +70,34 @@ Deno.serve({ port: PORT }, async (req) => {
     return new Response("Expected WebSocket", { status: 400 });
   }
 
-  let filePath = url.pathname;
-  if (filePath === "/") {
-    filePath = "/index.html";
+  // Delegate Edge API endpoints (/api/ai/ask, /api/feedback, /api/insights, etc.)
+  if (
+    url.pathname.startsWith("/api/") && !url.pathname.startsWith("/api/openapi") &&
+    !url.pathname.startsWith("/api/runtime")
+  ) {
+    return await handleRequest(req);
+  }
+
+  const distRoot = resolve(Deno.cwd(), "dist");
+  let rawPath = "";
+  try {
+    rawPath = decodeURIComponent(url.pathname);
+  } catch {
+    return new Response("400: Bad Request", { status: 400 });
+  }
+
+  let filePath = rawPath;
+  if (filePath.endsWith("/")) {
+    filePath = `${filePath}index.html`;
   } else if (!extname(filePath)) {
     filePath = `${filePath}.html`;
   }
 
-  const diskPath = join(Deno.cwd(), "dist", filePath);
+  const diskPath = resolve(distRoot, filePath.replace(/^[/\\]+/, ""));
+  if (diskPath !== distRoot && !diskPath.startsWith(distRoot + SEPARATOR)) {
+    return new Response("403: Forbidden", { status: 403 });
+  }
+
   try {
     const file = await Deno.readFile(diskPath);
     return new Response(file, {
@@ -83,16 +107,23 @@ Deno.serve({ port: PORT }, async (req) => {
       },
     });
   } catch {
-    // Try index.html inside directory if present
+    // Try index.html inside directory if present (e.g. /playground -> dist/playground/index.html)
     try {
-      const dirIndex = join(Deno.cwd(), "dist", url.pathname, "index.html");
-      const file = await Deno.readFile(dirIndex);
-      return new Response(file, {
-        headers: { "content-type": "text/html; charset=utf-8" },
-      });
+      const cleanDir = rawPath.replace(/^[/\\]+|[/\\]+$/g, "");
+      const dirIndex = resolve(distRoot, cleanDir, "index.html");
+      if (dirIndex.startsWith(distRoot + SEPARATOR)) {
+        const file = await Deno.readFile(dirIndex);
+        return new Response(file, {
+          headers: {
+            "content-type": "text/html; charset=utf-8",
+            "cache-control": "no-cache",
+          },
+        });
+      }
     } catch {
-      return new Response(`404: Not Found (${url.pathname})`, { status: 404 });
+      // Fall through to 404
     }
+    return new Response(`404: Not Found (${url.pathname})`, { status: 404 });
   }
 });
 

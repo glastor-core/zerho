@@ -30,7 +30,188 @@ export interface OpenApiSpec {
   endpoints: OpenApiEndpoint[];
 }
 
-export function renderOpenApiExplorer(spec: OpenApiSpec): string {
+function escapeHtml(str: unknown): string {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/**
+ * Resolves internal JSON Pointers (`$ref: "#/components/schemas/..."`) inside an OpenAPI 3.0/3.1 document.
+ */
+export function resolveOpenApiRef(
+  root: Record<string, unknown>,
+  node: unknown,
+  depth = 0,
+): Record<string, unknown> {
+  if (!node || typeof node !== "object" || depth > 8) {
+    return (node as Record<string, unknown>) || {};
+  }
+  const obj = node as Record<string, unknown>;
+  if (typeof obj.$ref === "string" && obj.$ref.startsWith("#/")) {
+    const parts = obj.$ref.slice(2).split("/");
+    let current: unknown = root;
+    for (const part of parts) {
+      if (current && typeof current === "object") {
+        current = (current as Record<string, unknown>)[part];
+      } else {
+        current = undefined;
+        break;
+      }
+    }
+    if (current && typeof current === "object") {
+      return resolveOpenApiRef(root, current, depth + 1);
+    }
+  }
+  return obj;
+}
+
+/**
+ * Builds a representative JSON example payload from an OpenAPI Schema object.
+ */
+function buildSchemaExample(
+  root: Record<string, unknown>,
+  rawSchema: unknown,
+  depth = 0,
+): unknown {
+  if (!rawSchema || typeof rawSchema !== "object" || depth > 5) return {};
+  const schema = resolveOpenApiRef(root, rawSchema, depth);
+  if (schema.example !== undefined) return schema.example;
+  if (schema.default !== undefined) return schema.default;
+
+  const type = schema.type as string | undefined;
+  if (type === "string") {
+    return schema.format === "uuid" ? "00000000-0000-4000-8000-000000000000" : "string";
+  }
+  if (type === "number" || type === "integer") return 1;
+  if (type === "boolean") return true;
+  if (type === "array") {
+    return [buildSchemaExample(root, schema.items, depth + 1)];
+  }
+  if (schema.properties && typeof schema.properties === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [key, propVal] of Object.entries(schema.properties as Record<string, unknown>)) {
+      out[key] = buildSchemaExample(root, propVal, depth + 1);
+    }
+    return out;
+  }
+  return {};
+}
+
+/**
+ * Normalizes either a standard OpenAPI 3.0/3.1 document (`openapi`, `info`, `servers`, `paths`, `components`)
+ * or a simplified Zerho `OpenApiSpec` object into a unified `OpenApiSpec`.
+ * @param input Standard OpenAPI 3.0/3.1 object or simplified OpenApiSpec
+ * @returns Normalized OpenApiSpec ready for rendering
+ */
+export function normalizeOpenApiSpec(
+  input: OpenApiSpec | Record<string, unknown>,
+): OpenApiSpec {
+  const raw = input as Record<string, unknown>;
+  if (Array.isArray(raw.endpoints)) {
+    return input as OpenApiSpec;
+  }
+
+  const info = (raw.info as Record<string, unknown>) || {};
+  const servers = Array.isArray(raw.servers) ? (raw.servers as Array<Record<string, unknown>>) : [];
+  const baseUrl = String(raw.baseUrl || servers[0]?.url || "https://api.example.com").replace(
+    /\/$/,
+    "",
+  );
+  const endpoints: OpenApiEndpoint[] = [];
+
+  const paths = (raw.paths as Record<string, Record<string, unknown>>) || {};
+  const validMethods = new Set(["get", "post", "put", "delete", "patch"]);
+
+  for (const [pathKey, pathItem] of Object.entries(paths)) {
+    if (!pathItem || typeof pathItem !== "object") continue;
+
+    for (const [methodKey, opValue] of Object.entries(pathItem)) {
+      const lowerMethod = methodKey.toLowerCase();
+      if (!validMethods.has(lowerMethod) || !opValue || typeof opValue !== "object") continue;
+
+      const op = opValue as Record<string, unknown>;
+      const tags = Array.isArray(op.tags) && op.tags.length > 0 ? String(op.tags[0]) : "General";
+      const summary = String(
+        op.summary || op.operationId || `${lowerMethod.toUpperCase()} ${pathKey}`,
+      );
+      const description = String(op.description || summary);
+
+      // Extract parameters (path-level + operation-level)
+      const rawParams = [
+        ...(Array.isArray(pathItem.parameters) ? pathItem.parameters : []),
+        ...(Array.isArray(op.parameters) ? op.parameters : []),
+      ];
+      const parameters = rawParams.map((pItem) => {
+        const p = resolveOpenApiRef(raw, pItem);
+        const pSchema = resolveOpenApiRef(raw, p.schema);
+        const loc = String(p.in || "query");
+        return {
+          name: String(p.name || "param"),
+          in: (loc === "path" || loc === "header" ? loc : "query") as "path" | "query" | "header",
+          required: Boolean(p.required || loc === "path"),
+          type: String(p.type || pSchema.type || "string"),
+          description: String(p.description || ""),
+          default: pSchema.default !== undefined ? String(pSchema.default) : undefined,
+        };
+      });
+
+      // Extract requestBody if present
+      let requestBody: OpenApiEndpoint["requestBody"] | undefined;
+      if (op.requestBody) {
+        const rb = resolveOpenApiRef(raw, op.requestBody);
+        const content = (rb.content as Record<string, Record<string, unknown>>) || {};
+        const contentType = Object.keys(content)[0] || "application/json";
+        const mediaObj = content[contentType] || {};
+        const example = mediaObj.example ??
+          buildSchemaExample(raw, mediaObj.schema);
+        requestBody = {
+          contentType,
+          example: (example as Record<string, unknown>) || {},
+        };
+      }
+
+      // Extract responses
+      const responses: OpenApiEndpoint["responses"] = {};
+      const rawResponses = (op.responses as Record<string, unknown>) || {
+        "200": { description: "OK" },
+      };
+      for (const [statusCode, resVal] of Object.entries(rawResponses)) {
+        const resolvedRes = resolveOpenApiRef(raw, resVal);
+        responses[statusCode] = {
+          description: String(resolvedRes.description || "Respuesta HTTP"),
+        };
+      }
+
+      endpoints.push({
+        method: lowerMethod.toUpperCase() as OpenApiEndpoint["method"],
+        path: pathKey,
+        summary,
+        description,
+        tag: tags,
+        parameters: parameters.length > 0 ? parameters : undefined,
+        requestBody,
+        responses,
+      });
+    }
+  }
+
+  return {
+    title: String(raw.title || info.title || "API Reference"),
+    version: String(raw.version || info.version || "1.0.0"),
+    description: String(raw.description || info.description || ""),
+    baseUrl,
+    endpoints,
+  };
+}
+
+export function renderOpenApiExplorer(
+  specInput: OpenApiSpec | Record<string, unknown>,
+): string {
+  const spec = normalizeOpenApiSpec(specInput);
   const groups: Record<string, OpenApiEndpoint[]> = {};
   for (const ep of spec.endpoints) {
     groups[ep.tag] = groups[ep.tag] || [];
@@ -42,38 +223,40 @@ export function renderOpenApiExplorer(spec: OpenApiSpec): string {
   <div class="openapi-hero">
     <div class="openapi-meta-badges">
       <span class="openapi-badge spec-version">OpenAPI 3.1</span>
-      <span class="openapi-badge api-version">v${spec.version}</span>
-      <span class="openapi-badge base-url">Base: <code>${spec.baseUrl}</code></span>
+      <span class="openapi-badge api-version">v${escapeHtml(spec.version)}</span>
+      <span class="openapi-badge base-url">Base: <code>${escapeHtml(spec.baseUrl)}</code></span>
     </div>
-    <h2 class="openapi-title">${spec.title}</h2>
-    <p class="openapi-desc">${spec.description}</p>
+    <h2 class="openapi-title">${escapeHtml(spec.title)}</h2>
+    <p class="openapi-desc">${escapeHtml(spec.description)}</p>
   </div>
 `;
 
   for (const [tag, endpoints] of Object.entries(groups)) {
     html += `
   <div class="openapi-group">
-    <h3 class="openapi-group-title">${tag}</h3>
+    <h3 class="openapi-group-title">${escapeHtml(tag)}</h3>
     <div class="openapi-endpoints-list">
 `;
 
     for (let i = 0; i < endpoints.length; i++) {
       const ep = endpoints[i];
-      const epId = `ep_${tag.toLowerCase().replace(/\s+/g, "_")}_${i}`;
+      const epId = `ep_${tag.toLowerCase().replace(/[^a-z0-9_]+/g, "_")}_${i}`;
       const methodClass = `method-${ep.method.toLowerCase()}`;
       const reqBodyJson = ep.requestBody ? JSON.stringify(ep.requestBody.example, null, 2) : "";
+      const safeReqBodyJson = escapeHtml(reqBodyJson);
+      const safeFullUrl = escapeHtml(`${spec.baseUrl}${ep.path}`);
 
       html += `
       <div class="openapi-endpoint-card" id="${epId}">
         <div class="endpoint-header" onclick="toggleEndpoint('${epId}')">
-          <span class="method-badge ${methodClass}">${ep.method}</span>
-          <span class="endpoint-path">${ep.path}</span>
-          <span class="endpoint-summary">${ep.summary}</span>
+          <span class="method-badge ${methodClass}">${escapeHtml(ep.method)}</span>
+          <span class="endpoint-path">${escapeHtml(ep.path)}</span>
+          <span class="endpoint-summary">${escapeHtml(ep.summary)}</span>
           <svg class="endpoint-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
 
         <div class="endpoint-details" style="display: none;">
-          <p class="endpoint-desc">${ep.description}</p>
+          <p class="endpoint-desc">${escapeHtml(ep.description)}</p>
 
           <div class="endpoint-grid">
             <div class="endpoint-left-col">
@@ -90,13 +273,13 @@ export function renderOpenApiExplorer(spec: OpenApiSpec): string {
                     ${
             ep.parameters.map((p) => `
                     <tr>
-                      <td><code>${p.name}</code></td>
-                      <td><span class="type-pill">${p.type}</span></td>
-                      <td><span class="in-pill">${p.in}</span></td>
+                      <td><code>${escapeHtml(p.name)}</code></td>
+                      <td><span class="type-pill">${escapeHtml(p.type)}</span></td>
+                      <td><span class="in-pill">${escapeHtml(p.in)}</span></td>
                       <td>${
               p.required ? '<span class="req-yes">Sí</span>' : '<span class="req-no">No</span>'
             }</td>
-                      <td>${p.description}</td>
+                      <td>${escapeHtml(p.description)}</td>
                     </tr>`).join("")
           }
                   </tbody>
@@ -108,8 +291,10 @@ export function renderOpenApiExplorer(spec: OpenApiSpec): string {
               ${
         ep.requestBody
           ? `
-              <div class="endpoint-section-title">Cuerpo de la Petición (${ep.requestBody.contentType})</div>
-              <pre class="code-pre"><code class="language-json">${reqBodyJson}</code></pre>
+              <div class="endpoint-section-title">Cuerpo de la Petición (${
+            escapeHtml(ep.requestBody.contentType)
+          })</div>
+              <pre class="code-pre"><code class="language-json">${safeReqBodyJson}</code></pre>
               `
           : ""
       }
@@ -119,8 +304,8 @@ export function renderOpenApiExplorer(spec: OpenApiSpec): string {
                 ${
         Object.entries(ep.responses).map(([code, res]) => `
                 <div class="response-item status-${code.startsWith("2") ? "2xx" : "4xx"}">
-                  <span class="response-status-badge">${code}</span>
-                  <span class="response-desc">${res.description}</span>
+                  <span class="response-status-badge">${escapeHtml(code)}</span>
+                  <span class="response-desc">${escapeHtml(res.description)}</span>
                 </div>`).join("")
       }
               </div>
@@ -131,15 +316,17 @@ export function renderOpenApiExplorer(spec: OpenApiSpec): string {
               <div class="tryout-panel">
                 <div class="tryout-header">
                   <span>Probar Endpoint ("Try It Out")</span>
-                  <button class="tryout-send-btn" onclick="sendApiRequest('${epId}', '${ep.method}', '${spec.baseUrl}${ep.path}')">
+                  <button class="tryout-send-btn" onclick="sendApiRequest('${epId}', '${
+        escapeHtml(ep.method)
+      }', '${safeFullUrl}')">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                     <span>Enviar Request</span>
                   </button>
                 </div>
 
                 <div class="tryout-url-bar">
-                  <span class="tryout-method ${methodClass}">${ep.method}</span>
-                  <input type="text" class="tryout-url-input" id="${epId}_url" value="${spec.baseUrl}${ep.path}">
+                  <span class="tryout-method ${methodClass}">${escapeHtml(ep.method)}</span>
+                  <input type="text" class="tryout-url-input" id="${epId}_url" value="${safeFullUrl}">
                 </div>
 
                 ${
@@ -147,7 +334,7 @@ export function renderOpenApiExplorer(spec: OpenApiSpec): string {
           ? `
                 <div class="tryout-body-wrap">
                   <div class="tryout-label">JSON Request Body</div>
-                  <textarea class="tryout-body-textarea" id="${epId}_body">${reqBodyJson}</textarea>
+                  <textarea class="tryout-body-textarea" id="${epId}_body">${safeReqBodyJson}</textarea>
                 </div>`
           : ""
       }
@@ -155,28 +342,44 @@ export function renderOpenApiExplorer(spec: OpenApiSpec): string {
                 <!-- Snippets Generator Tabs -->
                 <div class="snippets-tabs">
                   <div class="snippets-tab-bar">
-                    <button class="snippet-tab-btn active" onclick="switchSnippetTab('${epId}', 'curl')">cURL</button>
-                    <button class="snippet-tab-btn" onclick="switchSnippetTab('${epId}', 'ts')">Deno (TS)</button>
-                    <button class="snippet-tab-btn" onclick="switchSnippetTab('${epId}', 'py')">Python</button>
+                    <button class="snippet-tab-btn active" data-snippet-lang="curl" onclick="switchSnippetTab('${epId}', 'curl', this)">cURL</button>
+                    <button class="snippet-tab-btn" data-snippet-lang="ts" onclick="switchSnippetTab('${epId}', 'ts', this)">Deno (TS)</button>
+                    <button class="snippet-tab-btn" data-snippet-lang="py" onclick="switchSnippetTab('${epId}', 'py', this)">Python</button>
+                    <button class="snippet-tab-btn" data-snippet-lang="go" onclick="switchSnippetTab('${epId}', 'go', this)">Go</button>
+                    <button class="snippet-tab-btn" data-snippet-lang="rs" onclick="switchSnippetTab('${epId}', 'rs', this)">Rust</button>
                   </div>
-                  <pre class="snippet-code" id="${epId}_snippet_curl"><code>curl -X ${ep.method} "${spec.baseUrl}${ep.path}" \\
+                  <pre class="snippet-code" id="${epId}_snippet_curl"><code>curl -X ${
+        escapeHtml(ep.method)
+      } "${safeFullUrl}" \\
   -H "Authorization: Bearer &lt;TOKEN&gt;" \\
   -H "Content-Type: application/json"</code></pre>
-                  <pre class="snippet-code" id="${epId}_snippet_ts" style="display:none;"><code>const res = await fetch("${spec.baseUrl}${ep.path}", {
-  method: "${ep.method}",
+                  <pre class="snippet-code" id="${epId}_snippet_ts" style="display:none;"><code>const res = await fetch("${safeFullUrl}", {
+  method: "${escapeHtml(ep.method)}",
   headers: {
-    "Authorization": "Bearer <TOKEN>",
+    "Authorization": "Bearer &lt;TOKEN&gt;",
     "Content-Type": "application/json"
-  }${ep.requestBody ? `,\n  body: JSON.stringify(${reqBodyJson})` : ""}
+  }${ep.requestBody ? `,\n  body: JSON.stringify(${safeReqBodyJson})` : ""}
 });
 const data = await res.json();
 console.log(data);</code></pre>
                   <pre class="snippet-code" id="${epId}_snippet_py" style="display:none;"><code>import requests
 
-url = "${spec.baseUrl}${ep.path}"
-headers = {"Authorization": "Bearer <TOKEN>"}
+url = "${safeFullUrl}"
+headers = {"Authorization": "Bearer &lt;TOKEN&gt;"}
 response = requests.${ep.method.toLowerCase()}(url, headers=headers)
 print(response.json())</code></pre>
+                  <pre class="snippet-code" id="${epId}_snippet_go" style="display:none;"><code>req, _ := http.NewRequest("${
+        escapeHtml(ep.method)
+      }", "${safeFullUrl}", nil)
+req.Header.Set("Authorization", "Bearer &lt;TOKEN&gt;")
+req.Header.Set("Content-Type", "application/json")
+res, _ := http.DefaultClient.Do(req)
+defer res.Body.Close()</code></pre>
+                  <pre class="snippet-code" id="${epId}_snippet_rs" style="display:none;"><code>let client = reqwest::Client::new();
+let res = client.${ep.method.toLowerCase()}("${safeFullUrl}")
+    .bearer_auth("&lt;TOKEN&gt;")
+    .send()
+    .await?;</code></pre>
                 </div>
 
                 <!-- Live Response Box -->
@@ -219,12 +422,14 @@ window.toggleEndpoint = function(id) {
   }
 };
 
-window.switchSnippetTab = function(epId, lang) {
+window.switchSnippetTab = function(epId, lang, btnEl) {
   const card = document.getElementById(epId);
   if (!card) return;
-  card.querySelectorAll('.snippet-tab-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  ['curl', 'ts', 'py'].forEach(l => {
+  card.querySelectorAll('.snippet-tab-btn').forEach(b => {
+    const isTarget = btnEl ? b === btnEl : b.getAttribute('data-snippet-lang') === lang;
+    b.classList.toggle('active', isTarget);
+  });
+  ['curl', 'ts', 'py', 'go', 'rs'].forEach(l => {
     const el = document.getElementById(epId + '_snippet_' + l);
     if (el) el.style.display = l === lang ? 'block' : 'none';
   });
@@ -240,7 +445,7 @@ window.sendApiRequest = async function(epId, method, defaultUrl) {
 
   const targetUrl = urlInput ? urlInput.value : defaultUrl;
   let bodyData = null;
-  if (bodyInput && (method === 'POST' || method === 'PUT')) {
+  if (bodyInput && (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE')) {
     bodyData = bodyInput.value;
   }
 

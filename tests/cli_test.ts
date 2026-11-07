@@ -67,6 +67,18 @@ Deno.test("CLI: Run init creates scaffolding in target directory", async () => {
     const indexPath = `${tmpDir}/docs/index.md`;
     const indexContent = await Deno.readTextFile(indexPath);
     assertStringIncludes(indexContent, "layout: home");
+
+    const configPath = `${tmpDir}/zerho.config.ts`;
+    const configContent = await Deno.readTextFile(configPath);
+    assertStringIncludes(configContent, "Mi Documentación");
+
+    const guidePath = `${tmpDir}/docs/guide/getting-started.md`;
+    const guideContent = await Deno.readTextFile(guidePath);
+    assertStringIncludes(guideContent, "Guía de Inicio Rápido");
+
+    const denoJsonPath = `${tmpDir}/deno.json`;
+    const denoJsonContent = await Deno.readTextFile(denoJsonPath);
+    assertStringIncludes(denoJsonContent, "@zerho/core/cli");
   } finally {
     await Deno.remove(tmpDir, { recursive: true }).catch(() => {});
   }

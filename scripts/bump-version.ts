@@ -246,11 +246,12 @@ export function formatChangelogEntry(
  * Inserts changelog entry into CHANGELOG.md right beneath the Unreleased section.
  */
 export function insertChangelogEntry(changelogContent: string, newEntry: string): string {
+  const normalizedEntry = newEntry.trim();
   const unreleasedMarker = "## [Unreleased]";
   const idx = changelogContent.indexOf(unreleasedMarker);
 
   if (idx === -1) {
-    return `${newEntry}\n${changelogContent}`;
+    return `${normalizedEntry}\n\n${changelogContent.trimStart()}`;
   }
 
   // Find the end of unreleased section (either "---" or next "## [")
@@ -258,7 +259,7 @@ export function insertChangelogEntry(changelogContent: string, newEntry: string)
   if (afterUnreleased === -1) {
     return changelogContent.replace(
       unreleasedMarker,
-      `${unreleasedMarker}\n\n${newEntry}`,
+      `${unreleasedMarker}\n\n${normalizedEntry}`,
     );
   }
 
@@ -266,7 +267,8 @@ export function insertChangelogEntry(changelogContent: string, newEntry: string)
   return (
     changelogContent.slice(0, insertPos) +
     "\n\n" +
-    newEntry +
+    normalizedEntry +
+    "\n\n" +
     changelogContent.slice(insertPos).trimStart()
   );
 }

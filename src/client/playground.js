@@ -45,22 +45,140 @@
 
   // Lightweight TypeScript type-stripper for direct client execution
   function transpileTS(code) {
-    // Strip type assertions and basic interfaces/type aliases
     return code
-      .replace(/^import\s+.*?;?\s*$/gm, (m) => `// ${m}`) // comment imports for sandbox
+      .replace(/^import\s+.*?;?\s*$/gm, (m) => `// ${m}`)
       .replace(/^export\s+default\s+/gm, "")
       .replace(/^export\s+/gm, "")
+      .replace(/interface\s+\w+(?:<[^>]+>)?\s*\{[\s\S]*?\}/g, "")
+      .replace(/^type\s+\w+(?:<[^>]+>)?\s*=\s*[^;]+;?/gm, "")
       .replace(
-        /:\s*(string|number|boolean|any|void|unknown|never|Record<[^>]+>|Array<[^>]+>|[\w]+\[\])\b/g,
-        "",
+        /\)\s*:\s*(?:Promise<[^>]+>|Record<[^>]+>|Array<[^>]+>|[A-Za-z0-9_<>[\]|]+)(?=\s*(?:\{|=>))/g,
+        ")",
       )
-      .replace(/as\s+[A-Za-z0-9_<>[\]]+/g, "")
-      .replace(/interface\s+\w+\s*\{[^}]*\}/g, "")
-      .replace(/type\s+\w+\s*=\s*[^;]+;/g, "");
+      .replace(
+        /(\b(?:const|let|var)\s+[A-Za-z0-9_$]+)\s*:\s*(?:Record<[^>]+>|Array<[^>]+>|[A-Za-z0-9_<>[\]|]+)(?=\s*=)/g,
+        "$1",
+      )
+      .replace(
+        /([,(]\s*(?:\.\.\.)?[A-Za-z0-9_$]+)\??\s*:\s*(?:Record<[^>]+>|Array<[^>]+>|[A-Za-z0-9_<>[\]|]+)(?=\s*[,)=])/g,
+        "$1",
+      )
+      .replace(/\bas\s+[A-Za-z0-9_<>[\]|]+/g, "");
+  }
+
+  let activeWorker = null;
+
+  // Execution inside isolated Web Worker with 3000ms timeout (prevents infinite loops from freezing UI)
+  function runCodeInWorker(cleanedCode, timeoutMs = 3000) {
+    return new Promise((resolve) => {
+      if (typeof Worker === "undefined" || typeof Blob === "undefined") {
+        resolve(null);
+        return;
+      }
+
+      if (activeWorker) {
+        try {
+          activeWorker.terminate();
+        } catch {
+          // Ignore termination error
+        }
+        activeWorker = null;
+      }
+
+      const workerScript = `
+        function formatArg(arg) {
+          if (typeof arg === "object" && arg !== null) {
+            try { return JSON.stringify(arg, null, 2); } catch { return String(arg); }
+          }
+          return String(arg);
+        }
+
+        self.onmessage = async (ev) => {
+          const logs = [];
+          const customConsole = {
+            log: (...args) => logs.push(args.map(formatArg).join(" ")),
+            info: (...args) => logs.push("[INFO] " + args.map(formatArg).join(" ")),
+            warn: (...args) => logs.push("[WARN] " + args.map(formatArg).join(" ")),
+            error: (...args) => logs.push("[ERROR] " + args.map(formatArg).join(" ")),
+          };
+
+          const Deno = (${createDenoEnvironment.toString()})(logs);
+          const startTime = performance.now();
+          let result = undefined;
+          let hasError = false;
+
+          try {
+            const asyncFn = new Function("Deno", "console", "return (async () => {\\n" + ev.data.code + "\\n})();");
+            result = await asyncFn(Deno, customConsole);
+          } catch (err) {
+            hasError = true;
+            logs.push("RuntimeError: " + (err && err.message ? err.message : String(err)));
+          }
+
+          const duration = (performance.now() - startTime).toFixed(1);
+          if (result !== undefined && logs.length === 0) {
+            logs.push(formatArg(result));
+          }
+
+          self.postMessage({
+            output: logs.join("\\n"),
+            durationMs: duration,
+            success: !hasError,
+          });
+        };
+      `;
+
+      try {
+        const blob = new Blob([workerScript], { type: "application/javascript" });
+        const workerUrl = URL.createObjectURL(blob);
+        const worker = new Worker(workerUrl);
+        activeWorker = worker;
+
+        const timer = setTimeout(() => {
+          worker.terminate();
+          URL.revokeObjectURL(workerUrl);
+          if (activeWorker === worker) activeWorker = null;
+          resolve({
+            output:
+              "TimeoutError: La ejecución superó el límite de 3000ms (posible bucle infinito).",
+            durationMs: String(timeoutMs),
+            success: false,
+          });
+        }, timeoutMs);
+
+        worker.onmessage = (e) => {
+          clearTimeout(timer);
+          worker.terminate();
+          URL.revokeObjectURL(workerUrl);
+          if (activeWorker === worker) activeWorker = null;
+          resolve(e.data);
+        };
+
+        worker.onerror = (err) => {
+          clearTimeout(timer);
+          worker.terminate();
+          URL.revokeObjectURL(workerUrl);
+          if (activeWorker === worker) activeWorker = null;
+          resolve({
+            output: "WorkerError: " + (err.message || "Error de sintaxis o ejecución"),
+            durationMs: "0.0",
+            success: false,
+          });
+        };
+
+        worker.postMessage({ code: cleanedCode });
+      } catch {
+        resolve(null);
+      }
+    });
   }
 
   // Execution worker / eval sandbox
   async function runCodeInSandbox(code) {
+    const cleanedCode = transpileTS(code);
+    const workerRes = await runCodeInWorker(cleanedCode, 3000);
+    if (workerRes) return workerRes;
+
     const logs = [];
     const customConsole = {
       log: (...args) => logs.push(args.map(formatArg).join(" ")),
@@ -81,7 +199,6 @@
     }
 
     const Deno = createDenoEnvironment(logs);
-    const cleanedCode = transpileTS(code);
 
     const startTime = performance.now();
     let result = undefined;
@@ -154,9 +271,37 @@
     const card = document.getElementById(cardId);
     if (!card) return;
     const code = decodeURIComponent(card.getAttribute("data-code"));
+    const copyBtn = card.querySelector(".copy-btn");
     navigator.clipboard.writeText(code).then(() => {
-      alert("¡Código copiado al portapapeles!");
+      if (copyBtn) {
+        const origTitle = copyBtn.getAttribute("title") || "Copiar código";
+        copyBtn.setAttribute("title", "¡Copiado!");
+        copyBtn.style.color = "var(--emerald-accent)";
+        setTimeout(() => {
+          copyBtn.setAttribute("title", origTitle);
+          copyBtn.style.color = "";
+        }, 1800);
+      }
     });
+  };
+
+  // Clone any guide code block directly into the interactive Playground page
+  window.openInPlayground = function (blockId) {
+    const el = document.getElementById(blockId);
+    if (!el) return;
+    const encodedAttr = el.getAttribute("data-code");
+    const rawTextarea = el.querySelector(".raw-code");
+    const code = encodedAttr
+      ? decodeURIComponent(encodedAttr)
+      : (rawTextarea ? rawTextarea.value : "");
+    if (!code) return;
+
+    try {
+      sessionStorage.setItem("zerho_pg_code", code);
+    } catch {
+      // Ignore storage quota errors
+    }
+    window.location.href = `/playground/?code=${encodeURIComponent(code)}`;
   };
 
   // Dedicated Playground Page
@@ -242,7 +387,17 @@ try {
     };
 
     const monacoContainer = document.getElementById("pgMonacoEditor");
-    const initialCode = PRESETS.server;
+    let customCode = null;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      customCode = params.get("code") || sessionStorage.getItem("zerho_pg_code");
+      if (sessionStorage.getItem("zerho_pg_code")) {
+        sessionStorage.removeItem("zerho_pg_code");
+      }
+    } catch {
+      // Ignore URL/storage errors
+    }
+    const initialCode = customCode || PRESETS.server;
 
     // Load Monaco Editor dynamically
     if (monacoContainer) {
@@ -421,8 +576,8 @@ try {
           execute();
         }
       });
-      // Initial value
-      textarea.value = PRESETS.server;
+      // Initial value (respecting code cloned from docs via "Abrir en Playground")
+      textarea.value = initialCode;
       execute();
     }
   };

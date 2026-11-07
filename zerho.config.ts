@@ -13,6 +13,16 @@ export interface SidebarItem {
   badge?: string;
 }
 
+export interface VersionItem {
+  label: string;
+  link: string;
+}
+
+export interface CtaButtonConfig {
+  text: string;
+  link: string;
+}
+
 export interface LocaleConfig {
   label: string;
   lang: string;
@@ -21,13 +31,38 @@ export interface LocaleConfig {
   tagline?: string;
   description?: string;
   nav?: NavItem[];
-  sidebar?: Record<string, SidebarItem[]> | SidebarItem[];
+  sidebar?: Record<string, SidebarItem[]> | SidebarItem[] | "auto";
 }
 
 export interface ApiDocsConfig {
   entrypoints: string[];
   route?: string;
   title?: string;
+  strict?: boolean;
+  /** Base repository URL for linking symbols directly to source code lines (e.g. https://github.com/org/repo/blob/main) */
+  repoUrl?: string;
+}
+
+export interface ThemeColorsConfig {
+  /** Primary brand accent hex/rgb color (overrides --brand-primary) */
+  primary?: string;
+  /** Secondary brand accent hex/rgb color (overrides --brand-secondary) */
+  secondary?: string;
+  /** Background surface hex/rgb color (overrides --bg-primary) */
+  bgPrimary?: string;
+}
+
+export interface ZerhoPlugin {
+  /** Unique plugin identifier */
+  name: string;
+  /** Hook executed before site compilation starts */
+  onBeforeBuild?: (config: ZerhoConfig) => Promise<void> | void;
+  /** Hook to transform raw Markdown content before parsing */
+  transformMarkdown?: (markdown: string, routePath: string) => Promise<string> | string;
+  /** Hook to transform compiled HTML output before writing to disk */
+  transformHtml?: (html: string, routePath: string) => Promise<string> | string;
+  /** Hook executed after all static assets and indices have been written */
+  onAfterBuild?: (context: { outDir: string; routes: string[] }) => Promise<void> | void;
 }
 
 export interface ZerhoConfig {
@@ -35,15 +70,28 @@ export interface ZerhoConfig {
   tagline: string;
   description: string;
   lang: string;
+  siteUrl?: string;
   base?: string;
   head?: [string, Record<string, string>][];
   apiDocs?: ApiDocsConfig;
   locales?: Record<string, LocaleConfig>;
+  /** Fail compilation if broken internal links or missing heading anchors are detected */
+  strictLinks?: boolean;
+  /** Extensible lifecycle plugins */
+  plugins?: ZerhoPlugin[];
   themeConfig: {
     logo?: string;
     siteTitle?: string;
+    /** Custom brand color palette tokens injected without editing CSS */
+    colors?: ThemeColorsConfig;
+    /** Optional badge displayed next to brand logo (e.g. 'v2.0' or 'Deno 2.x'). Set to '' to hide. */
+    versionBadge?: string;
+    /** Multi-version documentation dropdown items */
+    versions?: VersionItem[];
+    /** Custom header Call-To-Action button, or false to hide */
+    ctaButton?: CtaButtonConfig | false;
     nav: NavItem[];
-    sidebar: Record<string, SidebarItem[]> | SidebarItem[];
+    sidebar: Record<string, SidebarItem[]> | SidebarItem[] | "auto";
     socialLinks: { icon: "github" | "twitter" | "discord"; link: string }[];
     footer: {
       message?: string;
@@ -65,10 +113,13 @@ export const config: ZerhoConfig = {
   description:
     "SSG ultrarrápido, playground interactivo en vivo, búsqueda instantánea Cmd+K y estética de clase mundial.",
   lang: "es",
+  siteUrl: "https://zerho.xyz",
   apiDocs: {
     entrypoints: ["./src/core/builder.ts", "./src/core/markdown.ts", "./src/core/search.ts"],
     route: "/reference",
     title: "Referencia de API (Deno Doc)",
+    strict: true,
+    repoUrl: "https://github.com/glastor-core/zerho/blob/main",
   },
   locales: {
     root: {
@@ -124,15 +175,14 @@ export const config: ZerhoConfig = {
         link: "/guide/markdown-features",
         activeMatch: "/guide/markdown-features",
       },
-      { text: "Referencia API", link: "/reference", activeMatch: "/reference", badge: "Auto" },
-      { text: "Playground TS", link: "/playground/", activeMatch: "/playground/", badge: "Monaco" },
+      { text: "Referencia", link: "/reference", activeMatch: "/reference", badge: "Auto" },
+      { text: "Playground", link: "/playground/", activeMatch: "/playground/", badge: "Monaco" },
       {
-        text: "OpenAPI Explorer",
+        text: "OpenAPI",
         link: "/api/openapi",
         activeMatch: "/api/openapi",
         badge: "Live",
       },
-      { text: "API Deno", link: "/api/runtime", activeMatch: "/api/runtime" },
       { text: "Deploy", link: "/guide/deployment", activeMatch: "/guide/deployment" },
     ],
     sidebar: {

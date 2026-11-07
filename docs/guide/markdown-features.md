@@ -14,20 +14,38 @@ next:
 Zerho soporta contenedores estilizados estilo VitePress para resaltar notas, sugerencias,
 precauciones y detalles desplegables:
 
-::: info INFORMACIÓN Este es un bloque de información general con tono azul eléctrico. Ideal para
-contexto adicional o notas explicativas. :::
+::: info INFORMACIÓN
 
-::: tip CONSEJO PRO Puedes usar Markdown dentro de los callouts, como **negritas**, _cursivas_ o
-`código en línea`. :::
+Este es un bloque de información general con tono azul eléctrico. Ideal para contexto adicional o
+notas explicativas.
 
-::: warning ADVERTENCIA Ten en cuenta que modificar ciertas variables de entorno puede alterar el
-comportamiento del runtime de Deno. :::
+:::
 
-::: danger PELIGRO No expongas credenciales privadas ni claves de API en el código estático del
-cliente. :::
+::: tip CONSEJO PRO
 
-::: details Haz clic para ver detalles avanzados Aquí puedes colocar contenido colapsable que no
-sobrecargue la lectura inicial del usuario, como registros de depuración o tablas extensas. :::
+Puedes usar Markdown dentro de los callouts, como **negritas**, _cursivas_ o `código en línea`.
+
+:::
+
+::: warning ADVERTENCIA
+
+Ten en cuenta que modificar ciertas variables de entorno puede alterar el comportamiento del runtime
+de Deno.
+
+:::
+
+::: danger PELIGRO
+
+No expongas credenciales privadas ni claves de API en el código estático del cliente.
+
+:::
+
+::: details Haz clic para ver detalles avanzados
+
+Aquí puedes colocar contenido colapsable que no sobrecargue la lectura inicial del usuario, como
+registros de depuración o tablas extensas.
+
+:::
 
 ---
 
@@ -127,9 +145,92 @@ bunx jsr add @zerho/zerho
 
 :::
 
-::: tip SINCRONIZACIÓN AUTOMÁTICA Si el usuario selecciona la pestaña **pnpm** o **Deno**, Zerho
-memoriza su preferencia en `localStorage` y actualiza automáticamente todos los grupos de código del
-sitio web para mostrar su gestor de paquetes favorito. :::
+::: tip SINCRONIZACIÓN AUTOMÁTICA
+
+Si el usuario selecciona la pestaña **pnpm** o **Deno**, Zerho memoriza su preferencia en
+`localStorage` y actualiza automáticamente todos los grupos de código del sitio web para mostrar su
+gestor de paquetes favorito.
+
+:::
+
+---
+
+## Componentes UI Declarativos
+
+Zerho incluye contenedores nativos de alto impacto visual sin requerir MDX ni React:
+
+### Pasos Numerados (`::: steps`)
+
+::: steps
+
+### Inicializa tu proyecto
+
+Ejecuta `deno run -A jsr:@zerho/core/init` en cualquier repositorio para generar la estructura base.
+
+### Personaliza tu configuración
+
+Ajusta colores, barra lateral automática (`sidebar: "auto"`) y plugins en `zerho.config.ts`.
+
+### Compila y despliega en el Edge
+
+Ejecuta `deno task build` para generar el sitio estático, feeds RSS, tarjetas OpenGraph y contexto
+MCP.
+
+:::
+
+### Pestañas de Contenido General (`::: tabs`)
+
+::: tabs
+
+@tab Deno 2 Nativo
+
+Zerho se ejecuta directamente sobre **Deno 2** sin `node_modules`, aprovechando `deno doc` y
+`Deno.serve`.
+
+@tab Edge AI & MCP
+
+Incluye servidor **Model Context Protocol (`POST /api/mcp`)** y generación automática de
+`/llms.txt`.
+
+:::
+
+### Cuadrícula de Tarjetas (`::: cards`)
+
+::: cards
+
+- ⚡ **Compilación Sub-100ms** | Motor SSG ultrarrápido optimizado para Deno 2 y Deno Deploy. |
+  /guide/getting-started
+- 🔌 **OpenAPI 3.1 Nativo** | Explorador interactivo con resolución de `$ref` y snippets en 5
+  lenguajes. | /api/openapi
+- 🤖 **MCP Server & LLMs.txt** | Conecta Cursor, Claude Desktop y Windsurf directamente a tu
+  documentación. | /guide/configuration
+
+:::
+
+### Árbol de Archivos (`::: file-tree`)
+
+::: file-tree
+
+- zerho.config.ts
+- main.ts
+- docs/
+  - index.md
+  - guide/
+    - getting-started.md
+    - markdown-features.md
+
+:::
+
+---
+
+## Fórmulas Matemáticas (LaTeX / KaTeX)
+
+Zerho soporta notación matemática en línea como $E = mc^2$ y bloques de ecuaciones completas con
+carga bajo demanda de KaTeX:
+
+$$
+\text{Latencia Edge} = \frac{1}{\sum_{i=1}^{N} \text{Regiones}_i} + \mathcal{O}(1)
+$$
 
 ---
 

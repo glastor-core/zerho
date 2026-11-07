@@ -18,7 +18,7 @@ Al usar TypeScript nativo en Deno, cuentas con autocompletado inteligente y vali
 tipos sin necesidad de herramientas externas.
 
 ```ts [zerho.config.ts]
-import { ZerhoConfig } from "./src/core/types.ts";
+import type { ZerhoConfig } from "./zerho.config.ts";
 
 export const config: ZerhoConfig = {
   title: "Mi Documentación",
@@ -187,12 +187,47 @@ versiones preservando el estado de la aplicación.
 
 ---
 
-## Soporte para Agentes de IA (`llms.txt`)
+## Soporte para Agentes de IA (`llms.txt` y Servidor MCP)
 
-Durante la compilación, Zerho genera automáticamente dos archivos estándar en la raíz de tu sitio:
+Durante la compilación y ejecución en el Edge, Zerho expone nativamente tu documentación para
+agentes y editores de IA (Cursor, Windsurf, Claude Desktop):
 
 1. **`/llms.txt`**: Manifiesto estructurado según la especificación de
    [llmstxt.org](https://llmstxt.org) que lista todas las páginas indexadas con títulos y
    descripciones concisas.
 2. **`/llms-full.txt`**: Documentación técnica consolidada en un único archivo Markdown limpio (sin
    HTML boilerplate), ideal para ingestión en agentes y LLMs con ventanas de contexto extendidas.
+3. **Servidor MCP Nativo (`POST /api/mcp`)**: Endpoint JSON-RPC 2.0 compatible con el **Model
+   Context Protocol** que expone las herramientas `search_docs` y `get_llms_context` sin requerir
+   configuración adicional.
+
+---
+
+## Auto-Sidebar, Theming Zero-CSS y Plugins (`ZerhoPlugin`)
+
+Puedes activar la generación automática de barra lateral (`sidebar: "auto"`), validar enlaces
+internos en CI (`strictLinks: true`), personalizar colores de marca sin tocar CSS y extender el
+ciclo de vida del compilador mediante plugins:
+
+```ts [zerho.config.ts]
+const advancedConfig = {
+  strictLinks: true,
+  repoUrl: "https://github.com/glastor-core/zerho",
+  themeConfig: {
+    sidebar: "auto",
+    versionBadge: "v1.7",
+    colors: {
+      brandPrimary: "#8b5cf6",
+      brandSecondary: "#06b6d4",
+    },
+  },
+  plugins: [
+    {
+      name: "custom-telemetry-banner",
+      transformMarkdown(md: string) {
+        return md;
+      },
+    },
+  ],
+};
+```

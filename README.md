@@ -11,6 +11,8 @@
   <img src="https://img.shields.io/badge/JSR-@zerho/core-facc15?style=for-the-badge&logo=jsr&logoColor=black" alt="JSR Package" />
   <img src="https://img.shields.io/badge/LLMs.txt-Supported-8b5cf6?style=for-the-badge" alt="LLMs.txt Supported" />
   <a href="https://github.com/glastor-core/nemesis"><img src="https://img.shields.io/badge/Security-Nemesis_Audit-purple?style=for-the-badge" alt="Nemesis Security Audit" /></a>
+  <a href="https://github.com/glastor-core/specter"><img src="https://img.shields.io/badge/API_Contract-Specter_v1-8b5cf6?style=for-the-badge" alt="Specter API Contract Gatekeeper" /></a>
+  <a href="https://github.com/glastor-core/vortex"><img src="https://img.shields.io/badge/Predictive_CI-Vortex_v1-06b6d4?style=for-the-badge" alt="Vortex Predictive CI" /></a>
   <img src="https://img.shields.io/badge/Licencia-MIT-blue?style=for-the-badge" alt="MIT License" />
 </p>
 
@@ -23,21 +25,24 @@
 
 ## 🚀 ¿Por qué Zerho supera a VitePress y herramientas tradicionales?
 
-| Característica             |         VitePress / Docusaurus          |                   Zerho Pro en Deno 2                   |
-| :------------------------- | :-------------------------------------: | :-----------------------------------------------------: |
-| **Runtime Base**           | Node.js + npm + `node_modules` (400MB+) |           **Deno 2 Nativo (0 node_modules)**            |
-| **Playground en Vivo**     |      ❌ Requiere plugins externos       |       **✅ Sandbox TypeScript / Deno Integrado**        |
-| **Bloques Ejecutables**    |         Solo estáticos con copy         |      **✅ `ts run` con salida de consola en vivo**      |
-| **Soporte IA (LLMs.txt)**  |        ❌ No disponible de serie        |      **✅ `/llms.txt` y `/llms-full.txt` nativos**      |
-| **Auto-Docs desde Código** |       Requiere TypeDoc / plugins        |       **✅ `deno doc --json` integrado de serie**       |
-| **Code-Groups Políglotas** |          Requiere bundler Node          |     **✅ Sincronización global con `localStorage`**     |
-| **Telemetría e Insights**  |        Cookies de terceros (GA4)        | **✅ Edge Deno KV (queries y preguntas sin responder)** |
-| **Internacionalización**   |         Configuración compleja          |   **✅ i18n declarativo (`/en/`, `/es/`) en header**    |
-| **Despliegue Edge**        |    Configuración manual de adapters     |        **✅ 1 Clic en Deno Deploy (`main.ts`)**         |
-| **Búsqueda Instantánea**   |     Algolia externo o local básico      |        **✅ Buscador Cmd+K spotlight indexado**         |
-| **Diagramas Mermaid**      |              Plugin extra               |             **✅ Soporte nativo de serie**              |
-| **Tiempo de Compilación**  |              ~2.5 segundos              |            **~90 milisegundos (11 páginas)**            |
-| **Estética UI**            |          Tema default clásico           |      **Estilo Linear / Vercel con Glassmorphism**       |
+| Característica                |         VitePress / Docusaurus          |                   Zerho Pro en Deno 2                   |
+| :---------------------------- | :-------------------------------------: | :-----------------------------------------------------: |
+| **Runtime Base**              | Node.js + npm + `node_modules` (400MB+) |           **Deno 2 Nativo (0 node_modules)**            |
+| **Playground en Vivo**        |      ❌ Requiere plugins externos       |       **✅ Sandbox TypeScript / Deno Integrado**        |
+| **Bloques Ejecutables**       |         Solo estáticos con copy         |      **✅ `ts run` con salida de consola en vivo**      |
+| **Soporte IA (LLMs.txt)**     |        ❌ No disponible de serie        | **✅ `/llms.txt`, `/llms-full.txt` y MCP (`/api/mcp`)** |
+| **Auto-Docs desde Código**    |       Requiere TypeDoc / plugins        |   **✅ `deno doc --json` + modo estricto (`strict`)**   |
+| **OpenAPI 3.0 / 3.1**         |           Plugins de terceros           |  **✅ Parser `$ref` + Snippets en 5 lenguajes + Live**  |
+| **Componentes UI & KaTeX**    |          Requiere MDX / React           |  **✅ `steps`, `tabs`, `cards`, `file-tree` y LaTeX**   |
+| **Doc Testing (`test:docs`)** |        ❌ No disponible de serie        |   **✅ Verifica y ejecuta bloques TS/JS en Markdown**   |
+| **Code-Groups Políglotas**    |          Requiere bundler Node          |     **✅ Sincronización global con `localStorage`**     |
+| **Telemetría e Insights**     |        Cookies de terceros (GA4)        | **✅ Edge Deno KV (queries y preguntas sin responder)** |
+| **Internacionalización**      |         Configuración compleja          |      **✅ i18n N-idiomas dinámico + RSS y OG SVG**      |
+| **Despliegue Edge**           |    Configuración manual de adapters     |        **✅ 1 Clic en Deno Deploy (`main.ts`)**         |
+| **Búsqueda Instantánea**      |     Algolia externo o local básico      |        **✅ Buscador Cmd+K spotlight indexado**         |
+| **Diagramas Mermaid**         |              Plugin extra               |             **✅ Soporte nativo de serie**              |
+| **Tiempo de Compilación**     |              ~2.5 segundos              |            **~90 milisegundos (11 páginas)**            |
+| **Estética UI**               |          Tema default clásico           |      **Estilo Linear / Vercel con Glassmorphism**       |
 
 ---
 
@@ -46,13 +51,19 @@
 Solo necesitas tener instalado [Deno 2](https://deno.com).
 
 ```bash
+# 0. (Opcional) Inicializar Zerho en cualquier repositorio existente con 1 comando
+deno run -A jsr:@zerho/core/init
+
 # 1. Iniciar el servidor local de desarrollo con Live-Reload (WebSocket HMR)
 deno task dev
 
-# 2. Compilar el sitio estático para producción (genera dist/ con sitemap y llms.txt)
+# 2. Compilar el sitio estático para producción (genera dist/ con sitemap, OG SVG, RSS y llms.txt)
 deno task build
 
-# 3. Servir en modo producción con encabezados de seguridad Edge y Deno KV
+# 3. Verificar sintaxis y ejecución en vivo de todos los bloques de código en Markdown
+deno task test:docs
+
+# 4. Servir en modo producción con encabezados de seguridad Edge, MCP Server y Deno KV
 deno task serve
 ```
 

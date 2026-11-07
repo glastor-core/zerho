@@ -1,6 +1,7 @@
-import { extname, join } from "@std/path";
+import { extname, join, resolve, SEPARATOR } from "@std/path";
 import { exists } from "@std/fs";
 import { buildSite } from "./src/core/builder.ts";
+import { SearchIndexer } from "./src/core/search.ts";
 
 // If dist directory does not exist (e.g. fresh Deno Deploy checkout), build on the fly
 if (!(await exists(join(Deno.cwd(), "dist")))) {
@@ -44,19 +45,58 @@ function getContentType(path: string): string {
   return types[ext] || "application/octet-stream";
 }
 
-// In-memory search index for Ask AI
-let cachedSearchIndex:
-  | Array<{ id: string; url: string; title: string; section?: string; content: string }>
-  | null = null;
-async function getSearchIndex() {
-  if (cachedSearchIndex) return cachedSearchIndex;
+// In-memory search indexer for Ask AI
+let cachedIndexer: SearchIndexer | null = null;
+async function getSearchIndexer(): Promise<SearchIndexer> {
+  if (cachedIndexer) return cachedIndexer;
   try {
     const data = await Deno.readTextFile(join(Deno.cwd(), "dist", "search-index.json"));
-    cachedSearchIndex = JSON.parse(data);
+    cachedIndexer = SearchIndexer.fromJSON(data);
   } catch {
-    cachedSearchIndex = [];
+    cachedIndexer = new SearchIndexer();
   }
-  return cachedSearchIndex || [];
+  return cachedIndexer;
+}
+
+function isValidDocPath(path: unknown): path is string {
+  return (
+    typeof path === "string" &&
+    path.length > 0 &&
+    path.length <= 200 &&
+    path.startsWith("/") &&
+    !path.includes("..") &&
+    !path.includes("\\")
+  );
+}
+
+function getCacheControl(urlPath: string, diskPath: string): string {
+  if (urlPath.startsWith("/assets/")) {
+    return "public, max-age=31536000, immutable";
+  }
+  const ext = extname(diskPath).toLowerCase();
+  if (ext === ".xml" || ext === ".txt" || ext === ".ico" || ext === ".png" || ext === ".svg") {
+    return "public, max-age=86400";
+  }
+  return "no-cache, must-revalidate";
+}
+
+export function resolveSafeDistPath(distRoot: string, rawSubPath: string): string | null {
+  try {
+    const decoded = decodeURIComponent(rawSubPath);
+    if (decoded.includes("\0") || decoded.includes("..")) return null;
+    const normalizedRel = decoded.replace(/^[/\\]+/, "");
+    const resolvedRoot = resolve(distRoot);
+    const resolvedTarget = resolve(resolvedRoot, normalizedRel);
+    if (
+      resolvedTarget !== resolvedRoot &&
+      !resolvedTarget.startsWith(resolvedRoot + SEPARATOR)
+    ) {
+      return null;
+    }
+    return resolvedTarget;
+  } catch {
+    return null;
+  }
 }
 
 export async function handleRequest(req: Request): Promise<Response> {
@@ -67,12 +107,16 @@ export async function handleRequest(req: Request): Promise<Response> {
     try {
       const body = await req.json();
       const { path, helpful } = body;
-      if (!path || typeof helpful !== "boolean") {
-        return Response.json({ success: false, error: "path and helpful are required" }, {
-          status: 400,
-        });
+      if (!isValidDocPath(path) || typeof helpful !== "boolean") {
+        return Response.json(
+          {
+            success: false,
+            error: "Valid path (starting with '/') and helpful boolean are required",
+          },
+          { status: 400 },
+        );
       }
-      if (kv && path) {
+      if (kv) {
         const key = ["feedback", path, helpful ? "positive" : "negative"];
         await kv.atomic().sum(key, 1n).commit();
       }
@@ -86,7 +130,7 @@ export async function handleRequest(req: Request): Promise<Response> {
   if (url.pathname === "/api/feedback/stats" && req.method === "GET") {
     const stats: Record<string, { positive: number; negative: number }> = {};
     if (kv) {
-      const iter = kv.list({ prefix: ["feedback"] });
+      const iter = kv.list({ prefix: ["feedback"] }, { limit: 200 });
       for await (const entry of iter) {
         const path = entry.key[1] as string;
         const type = entry.key[2] as "positive" | "negative";
@@ -140,7 +184,7 @@ export async function handleRequest(req: Request): Promise<Response> {
       }
 
       // 2. Top Queries
-      const queryIter = kv.list<Deno.KvU64>({ prefix: ["analytics", "query"] });
+      const queryIter = kv.list<Deno.KvU64>({ prefix: ["analytics", "query"] }, { limit: 200 });
       for await (const entry of queryIter) {
         const q = entry.key[2] as string;
         topQueries.push({ query: q, count: Number(entry.value.value) });
@@ -148,7 +192,10 @@ export async function handleRequest(req: Request): Promise<Response> {
       topQueries.sort((a, b) => b.count - a.count);
 
       // 3. Unanswered Queries (zero results)
-      const zeroIter = kv.list<Deno.KvU64>({ prefix: ["analytics", "zero_results"] });
+      const zeroIter = kv.list<Deno.KvU64>(
+        { prefix: ["analytics", "zero_results"] },
+        { limit: 200 },
+      );
       for await (const entry of zeroIter) {
         const q = entry.key[2] as string;
         unansweredQueries.push({ query: q, count: Number(entry.value.value) });
@@ -156,7 +203,7 @@ export async function handleRequest(req: Request): Promise<Response> {
       unansweredQueries.sort((a, b) => b.count - a.count);
 
       // 4. Feedback Summary
-      const fbIter = kv.list({ prefix: ["feedback"] });
+      const fbIter = kv.list({ prefix: ["feedback"] }, { limit: 200 });
       for await (const entry of fbIter) {
         const path = entry.key[1] as string;
         const type = entry.key[2] as "positive" | "negative";
@@ -180,29 +227,16 @@ export async function handleRequest(req: Request): Promise<Response> {
   if (url.pathname === "/api/ai/ask" && req.method === "POST") {
     try {
       const { query } = await req.json();
-      if (!query || typeof query !== "string") {
+      if (!query || typeof query !== "string" || !query.trim()) {
         return Response.json({ error: "Query is required" }, { status: 400 });
       }
 
-      const index = await getSearchIndex();
-      const queryLower = query.toLowerCase();
-      const terms = queryLower.split(/\s+/).filter((t: string) => t.length > 2);
+      const indexer = await getSearchIndexer();
+      const hits = indexer.search(query, 3);
 
-      // Score matching documents
-      const scored = index.map((doc) => {
-        let score = 0;
-        const text = `${doc.title} ${doc.section || ""} ${doc.content}`.toLowerCase();
-        for (const term of terms) {
-          if (doc.title.toLowerCase().includes(term)) score += 5;
-          if (doc.section && doc.section.toLowerCase().includes(term)) score += 3;
-          if (text.includes(term)) score += 1;
-        }
-        return { doc, score };
-      }).filter((s) => s.score > 0).sort((a, b) => b.score - a.score);
-
-      const topSources = scored.slice(0, 3).map((s) => ({
-        title: `${s.doc.title} ${s.doc.section ? `› ${s.doc.section}` : ""}`,
-        url: s.doc.url,
+      const topSources = hits.map((h) => ({
+        title: `${h.item.title} ${h.item.section ? `› ${h.item.section}` : ""}`,
+        url: h.item.url,
       }));
 
       // Synthesize intelligent response
@@ -211,7 +245,7 @@ export async function handleRequest(req: Request): Promise<Response> {
         answer =
           `No encontré coincidencias exactas para "${query}" en la documentación actual. Te sugiero explorar la sección de **Guía de Inicio** o consultar el **Playground Interactivo**.`;
       } else {
-        const topDoc = scored[0].doc;
+        const topDoc = hits[0].item;
         answer = `En base a la documentación de **Zerho**:\n\n` +
           `Para resolver tu consulta sobre **"${query}"**, la sección más relevante es [${
             topSources[0].title
@@ -231,18 +265,158 @@ export async function handleRequest(req: Request): Promise<Response> {
     }
   }
 
-  // 4. Static file router with Edge Caching
+  // 6. Native Model Context Protocol (MCP) Server Endpoint for AI Agents (/api/mcp)
+  if (url.pathname === "/api/mcp") {
+    const mcpTools = [
+      {
+        name: "search_docs",
+        description:
+          "Busca semántica y textualmente en toda la documentación técnica del proyecto.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: { type: "string", description: "Consulta o término técnico a buscar" },
+            limit: { type: "number", description: "Número máximo de resultados (por defecto 5)" },
+          },
+          required: ["query"],
+        },
+      },
+      {
+        name: "get_llms_context",
+        description:
+          "Obtiene el índice estructurado /llms.txt completo de la documentación del proyecto.",
+        inputSchema: {
+          type: "object",
+          properties: {},
+        },
+      },
+    ];
+
+    if (req.method === "GET") {
+      return Response.json({
+        protocol: "Model Context Protocol (MCP)",
+        protocolVersion: "2024-11-05",
+        serverInfo: { name: "zerho-docs-mcp", version: "1.7.0" },
+        tools: mcpTools,
+      });
+    }
+
+    if (req.method === "POST") {
+      try {
+        const rpc = await req.json();
+        const id = rpc.id ?? null;
+        const method = rpc.method;
+
+        if (method === "initialize") {
+          return Response.json({
+            jsonrpc: "2.0",
+            id,
+            result: {
+              protocolVersion: "2024-11-05",
+              serverInfo: { name: "zerho-docs-mcp", version: "1.7.0" },
+              capabilities: { tools: {} },
+            },
+          });
+        }
+
+        if (method === "tools/list") {
+          return Response.json({
+            jsonrpc: "2.0",
+            id,
+            result: { tools: mcpTools },
+          });
+        }
+
+        if (method === "tools/call") {
+          const toolName = rpc.params?.name;
+          const toolArgs = rpc.params?.arguments || {};
+
+          if (toolName === "search_docs") {
+            const q = String(toolArgs.query || "");
+            const limit = Number(toolArgs.limit) || 5;
+            const indexer = await getSearchIndexer();
+            const results = indexer.search(q, limit).map((r) => ({
+              title: r.item.title,
+              section: r.item.section,
+              url: r.item.url,
+              excerpt: r.item.content,
+              score: r.score,
+            }));
+            return Response.json({
+              jsonrpc: "2.0",
+              id,
+              result: {
+                content: [{ type: "text", text: JSON.stringify(results, null, 2) }],
+              },
+            });
+          }
+
+          if (toolName === "get_llms_context") {
+            let llmsContent = "# Documentación Zerho";
+            try {
+              llmsContent = await Deno.readTextFile(join(Deno.cwd(), "dist", "llms.txt"));
+            } catch {
+              // Fallback if dist/llms.txt not yet built
+            }
+            return Response.json({
+              jsonrpc: "2.0",
+              id,
+              result: {
+                content: [{ type: "text", text: llmsContent }],
+              },
+            });
+          }
+
+          return Response.json(
+            {
+              jsonrpc: "2.0",
+              id,
+              error: { code: -32601, message: `Herramienta MCP desconocida: ${toolName}` },
+            },
+            { status: 400 },
+          );
+        }
+
+        return Response.json(
+          {
+            jsonrpc: "2.0",
+            id,
+            error: { code: -32601, message: `Método JSON-RPC no soportado: ${method}` },
+          },
+          { status: 400 },
+        );
+      } catch {
+        return Response.json(
+          { jsonrpc: "2.0", id: null, error: { code: -32700, message: "Parse error" } },
+          { status: 400 },
+        );
+      }
+    }
+  }
+
+  // 7. Static file router with Path Traversal protection & Edge Caching
+  const distRoot = join(Deno.cwd(), "dist");
   let filePath = url.pathname;
-  if (filePath === "/") {
-    filePath = "/index.html";
+  if (filePath.endsWith("/")) {
+    filePath = `${filePath}index.html`;
   } else if (!extname(filePath)) {
     filePath = `${filePath}.html`;
   }
 
-  const diskPath = join(Deno.cwd(), "dist", filePath);
+  const diskPath = resolveSafeDistPath(distRoot, filePath);
+  if (!diskPath) {
+    return new Response("403: Acceso denegado", {
+      status: 403,
+      headers: {
+        ...SECURITY_HEADERS,
+        "content-type": "text/plain; charset=utf-8",
+      },
+    });
+  }
+
   try {
     const file = await Deno.readFile(diskPath);
-    const cacheControl = "no-cache, must-revalidate";
+    const cacheControl = getCacheControl(url.pathname, diskPath);
 
     return new Response(file, {
       headers: {
@@ -253,28 +427,33 @@ export async function handleRequest(req: Request): Promise<Response> {
     });
   } catch {
     // Try subfolder index.html
-    try {
-      const dirIndex = join(Deno.cwd(), "dist", url.pathname, "index.html");
-      const file = await Deno.readFile(dirIndex);
-      return new Response(file, {
-        headers: {
-          ...SECURITY_HEADERS,
-          "content-type": "text/html; charset=utf-8",
-          "cache-control": "public, max-age=3600",
-        },
-      });
-    } catch {
-      return new Response("404: Página no encontrada en Zerho", {
-        status: 404,
-        headers: {
-          ...SECURITY_HEADERS,
-          "content-type": "text/plain; charset=utf-8",
-        },
-      });
+    const dirIndex = resolveSafeDistPath(distRoot, `${url.pathname}/index.html`);
+    if (dirIndex) {
+      try {
+        const file = await Deno.readFile(dirIndex);
+        return new Response(file, {
+          headers: {
+            ...SECURITY_HEADERS,
+            "content-type": "text/html; charset=utf-8",
+            "cache-control": "no-cache, must-revalidate",
+          },
+        });
+      } catch {
+        // Fall through to 404
+      }
     }
+    return new Response("404: Página no encontrada en Zerho", {
+      status: 404,
+      headers: {
+        ...SECURITY_HEADERS,
+        "content-type": "text/plain; charset=utf-8",
+      },
+    });
   }
 }
 
 if (import.meta.main) {
-  Deno.serve(handleRequest);
+  const portEnv = Deno.env.get("PORT");
+  const port = portEnv ? Number(portEnv) : 8000;
+  Deno.serve({ port: Number.isFinite(port) && port > 0 ? port : 8000 }, handleRequest);
 }

@@ -20,6 +20,151 @@ export interface SearchResult {
   score: number;
 }
 
+const STOP_WORDS = new Set([
+  "de",
+  "la",
+  "el",
+  "en",
+  "un",
+  "es",
+  "al",
+  "lo",
+  "se",
+  "su",
+  "mi",
+  "tu",
+  "por",
+  "con",
+  "del",
+  "las",
+  "los",
+  "una",
+  "para",
+  "como",
+  "cómo",
+  "que",
+  "qué",
+  "in",
+  "on",
+  "at",
+  "to",
+  "of",
+  "is",
+  "it",
+  "or",
+  "an",
+  "as",
+  "by",
+  "the",
+  "and",
+  "for",
+  "how",
+]);
+
+/** Semantic concept clusters for natural-language synonym expansion in Spanish and English */
+const SEMANTIC_CLUSTERS: string[][] = [
+  [
+    "puerto",
+    "port",
+    "exponer",
+    "expongo",
+    "escuchar",
+    "listen",
+    "red",
+    "network",
+    "http",
+    "serve",
+    "servidor",
+    "server",
+  ],
+  [
+    "desplegar",
+    "despliegue",
+    "deploy",
+    "deployment",
+    "publicar",
+    "produccion",
+    "producción",
+    "nube",
+    "cloud",
+    "cloudflare",
+    "edge",
+    "hosting",
+  ],
+  [
+    "ejecutar",
+    "correr",
+    "probar",
+    "sandbox",
+    "playground",
+    "consola",
+    "monaco",
+    "interactivo",
+    "worker",
+  ],
+  [
+    "ia",
+    "ai",
+    "llm",
+    "llms",
+    "llms.txt",
+    "rag",
+    "agente",
+    "agentes",
+    "semantica",
+    "semántica",
+  ],
+  [
+    "api",
+    "rest",
+    "openapi",
+    "swagger",
+    "endpoint",
+    "endpoints",
+    "peticion",
+    "request",
+    "curl",
+  ],
+  [
+    "tema",
+    "theme",
+    "oscuro",
+    "dark",
+    "claro",
+    "light",
+    "estilos",
+    "colores",
+    "css",
+    "diseño",
+  ],
+];
+
+/**
+ * Expands primary query terms with semantically related domain synonyms.
+ * @param primaryTerms Cleaned user query terms
+ * @returns Array of semantically related expansion terms not already in primaryTerms
+ */
+export function expandSemanticTerms(primaryTerms: string[]): string[] {
+  const primarySet = new Set(primaryTerms);
+  const expanded = new Set<string>();
+
+  for (const rawTerm of primaryTerms) {
+    const clean = rawTerm.replace(/[¿?¡!.,;:()"']/g, "");
+    if (!clean) continue;
+    for (const cluster of SEMANTIC_CLUSTERS) {
+      if (cluster.some((word) => word === clean || (clean.length >= 4 && word.startsWith(clean)))) {
+        for (const synonym of cluster) {
+          if (!primarySet.has(synonym)) {
+            expanded.add(synonym);
+          }
+        }
+      }
+    }
+  }
+
+  return Array.from(expanded);
+}
+
 /** In-memory client-side and server-side search indexer and query ranking engine. */
 export class SearchIndexer {
   private docs: SearchDocument[] = [];
@@ -80,7 +225,13 @@ export class SearchIndexer {
     const trimmed = query.trim().toLowerCase();
     if (!trimmed) return [];
 
-    const terms = trimmed.split(/\s+/).filter((t) => t.length > 0);
+    const rawTerms = trimmed
+      .replace(/[¿?¡!.,;:()"']/g, " ")
+      .split(/\s+/)
+      .filter((t) => t.length > 0);
+    const filteredTerms = rawTerms.filter((t) => !STOP_WORDS.has(t));
+    const terms = filteredTerms.length > 0 ? filteredTerms : rawTerms;
+    const semanticSynonyms = expandSemanticTerms(terms);
     const scored: SearchResult[] = [];
 
     for (const doc of this.docs) {
@@ -96,11 +247,18 @@ export class SearchIndexer {
         score += 30;
       }
 
-      // Check each query term
+      // Check each primary query term
       for (const term of terms) {
         if (titleLower.includes(term)) score += 10;
         if (sectionLower.includes(term)) score += 5;
         if (contentLower.includes(term)) score += 1;
+      }
+
+      // Check semantic expansion terms (lower weight so literal hits always rank first)
+      for (const syn of semanticSynonyms) {
+        if (titleLower.includes(syn)) score += 3;
+        if (sectionLower.includes(syn)) score += 1.5;
+        if (contentLower.includes(syn)) score += 0.5;
       }
 
       if (score > 0) {

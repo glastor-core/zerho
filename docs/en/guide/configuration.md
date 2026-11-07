@@ -23,7 +23,7 @@ zero extra bundler overhead.
 Here is an annotated overview of the configuration schema:
 
 ```ts [zerho.config.ts]
-import { ZerhoConfig } from "./src/core/types.ts";
+import type { ZerhoConfig } from "./zerho.config.ts";
 
 export const config: ZerhoConfig = {
   title: "My Documentation",
@@ -128,4 +128,26 @@ locales: {
     sidebar: {...},
   },
 }
+```
+
+---
+
+## Auto-Sidebar, Zero-CSS Brand Theming & Plugins
+
+Enable automatic filesystem sidebar discovery (`sidebar: "auto"`), strict broken-link checking
+(`strictLinks: true`), custom brand tokens (`themeConfig.colors`), and lifecycle plugins
+(`ZerhoPlugin`):
+
+```ts [zerho.config.ts]
+const advancedConfig = {
+  strictLinks: true,
+  repoUrl: "https://github.com/glastor-core/zerho",
+  themeConfig: {
+    sidebar: "auto",
+    colors: {
+      brandPrimary: "#8b5cf6",
+      brandSecondary: "#06b6d4",
+    },
+  },
+};
 ```

@@ -81,3 +81,20 @@ Deno.test("SearchIndexer: JSON serialization and deserialization", () => {
   assertEquals(searchHits.length, 1);
   assertEquals(searchHits[0].item.id, "/test");
 });
+
+Deno.test("SearchIndexer: Semantic synonym expansion finds conceptually related docs", () => {
+  const indexer = new SearchIndexer();
+  indexer.addDocument({
+    id: "/api/runtime",
+    url: "/api/runtime",
+    title: "Configuración de Red y Servidor HTTP",
+    section: "Deno.serve",
+    content: "Levanta un servidor HTTP de baja latencia usando Deno.serve en el Edge.",
+  });
+
+  // Query uses "expongo un puerto", which does not appear literally in the document,
+  // but maps semantically to red / http / serve / servidor
+  const hits = indexer.search("¿Cómo expongo un puerto?");
+  assertEquals(hits.length, 1);
+  assertEquals(hits[0].item.id, "/api/runtime");
+});

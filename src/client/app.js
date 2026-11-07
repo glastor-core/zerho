@@ -399,7 +399,7 @@ function initSearchModal() {
     }, 800);
   }
 
-  // Input listener for Quick Search
+  // Input listener for Quick Search (Weighted Multi-Term Ranking)
   input.addEventListener("input", () => {
     if (window.__currentSearchTab !== "quick") return;
 
@@ -410,13 +410,36 @@ function initSearchModal() {
       return;
     }
 
-    const matches = searchIndex.filter((item) => {
-      return (
-        item.title.toLowerCase().includes(query) ||
-        (item.section && item.section.toLowerCase().includes(query)) ||
-        item.content.toLowerCase().includes(query)
-      );
-    }).slice(0, 8);
+    const terms = query.split(/\s+/).filter((t) => t.length > 0);
+    const scored = [];
+
+    for (const item of searchIndex) {
+      let score = 0;
+      const titleLower = (item.title || "").toLowerCase();
+      const sectionLower = (item.section || "").toLowerCase();
+      const contentLower = (item.content || "").toLowerCase();
+
+      if (titleLower === query) {
+        score += 100;
+      } else if (titleLower.includes(query)) {
+        score += 30;
+      }
+
+      for (const term of terms) {
+        if (titleLower.includes(term)) score += 10;
+        if (sectionLower.includes(term)) score += 5;
+        if (contentLower.includes(term)) score += 1;
+      }
+
+      if (score > 0) {
+        scored.push({ item, score });
+      }
+    }
+
+    const matches = scored
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 8)
+      .map((s) => s.item);
 
     renderResults(matches, query);
     reportSearchAnalytics(query, matches.length);
@@ -548,3 +571,39 @@ function initSearchModal() {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 }
+
+// Copy entire page as clean Markdown for AI agents (Mintlify/Stripe standard)
+window.copyPageAsMarkdown = async function () {
+  const rawEl = document.getElementById("rawPageMarkdown");
+  const btnText = document.getElementById("copyPageMdText");
+  if (!rawEl) return;
+  try {
+    await navigator.clipboard.writeText(rawEl.value);
+    if (btnText) {
+      const original = btnText.textContent;
+      btnText.textContent = "✓ Copiado para IA";
+      setTimeout(() => {
+        btnText.textContent = original;
+      }, 2000);
+    }
+  } catch (err) {
+    console.error("Failed to copy page markdown:", err);
+  }
+};
+
+// Interactive general content tabs (::: tabs / @tab)
+document.addEventListener("click", (e) => {
+  const tabBtn = e.target.closest(".z-tab-btn");
+  if (!tabBtn) return;
+  const container = tabBtn.closest("[data-z-tabs]");
+  if (!container) return;
+  const targetIdx = tabBtn.getAttribute("data-z-tab-idx");
+  container.querySelectorAll(".z-tab-btn").forEach((b) => {
+    b.classList.toggle("active", b.getAttribute("data-z-tab-idx") === targetIdx);
+  });
+  container.querySelectorAll(".z-tab-panel").forEach((p) => {
+    const isMatch = p.getAttribute("data-z-panel-idx") === targetIdx;
+    p.classList.toggle("active", isMatch);
+    p.style.display = isMatch ? "" : "none";
+  });
+});
