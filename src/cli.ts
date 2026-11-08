@@ -1,4 +1,16 @@
 #!/usr/bin/env -S deno run -A
+/**
+ * @module cli
+ * Command line interface runner for the Zerho documentation engine.
+ *
+ * @example
+ * ```ts
+ * import { runCli } from "@glastor/zerho/cli";
+ *
+ * await runCli(["build"]);
+ * ```
+ */
+
 import { isAbsolute, join } from "@std/path";
 import { buildSite } from "./core/builder.ts";
 import { VERSION } from "./version.ts";
@@ -35,7 +47,11 @@ function parsePortArg(args: string[]): string | undefined {
   return undefined;
 }
 
-export async function runCli(args: string[] = Deno.args) {
+/**
+ * Runs the Zerho CLI command pipeline.
+ * @param args Array of CLI arguments (defaults to Deno.args).
+ */
+export async function runCli(args: string[] = Deno.args): Promise<void> {
   const command = args[0] || "--help";
   const customPort = parsePortArg(args);
 

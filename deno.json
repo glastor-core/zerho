@@ -1,17 +1,13 @@
 {
   "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
   "name": "@glastor/zerho",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Next-generation documentation engine for Deno & Deno Deploy with live interactive playground, Monaco editor, OpenAPI explorer and Edge AI search",
   "exports": {
     ".": "./main.ts",
     "./cli": "./src/cli.ts",
     "./init": "./src/init.ts",
-    "./config": "./zerho.config.ts",
-    "./builder": "./src/core/builder.ts",
-    "./markdown": "./src/core/markdown.ts",
-    "./docgen": "./src/core/docgen.ts",
-    "./openapi": "./src/core/openapi.ts"
+    "./config": "./zerho.config.ts"
   },
   "publish": {
     "include": [

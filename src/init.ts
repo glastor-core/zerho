@@ -1,7 +1,13 @@
 #!/usr/bin/env -S deno run -A
 /**
- * One-step Zerho Project Initializer entrypoint (`jsr:@zerho/core/init`).
+ * @module init
+ * One-step Zerho Project Initializer entrypoint.
  * Scaffolds a complete, batteries-included Deno 2 documentation workspace.
+ *
+ * @example
+ * ```bash
+ * deno run -A jsr:@glastor/zerho/init
+ * ```
  */
 
 import { runCli } from "./cli.ts";

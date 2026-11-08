@@ -1,3 +1,15 @@
+/**
+ * @module
+ * Next-generation documentation engine and HTTP server for Deno 2 and Deno Deploy.
+ *
+ * @example
+ * ```ts
+ * import { handleRequest } from "@glastor/zerho";
+ *
+ * Deno.serve((req) => handleRequest(req));
+ * ```
+ */
+
 import { extname, join, resolve, SEPARATOR } from "@std/path";
 import { exists } from "@std/fs";
 import { buildSite } from "./src/core/builder.ts";
@@ -80,6 +92,12 @@ function getCacheControl(urlPath: string, diskPath: string): string {
   return "no-cache, must-revalidate";
 }
 
+/**
+ * Safely resolves a subpath within the static distribution directory, preventing path traversal attacks.
+ * @param distRoot The root directory path containing static files.
+ * @param rawSubPath The requested relative URL or file path.
+ * @returns The resolved absolute path if safe, or `null` if traversal/null byte was detected.
+ */
 export function resolveSafeDistPath(distRoot: string, rawSubPath: string): string | null {
   try {
     const decoded = decodeURIComponent(rawSubPath);
@@ -99,6 +117,11 @@ export function resolveSafeDistPath(distRoot: string, rawSubPath: string): strin
   }
 }
 
+/**
+ * Handles incoming HTTP requests for Deno Deploy, local development, and production Edge servers.
+ * @param req Incoming HTTP standard Request object.
+ * @returns Standard HTTP Response object.
+ */
 export async function handleRequest(req: Request): Promise<Response> {
   const url = new URL(req.url);
 

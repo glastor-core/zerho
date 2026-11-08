@@ -1,57 +1,100 @@
+/**
+ * @module config
+ * Configuration definitions, schema types and default options for the Zerho documentation engine.
+ *
+ * @example
+ * ```ts
+ * import { type ZerhoConfig, config } from "@glastor/zerho/config";
+ * ```
+ */
+
+/** Top navigation bar link item */
 export interface NavItem {
+  /** Display label for the navigation item */
   text: string;
+  /** Target URL link or route path */
   link: string;
+  /** Active regex or route pattern match */
   activeMatch?: string;
+  /** Optional badge text displayed next to label */
   badge?: string;
 }
 
+/** Sidebar menu navigation tree item */
 export interface SidebarItem {
+  /** Display title for the sidebar entry */
   text: string;
+  /** Optional target URL link or document path */
   link?: string;
+  /** Nested child sidebar items for subdirectories */
   items?: SidebarItem[];
+  /** Whether the section starts in collapsed state */
   collapsed?: boolean;
+  /** Optional status or version badge */
   badge?: string;
 }
 
+/** Version selector dropdown item */
 export interface VersionItem {
+  /** Version display label (e.g. 'v1.0') */
   label: string;
+  /** Link to target version documentation */
   link: string;
 }
 
+/** Call-to-action button configuration */
 export interface CtaButtonConfig {
+  /** Button display label */
   text: string;
+  /** Button target URL */
   link: string;
 }
 
+/** Multi-language locale configuration */
 export interface LocaleConfig {
+  /** Locale display label */
   label: string;
+  /** Language ISO code (e.g. 'en', 'es') */
   lang: string;
+  /** Base root route link for this locale */
   link?: string;
+  /** Overridden site title for this locale */
   title?: string;
+  /** Overridden tagline for this locale */
   tagline?: string;
+  /** Overridden description for this locale */
   description?: string;
+  /** Custom navigation bar for this locale */
   nav?: NavItem[];
+  /** Custom sidebar tree for this locale */
   sidebar?: Record<string, SidebarItem[]> | SidebarItem[] | "auto";
 }
 
+/** API documentation generator options */
 export interface ApiDocsConfig {
+  /** TypeScript/Deno source entrypoints to document */
   entrypoints: string[];
+  /** Base web route path for API docs */
   route?: string;
+  /** Page header title */
   title?: string;
+  /** Strict verification mode */
   strict?: boolean;
-  /** Base repository URL for linking symbols directly to source code lines (e.g. https://github.com/org/repo/blob/main) */
+  /** Base repository URL for linking symbols directly to source code lines */
   repoUrl?: string;
 }
 
+/** Brand theme colors configuration */
 export interface ThemeColorsConfig {
-  /** Primary brand accent hex/rgb color (overrides --brand-primary) */
+  /** Primary brand accent hex/rgb color */
   primary?: string;
-  /** Secondary brand accent hex/rgb color (overrides --brand-secondary) */
+  /** Secondary brand accent hex/rgb color */
   secondary?: string;
-  /** Background surface hex/rgb color (overrides --bg-primary) */
+  /** Background surface hex/rgb color */
   bgPrimary?: string;
 }
 
+/** Extensible build lifecycle plugin definition */
 export interface ZerhoPlugin {
   /** Unique plugin identifier */
   name: string;
@@ -65,30 +108,37 @@ export interface ZerhoPlugin {
   onAfterBuild?: (context: { outDir: string; routes: string[] }) => Promise<void> | void;
 }
 
+/** Complete Zerho site configuration specification */
 export interface ZerhoConfig {
+  /** Site name and title */
   title: string;
+  /** Hero subtitle / tagline */
   tagline: string;
+  /** Meta description for SEO */
   description: string;
+  /** Default language code */
   lang: string;
+  /** Canonical production site base URL */
   siteUrl?: string;
+  /** Base path prefix */
   base?: string;
+  /** Extra HTML head elements */
   head?: [string, Record<string, string>][];
+  /** Automated API reference docs options */
   apiDocs?: ApiDocsConfig;
+  /** Internationalization locales */
   locales?: Record<string, LocaleConfig>;
-  /** Fail compilation if broken internal links or missing heading anchors are detected */
+  /** Fail compilation if broken internal links are detected */
   strictLinks?: boolean;
   /** Extensible lifecycle plugins */
   plugins?: ZerhoPlugin[];
+  /** Visual presentation and navigation theme configuration */
   themeConfig: {
     logo?: string;
     siteTitle?: string;
-    /** Custom brand color palette tokens injected without editing CSS */
     colors?: ThemeColorsConfig;
-    /** Optional badge displayed next to brand logo (e.g. 'v2.0' or 'Deno 2.x'). Set to '' to hide. */
     versionBadge?: string;
-    /** Multi-version documentation dropdown items */
     versions?: VersionItem[];
-    /** Custom header Call-To-Action button, or false to hide */
     ctaButton?: CtaButtonConfig | false;
     nav: NavItem[];
     sidebar: Record<string, SidebarItem[]> | SidebarItem[] | "auto";
@@ -107,6 +157,16 @@ export interface ZerhoConfig {
   };
 }
 
+/**
+ * Type-safe configuration helper function for Zerho.
+ * @param userConfig User site configuration options.
+ * @returns The validated configuration object.
+ */
+export function defineConfig(userConfig: ZerhoConfig): ZerhoConfig {
+  return userConfig;
+}
+
+/** Default Zerho configuration instance */
 export const config: ZerhoConfig = {
   title: "Zerho",
   tagline: "El motor de documentación de nivel pro diseñado nativamente para Deno & Deno Deploy",
