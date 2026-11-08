@@ -1,7 +1,7 @@
 # ⚡ Zerho
 
 <p align="center">
-  <strong>El motor de documentación técnica de nivel pro diseñado nativamente para Deno 2 y Deno Deploy.</strong>
+  <strong>The pro-grade technical documentation engine built natively for Deno 2 and Deno Deploy.</strong>
 </p>
 
 <p align="center">
@@ -13,103 +13,103 @@
   <a href="https://github.com/glastor-core/nemesis"><img src="https://img.shields.io/badge/Security-Nemesis_Audit-purple?style=for-the-badge" alt="Nemesis Security Audit" /></a>
   <a href="https://github.com/glastor-core/specter"><img src="https://img.shields.io/badge/API_Contract-Specter_v1-8b5cf6?style=for-the-badge" alt="Specter API Contract Gatekeeper" /></a>
   <a href="https://github.com/glastor-core/vortex"><img src="https://img.shields.io/badge/Predictive_CI-Vortex_v1-06b6d4?style=for-the-badge" alt="Vortex Predictive CI" /></a>
-  <img src="https://img.shields.io/badge/Licencia-MIT-blue?style=for-the-badge" alt="MIT License" />
+  <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License" />
 </p>
 
 <p align="center">
-  <a href="https://zerho.glastor-dev.deno.net/"><strong>Explorar Documentación en Vivo &rarr;</strong></a> |
-  <a href="https://zerho.xyz/llms.txt"><strong>Contexto LLMs.txt &rarr;</strong></a>
+  <a href="https://zerho.glastor-dev.deno.net/"><strong>Explore Live Documentation &rarr;</strong></a> |
+  <a href="https://zerho.xyz/llms.txt"><strong>LLMs.txt Context &rarr;</strong></a>
 </p>
 
 ---
 
-## 🚀 ¿Por qué Zerho supera a VitePress y herramientas tradicionales?
+## 🚀 Why Zerho Outperforms VitePress and Traditional Tools
 
-| Característica                |         VitePress / Docusaurus          |                   Zerho Pro en Deno 2                   |
-| :---------------------------- | :-------------------------------------: | :-----------------------------------------------------: |
-| **Runtime Base**              | Node.js + npm + `node_modules` (400MB+) |           **Deno 2 Nativo (0 node_modules)**            |
-| **Playground en Vivo**        |      ❌ Requiere plugins externos       |       **✅ Sandbox TypeScript / Deno Integrado**        |
-| **Bloques Ejecutables**       |         Solo estáticos con copy         |      **✅ `ts run` con salida de consola en vivo**      |
-| **Soporte IA (LLMs.txt)**     |        ❌ No disponible de serie        | **✅ `/llms.txt`, `/llms-full.txt` y MCP (`/api/mcp`)** |
-| **Auto-Docs desde Código**    |       Requiere TypeDoc / plugins        |   **✅ `deno doc --json` + modo estricto (`strict`)**   |
-| **OpenAPI 3.0 / 3.1**         |           Plugins de terceros           |  **✅ Parser `$ref` + Snippets en 5 lenguajes + Live**  |
-| **Componentes UI & KaTeX**    |          Requiere MDX / React           |  **✅ `steps`, `tabs`, `cards`, `file-tree` y LaTeX**   |
-| **Doc Testing (`test:docs`)** |        ❌ No disponible de serie        |   **✅ Verifica y ejecuta bloques TS/JS en Markdown**   |
-| **Code-Groups Políglotas**    |          Requiere bundler Node          |     **✅ Sincronización global con `localStorage`**     |
-| **Telemetría e Insights**     |        Cookies de terceros (GA4)        | **✅ Edge Deno KV (queries y preguntas sin responder)** |
-| **Internacionalización**      |         Configuración compleja          |      **✅ i18n N-idiomas dinámico + RSS y OG SVG**      |
-| **Despliegue Edge**           |    Configuración manual de adapters     |        **✅ 1 Clic en Deno Deploy (`main.ts`)**         |
-| **Búsqueda Instantánea**      |     Algolia externo o local básico      |        **✅ Buscador Cmd+K spotlight indexado**         |
-| **Diagramas Mermaid**         |              Plugin extra               |             **✅ Soporte nativo de serie**              |
-| **Tiempo de Compilación**     |              ~2.5 segundos              |            **~90 milisegundos (11 páginas)**            |
-| **Estética UI**               |          Tema default clásico           |      **Estilo Linear / Vercel con Glassmorphism**       |
+| Feature                       |         VitePress / Docusaurus          |                     Zerho Pro on Deno 2                     |
+| :---------------------------- | :-------------------------------------: | :---------------------------------------------------------: |
+| **Runtime Base**              | Node.js + npm + `node_modules` (400MB+) |             **Native Deno 2 (0 node_modules)**              |
+| **Live Playground**           |      ❌ Requires external plugins       |         **✅ Integrated TypeScript / Deno Sandbox**         |
+| **Executable Blocks**         |         Static copy-only blocks         |        **✅ `ts run` with live interactive console**        |
+| **AI Support (LLMs.txt)**     |       ❌ Not available of-the-box       |  **✅ Native `/llms.txt`, `/llms-full.txt` & `/api/mcp`**   |
+| **Auto-Docs from Source**     |       Requires TypeDoc / plugins        |    **✅ Built-in `deno doc --json` + strict validation**    |
+| **OpenAPI 3.0 / 3.1**         |           Third-party plugins           | **✅ Official `$ref` parser + 5-language code gen + Live**  |
+| **UI Components & KaTeX**     |          Requires MDX / React           | **✅ Native `steps`, `tabs`, `cards`, `file-tree` & LaTeX** |
+| **Doc Testing (`test:docs`)** |       ❌ Not available of-the-box       |  **✅ Validates & executes TS/JS blocks inside Markdown**   |
+| **Polyglot Code-Groups**      |          Requires Node bundler          |      **✅ Global client-side sync via `localStorage`**      |
+| **Telemetry & Insights**      |        Third-party cookies (GA4)        | **✅ Edge Deno KV (queries & unanswered search insights)**  |
+| **Internationalization**      |          Complex configuration          |        **✅ Declarative N-language i18n + RSS & OG**        |
+| **Edge Deployment**           |      Manual adapter configuration       |           **✅ 1-Click Deno Deploy (`main.ts`)**            |
+| **Instant Search**            |     External Algolia / basic local      |         **✅ Indexed Cmd+K spotlight search modal**         |
+| **Mermaid Diagrams**          |              Extra plugin               |               **✅ Built-in out-of-the-box**                |
+| **Build Time**                |              ~2.5 seconds               |               **~90 milliseconds (14 pages)**               |
+| **UI Aesthetics**             |          Classic default theme          |        **Linear / Vercel design with Glassmorphism**        |
 
 ---
 
-## ⚡ Inicio Rápido
+## ⚡ Quick Start
 
-Solo necesitas tener instalado [Deno 2](https://deno.com).
+You only need [Deno 2](https://deno.com) installed.
 
 ```bash
-# 0. (Opcional) Inicializar Zerho en cualquier repositorio existente con 1 comando
+# 0. (Optional) Scaffold Zerho into any existing repository with 1 command
 deno run -A jsr:@zerho/core/init
 
-# 1. Iniciar el servidor local de desarrollo con Live-Reload (WebSocket HMR)
+# 1. Start local development server with Live-Reload (WebSocket HMR)
 deno task dev
 
-# 2. Compilar el sitio estático para producción (genera dist/ con sitemap, OG SVG, RSS y llms.txt)
+# 2. Build static documentation for production (generates dist/ with sitemap, OG SVG, RSS & llms.txt)
 deno task build
 
-# 3. Verificar sintaxis y ejecución en vivo de todos los bloques de código en Markdown
+# 3. Verify syntax and live execution of all Markdown code blocks
 deno task test:docs
 
-# 4. Servir en modo producción con encabezados de seguridad Edge, MCP Server y Deno KV
+# 4. Serve in production mode with Edge security headers, MCP Server & Deno KV
 deno task serve
 ```
 
 ---
 
-## 🛠️ Estructura del Proyecto
+## 🛠️ Project Structure
 
 ```text
 zerho/
-├── deno.json               # Configuración oficial de Deno 2, JSR y tareas
-├── zerho.config.ts         # Metadatos, i18n, navegación, sidebar y apiDocs
-├── main.ts                 # Servidor Edge perimetral con Deno KV y cabeceras AppSec
-├── docs/                   # Contenido en Markdown
-│   ├── index.md            # Landing page principal (layout: home)
-│   ├── reference.md        # Referencia de API auto-generada con deno doc
-│   ├── guide/              # Guías en español (getting-started, configuration, etc.)
-│   ├── en/                 # Documentación internacionalizada en inglés
-│   ├── playground/         # Entorno de pruebas TypeScript interactivo
-│   └── api/                # Referencia de APIs del runtime y OpenAPI
+├── deno.json               # Official Deno 2, JSR, and task configuration
+├── zerho.config.ts         # Metadata, i18n, navigation, sidebar, and apiDocs
+├── main.ts                 # Edge perimeter server with Deno KV and AppSec headers
+├── docs/                   # Markdown documentation content
+│   ├── index.md            # Main landing page (layout: home)
+│   ├── reference.md        # Auto-generated API reference via deno doc
+│   ├── guide/              # Guides in Spanish (getting-started, configuration, etc.)
+│   ├── en/                 # Internationalized documentation in English
+│   ├── playground/         # Interactive TypeScript playground
+│   └── api/                # Runtime API reference and OpenAPI specs
 ├── src/
 │   ├── core/
-│   │   ├── docgen.ts       # Generador de referencias de API analizando AST de Deno Doc
-│   │   ├── builder.ts      # Generador SSG ultrarrápido con sitemap, robots y llms.txt
-│   │   ├── markdown.ts     # Compilador Markdown con ::: code-group y callouts
-│   │   ├── dev.ts          # Servidor dev con WebSocket HMR
-│   │   └── search.ts       # Indexador de búsqueda client-side
+│   │   ├── docgen.ts       # API reference generator analyzing Deno Doc AST
+│   │   ├── builder.ts      # Ultra-fast SSG generator with sitemap, robots, RSS & llms.txt
+│   │   ├── markdown.ts     # Markdown compiler with ::: code-group, UI components & callouts
+│   │   ├── dev.ts          # Development server with WebSocket HMR
+│   │   └── search.ts       # Client-side search indexer
 │   ├── client/
-│   │   ├── theme.css       # Estilos Pro (Glassmorphism, Dark/Light, i18n, Neon Glow)
-│   │   ├── app.js          # Controlador cliente (Theme, ScrollSpy, Cmd+K, Tabs Sync)
-│   │   └── playground.js   # Motor de ejecución en Web Worker simulando Deno
+│   │   ├── theme.css       # Pro theme styling (Glassmorphism, Dark/Light, i18n, Neon Glow)
+│   │   ├── app.js          # Client-side controller (Theme, ScrollSpy, Cmd+K, Tabs Sync)
+│   │   └── playground.js   # Client-side Web Worker execution sandbox simulating Deno
 │   └── templates/
-│       └── layout.ts       # Plantilla HTML con SEO, OpenGraph y alternativos para LLMs
-└── dist/                   # Salida estática compilada lista para producción
+│       └── layout.ts       # HTML layout template with SEO, OpenGraph SVG & LLM manifests
+└── dist/                   # Production-ready compiled static output
 ```
 
 ---
 
-## 🌐 Despliegue en Deno Deploy
+## 🌐 Deployment on Deno Deploy
 
-### Opción 1: Conexión Automática con GitHub (Recomendado)
+### Option 1: Automatic GitHub Integration (Recommended)
 
-1. Conecta tu repositorio en [dash.deno.com](https://dash.deno.com).
-2. Selecciona `main.ts` como entrypoint y `deno task build` como paso de compilación.
-3. ¡Listo! Cada `git push` despliega en más de 35 regiones mundiales con latencia inferior a 10ms.
+1. Connect your repository on [dash.deno.com](https://dash.deno.com).
+2. Select `main.ts` as the entrypoint and `deno task build` as the build command.
+3. Done! Every `git push` deploys across 35+ edge regions worldwide with sub-10ms latency.
 
-### Opción 2: Despliegue directo por CLI
+### Option 2: Direct CLI Deployment
 
 ```bash
 deno run -A jsr:@deno/deployctl deploy --project=zerho main.ts
@@ -117,24 +117,24 @@ deno run -A jsr:@deno/deployctl deploy --project=zerho main.ts
 
 ---
 
-## 🛡️ Gobernanza, Seguridad y Comunidad
+## 🛡️ Governance, Security & Community
 
-Este proyecto se adhiere a los más altos estándares de calidad y gobernanza de código abierto de
+This project adheres to the highest standards of quality, security, and open-source governance on
 GitHub:
 
-- **[Política de Seguridad (.github/SECURITY.md)](.github/SECURITY.md)**: Protocolo de divulgación
-  coordinada de vulnerabilidades.
-- **[Guía de Contribución (.github/CONTRIBUTING.md)](.github/CONTRIBUTING.md)**: Flujo de trabajo,
-  convenciones de commit y suite de verificación.
-- **[Código de Conducta (.github/CODE_OF_CONDUCT.md)](.github/CODE_OF_CONDUCT.md)**: Estándar
-  Contributor Covenant v2.1.
-- **[Registro de Cambios (CHANGELOG.md)](CHANGELOG.md)**: Basado en el estándar Keep a Changelog y
-  SemVer.
-- **[Cita Académica (CITATION.cff)](CITATION.cff)**: Metadatos para citación formal de software.
-- **[Colaboradores (CONTRIBUTORS.md)](CONTRIBUTORS.md)**: Equipo y reconocimientos.
+- **[Security Policy (.github/SECURITY.md)](.github/SECURITY.md)**: Coordinated vulnerability
+  disclosure protocol.
+- **[Contributing Guide (.github/CONTRIBUTING.md)](.github/CONTRIBUTING.md)**: Development workflow,
+  commit conventions, and verification suite.
+- **[Code of Conduct (.github/CODE_OF_CONDUCT.md)](.github/CODE_OF_CONDUCT.md)**: Contributor
+  Covenant v2.1 standard.
+- **[Changelog (CHANGELOG.md)](CHANGELOG.md)**: Adheres to Keep a Changelog and Semantic Versioning
+  (SemVer).
+- **[Academic Citation (CITATION.cff)](CITATION.cff)**: Formal software citation metadata.
+- **[Contributors (CONTRIBUTORS.md)](CONTRIBUTORS.md)**: Team and acknowledgments.
 
 ---
 
-## 📄 Licencia
+## 📄 License
 
 [MIT License](LICENSE) © 2026 GLASTOR® / Zerho.
