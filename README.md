@@ -5,10 +5,13 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/denolib/awesome-deno"><img src="https://awesome.re/mentioned-badge.svg" alt="Mentioned in Awesome Deno" /></a>
+  <a href="https://jsr.io/@glastor/zerho"><img src="https://jsr.io/badges/@glastor/zerho/score" alt="JSR Score" /></a>
+  <a href="https://jsr.io/@glastor/zerho"><img src="https://jsr.io/badges/@glastor/zerho" alt="JSR Package" /></a>
+  <a href="https://github.com/glastor-core/homebrew-tap"><img src="https://img.shields.io/badge/Homebrew-brew_install_zerho-orange?style=for-the-badge&logo=homebrew&logoColor=white" alt="Homebrew Tap" /></a>
   <img src="https://img.shields.io/badge/Deno-2.x-000000?style=for-the-badge&logo=deno&logoColor=white" alt="Deno 2" />
   <img src="https://img.shields.io/badge/Deno_Deploy-Live-06b6d4?style=for-the-badge&logo=deno&logoColor=white" alt="Deno Deploy" />
   <img src="https://img.shields.io/badge/CI-Passing-10b981?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI Status" />
-  <img src="https://img.shields.io/badge/JSR-@zerho/core-facc15?style=for-the-badge&logo=jsr&logoColor=black" alt="JSR Package" />
   <img src="https://img.shields.io/badge/LLMs.txt-Supported-8b5cf6?style=for-the-badge" alt="LLMs.txt Supported" />
   <a href="https://github.com/glastor-core/nemesis"><img src="https://img.shields.io/badge/Security-Nemesis_Audit-purple?style=for-the-badge" alt="Nemesis Security Audit" /></a>
   <a href="https://github.com/glastor-core/specter"><img src="https://img.shields.io/badge/API_Contract-Specter_v1-8b5cf6?style=for-the-badge" alt="Specter API Contract Gatekeeper" /></a>
