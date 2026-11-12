@@ -17,6 +17,9 @@
   <a href="https://github.com/glastor-core/specter"><img src="https://img.shields.io/badge/API_Contract-Specter_v1-8b5cf6?style=for-the-badge" alt="Specter API Contract Gatekeeper" /></a>
   <a href="https://github.com/glastor-core/vortex"><img src="https://img.shields.io/badge/Predictive_CI-Vortex_v1-06b6d4?style=for-the-badge" alt="Vortex Predictive CI" /></a>
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License" />
+  <br><br>
+  <a href="https://github.com/glastor-core/zerho"><img src="https://img.shields.io/github/stars/glastor-core/zerho?style=social" alt="GitHub Stars" /></a>
+  <a href="https://github.com/glastor-dev"><img src="https://img.shields.io/github/followers/glastor-dev?label=Follow%20%40glastor-dev&style=social" alt="Follow @glastor-dev" /></a>
 </p>
 
 <p align="center">
@@ -135,6 +138,18 @@ GitHub:
   (SemVer).
 - **[Academic Citation (CITATION.cff)](CITATION.cff)**: Formal software citation metadata.
 - **[Contributors (CONTRIBUTORS.md)](CONTRIBUTORS.md)**: Team and acknowledgments.
+
+---
+
+## ⭐ Star History
+
+<div align="center">
+
+[![Star History Chart](https://api.star-history.com/svg?repos=glastor-core/zerho&type=Date)](https://star-history.com/#glastor-core/zerho&Date)
+
+*If you find Zerho useful, please consider starring the repository and following [@glastor-dev](https://github.com/glastor-dev) on GitHub!*
+
+</div>
 
 ---
 
