@@ -1,5 +1,5 @@
 import { walk } from "@std/fs";
-import { dirname, extname, join, relative, toFileUrl } from "@std/path";
+import { dirname, extname, isAbsolute, join, relative, toFileUrl } from "@std/path";
 import config, { type SidebarItem, type ZerhoConfig } from "../../zerho.config.ts";
 import { type ParsedMarkdown, parseMarkdown } from "./markdown.ts";
 import { SearchIndexer } from "./search.ts";
@@ -16,6 +16,10 @@ export interface BuildOptions {
   docsDir?: string;
   /** Skip automatic generation of API reference documentation via deno doc */
   skipDocgen?: boolean;
+  /** Strict internal link validation (fails build if any broken links exist) */
+  strictLinks?: boolean;
+  /** Canonical production domain URL override */
+  siteUrl?: string;
   /** Optional explicit ZerhoConfig override */
   config?: ZerhoConfig;
 }
@@ -437,7 +441,10 @@ export async function buildSite(options: BuildOptions = {}): Promise<void> {
   const outDir = options.outDir || join(Deno.cwd(), "dist");
   const devMode = options.devMode || false;
   const activeConfig = options.config || (await loadUserConfig(Deno.cwd()));
-  const siteUrl = (activeConfig.siteUrl || "https://zerho.xyz").replace(/\/$/, "");
+  if (options.strictLinks !== undefined) {
+    activeConfig.strictLinks = options.strictLinks;
+  }
+  const siteUrl = (options.siteUrl || activeConfig.siteUrl || "https://zerho.xyz").replace(/\/$/, "");
   const plugins = activeConfig.plugins || [];
 
   console.log(`\n⚡ \x1b[35m[Zerho]\x1b[0m Compilando sitio para Deno...`);
@@ -449,7 +456,8 @@ export async function buildSite(options: BuildOptions = {}): Promise<void> {
     }
   }
 
-  // Ensure output directories
+  // Ensure source docs and output directories exist
+  await Deno.mkdir(docsDir, { recursive: true });
   await Deno.mkdir(outDir, { recursive: true });
   await Deno.mkdir(join(outDir, "assets"), { recursive: true });
   await Deno.mkdir(join(outDir, "og"), { recursive: true });
@@ -457,11 +465,24 @@ export async function buildSite(options: BuildOptions = {}): Promise<void> {
   // Optional: Auto-generate API reference via deno doc if configured
   if (activeConfig.apiDocs && !options.skipDocgen) {
     try {
+      const workspaceDir = options.docsDir ? dirname(options.docsDir) : Deno.cwd();
+      const resolvedEntrypoints = activeConfig.apiDocs.entrypoints.map((ep) =>
+        isAbsolute(ep) ? ep : join(workspaceDir, ep)
+      );
+      const configPath = join(workspaceDir, "deno.json");
+      let hasConfig = false;
+      try {
+        const cStat = await Deno.stat(configPath);
+        hasConfig = cStat.isFile;
+      } catch {
+        // No deno.json
+      }
       const apiMarkdown = await generateApiDocs({
-        entrypoints: activeConfig.apiDocs.entrypoints,
+        entrypoints: resolvedEntrypoints,
         title: activeConfig.apiDocs.title,
         strict: activeConfig.apiDocs.strict,
         repoUrl: activeConfig.apiDocs.repoUrl,
+        configPath: hasConfig ? configPath : undefined,
       });
       await Deno.writeTextFile(join(docsDir, "reference.md"), apiMarkdown);
     } catch (e) {

@@ -73,6 +73,24 @@ deno task test:docs
 deno task serve
 ```
 
+### 🏗️ Zerho CLI & Static Site Builder
+
+Zerho includes an ultra-fast Static Site Generator (SSG) compiling documentation, full-text search indexes, OpenGraph social cards, RSS 2.0 feeds, and `llms.txt` in under 200ms:
+
+```bash
+# Standard production build (compiles to dist/)
+deno run -A jsr:@glastor/zerho/cli build
+
+# Custom output and source documentation directories
+deno run -A jsr:@glastor/zerho/cli build --out-dir ./public --docs-dir ./docs
+
+# Strict CI mode (fails build if any broken internal link or anchor is detected)
+deno run -A jsr:@glastor/zerho/cli build --strict-links
+
+# Fast build skipping automatic deno doc reference generation
+deno run -A jsr:@glastor/zerho/cli build --skip-docgen
+```
+
 ---
 
 ## 🛠️ Project Structure

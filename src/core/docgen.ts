@@ -9,6 +9,8 @@ export interface DocgenOptions {
   strict?: boolean;
   /** Optional base repository URL to generate direct links to source files and lines */
   repoUrl?: string;
+  /** Optional path to deno.json configuration file to resolve import maps and dependencies */
+  configPath?: string;
 }
 
 export interface DocValidationIssue {
@@ -167,10 +169,18 @@ export function extractParamInfo(p: DenoDocParam | undefined): ExtractedParam {
   };
 }
 
-export async function extractDenoDoc(entrypoint: string): Promise<DenoDocSymbol[]> {
+export async function extractDenoDoc(
+  entrypoint: string,
+  configPath?: string,
+): Promise<DenoDocSymbol[]> {
   try {
+    const args = ["doc", "--json"];
+    if (configPath) {
+      args.push("--config", configPath);
+    }
+    args.push(entrypoint);
     const cmd = new Deno.Command("deno", {
-      args: ["doc", "--json", entrypoint],
+      args,
       stdout: "piped",
       stderr: "piped",
     });
@@ -420,7 +430,7 @@ export function validateSymbolsDocumentation(symbols: DenoDocSymbol[]): DocValid
 export async function generateApiDocs(options: DocgenOptions): Promise<string> {
   const allSymbols: DenoDocSymbol[] = [];
   for (const ep of options.entrypoints) {
-    const syms = await extractDenoDoc(ep);
+    const syms = await extractDenoDoc(ep, options.configPath);
     allSymbols.push(...syms);
   }
 

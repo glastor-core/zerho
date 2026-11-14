@@ -24,15 +24,58 @@ const HELP = `
 \x1b[1mCOMANDOS:\x1b[0m
   \x1b[36mdev\x1b[0m       Inicia el servidor de desarrollo local con recarga en vivo (HMR)
   \x1b[32mbuild\x1b[0m     Compila el sitio estático para producción en la carpeta dist/
+              Opciones: -o, --out-dir <dir>    Directorio de salida (por defecto: dist)
+                        -d, --docs-dir <dir>   Directorio markdown fuente (por defecto: docs)
+                        --strict-links         Falla la compilación si detecta enlaces rotos
+                        --skip-docgen          Omite la auto-generación de API reference
+                        --site-url <url>       URL canónica de producción
   \x1b[33mserve\x1b[0m     Sirve el sitio compilado en modo producción para Deno Deploy
   \x1b[35minit\x1b[0m      Crea una estructura inicial de documentación lista para usar
   \x1b[34mstats\x1b[0m     Consulta las métricas y feedback almacenadas en Deno KV
 
-\x1b[1mOPCIONES:\x1b[0m
+\x1b[1mOPCIONES GLOBALES:\x1b[0m
   -p, --port <puerto>   Puerto para el servidor HTTP (por defecto: 3000 o 8000)
   -h, --help            Muestra este mensaje de ayuda
   -v, --version         Muestra la versión de Zerho
 `;
+
+interface ParsedBuildArgs {
+  outDir?: string;
+  docsDir?: string;
+  skipDocgen?: boolean;
+  strictLinks?: boolean;
+  siteUrl?: string;
+}
+
+function parseBuildArgs(args: string[]): ParsedBuildArgs {
+  const result: ParsedBuildArgs = {};
+  for (let i = 1; i < args.length; i++) {
+    const arg = args[i];
+    if ((arg === "-o" || arg === "--out-dir" || arg === "--outDir") && args[i + 1]) {
+      result.outDir = isAbsolute(args[i + 1]) ? args[i + 1] : join(Deno.cwd(), args[i + 1]);
+      i++;
+    } else if (arg.startsWith("--out-dir=")) {
+      const val = arg.split("=")[1];
+      result.outDir = isAbsolute(val) ? val : join(Deno.cwd(), val);
+    } else if ((arg === "-d" || arg === "--docs-dir" || arg === "--docsDir") && args[i + 1]) {
+      result.docsDir = isAbsolute(args[i + 1]) ? args[i + 1] : join(Deno.cwd(), args[i + 1]);
+      i++;
+    } else if (arg.startsWith("--docs-dir=")) {
+      const val = arg.split("=")[1];
+      result.docsDir = isAbsolute(val) ? val : join(Deno.cwd(), val);
+    } else if (arg === "--skip-docgen" || arg === "--no-docgen") {
+      result.skipDocgen = true;
+    } else if (arg === "--strict" || arg === "--strict-links") {
+      result.strictLinks = true;
+    } else if (arg === "--site-url" && args[i + 1]) {
+      result.siteUrl = args[i + 1];
+      i++;
+    } else if (arg.startsWith("--site-url=")) {
+      result.siteUrl = arg.split("=")[1];
+    }
+  }
+  return result;
+}
 
 function parsePortArg(args: string[]): string | undefined {
   for (let i = 0; i < args.length; i++) {
@@ -66,8 +109,22 @@ export async function runCli(args: string[] = Deno.args): Promise<void> {
   }
 
   if (command === "build") {
+    const buildOpts = parseBuildArgs(args);
     console.log("⚡ Iniciando compilación de Zerho...");
-    await buildSite({ devMode: false });
+    if (buildOpts.outDir) {
+      console.log(`📁 Directorio de salida: ${buildOpts.outDir}`);
+    }
+    if (buildOpts.docsDir) {
+      console.log(`📖 Directorio markdown: ${buildOpts.docsDir}`);
+    }
+    await buildSite({
+      devMode: false,
+      outDir: buildOpts.outDir,
+      docsDir: buildOpts.docsDir,
+      skipDocgen: buildOpts.skipDocgen,
+      strictLinks: buildOpts.strictLinks,
+      siteUrl: buildOpts.siteUrl,
+    });
     return;
   }
 
