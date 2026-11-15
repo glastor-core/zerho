@@ -71,6 +71,20 @@ Este proyecto se adhiere a:
 
 ---
 
+## [1.10.0] - 2026-11-15
+
+### ✨ Added
+
+- **ci:** add project roadmap triage automation workflow ( da39fad)
+- **cli:** enhance 'zerho build' with custom out-dir, docs-dir, strict-links, and skip-docgen flags
+  ( c31762c)
+
+### 🐛 Fixed
+
+- **ci:** open release PRs in auto-version to respect main branch protection (a11e616)
+
+---
+
 ## [1.9.0] - 2026-11-07
 
 ### ✨ Added
