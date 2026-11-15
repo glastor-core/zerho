@@ -444,7 +444,10 @@ export async function buildSite(options: BuildOptions = {}): Promise<void> {
   if (options.strictLinks !== undefined) {
     activeConfig.strictLinks = options.strictLinks;
   }
-  const siteUrl = (options.siteUrl || activeConfig.siteUrl || "https://zerho.xyz").replace(/\/$/, "");
+  const siteUrl = (options.siteUrl || activeConfig.siteUrl || "https://zerho.xyz").replace(
+    /\/$/,
+    "",
+  );
   const plugins = activeConfig.plugins || [];
 
   console.log(`\n⚡ \x1b[35m[Zerho]\x1b[0m Compilando sitio para Deno...`);

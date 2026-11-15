@@ -79,7 +79,8 @@ deno task serve
 
 ### 🏗️ Zerho CLI & Static Site Builder
 
-Zerho includes an ultra-fast Static Site Generator (SSG) compiling documentation, full-text search indexes, OpenGraph social cards, RSS 2.0 feeds, and `llms.txt` in under 200ms:
+Zerho includes an ultra-fast Static Site Generator (SSG) compiling documentation, full-text search
+indexes, OpenGraph social cards, RSS 2.0 feeds, and `llms.txt` in under 200ms:
 
 ```bash
 # Standard production build (compiles to dist/)
@@ -165,8 +166,11 @@ GitHub:
 
 ## ⚡ Template & Documentation Starter
 
-- **Scaffold a New Site**: Click **[Use this template](https://github.com/glastor-core/zerho/generate)** to create a zero-Node documentation site hosted on Deno Deploy.
-- **Stay Updated**: Click **Watch** (top-right) and select **Custom ➔ Releases** for new theme components, JSR releases, and OpenAPI parsers.
+- **Scaffold a New Site**: Click
+  **[Use this template](https://github.com/glastor-core/zerho/generate)** to create a zero-Node
+  documentation site hosted on Deno Deploy.
+- **Stay Updated**: Click **Watch** (top-right) and select **Custom ➔ Releases** for new theme
+  components, JSR releases, and OpenAPI parsers.
 
 ---
 
@@ -176,7 +180,8 @@ GitHub:
 
 [![Star History Chart](https://api.star-history.com/svg?repos=glastor-core/zerho&type=Date)](https://star-history.com/#glastor-core/zerho&Date)
 
-*If you find Zerho useful, please consider starring the repository and following [@glastor-dev](https://github.com/glastor-dev) on GitHub!*
+_If you find Zerho useful, please consider starring the repository and following
+[@glastor-dev](https://github.com/glastor-dev) on GitHub!_
 
 </div>
 
