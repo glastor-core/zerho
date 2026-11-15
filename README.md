@@ -18,6 +18,10 @@
   <a href="https://github.com/glastor-core/vortex"><img src="https://img.shields.io/badge/Predictive_CI-Vortex_v1-06b6d4?style=for-the-badge" alt="Vortex Predictive CI" /></a>
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License" />
   <br><br>
+  <a href="https://github.com/glastor-core/zerho/generate"><img src="https://img.shields.io/badge/Template-Use_this_template-2ea44f?style=flat-square&logo=github" alt="Use this template" /></a>
+  <a href="https://codespaces.new/glastor-core/zerho"><img src="https://github.com/codespaces/badge.svg" alt="Open in GitHub Codespaces" /></a>
+  <a href="https://github.com/glastor-core/zerho/watchers"><img src="https://img.shields.io/github/watchers/glastor-core/zerho?style=social&label=Watch" alt="GitHub Watchers" /></a>
+  <a href="https://github.com/glastor-core/zerho/fork"><img src="https://img.shields.io/github/forks/glastor-core/zerho?style=social&label=Fork" alt="GitHub Forks" /></a>
   <a href="https://github.com/glastor-core/zerho"><img src="https://img.shields.io/github/stars/glastor-core/zerho?style=social" alt="GitHub Stars" /></a>
   <a href="https://github.com/glastor-dev"><img src="https://img.shields.io/github/followers/glastor-dev?label=Follow%20%40glastor-dev&style=social" alt="Follow @glastor-dev" /></a>
 </p>
@@ -156,6 +160,13 @@ GitHub:
   (SemVer).
 - **[Academic Citation (CITATION.cff)](CITATION.cff)**: Formal software citation metadata.
 - **[Contributors (CONTRIBUTORS.md)](CONTRIBUTORS.md)**: Team and acknowledgments.
+
+---
+
+## ⚡ Template & Documentation Starter
+
+- **Scaffold a New Site**: Click **[Use this template](https://github.com/glastor-core/zerho/generate)** to create a zero-Node documentation site hosted on Deno Deploy.
+- **Stay Updated**: Click **Watch** (top-right) and select **Custom ➔ Releases** for new theme components, JSR releases, and OpenAPI parsers.
 
 ---
 
